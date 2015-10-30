@@ -27,12 +27,19 @@
 	<div id="informations"></div>
 	<div id="variables"></div>
 	<canvas id="canvas" width="320" height="480" />
+	<!-- Rendu WebGL -->
 	<script type="text/javascript" src="js/gl/sylvester.js"></script>
 	<script type="text/javascript" src="js/gl/glutils.js"></script>
 	<script type="text/javascript" src="js/gl/Programme.js"></script>
 	<script type="text/javascript" src="js/gl/Texture.js"></script>
 	<script type="text/javascript" src="js/gl/Camera.js"></script>
 	<script type="text/javascript" src="js/gl/Mesh.js"></script>
+
+	<!-- Rendu 2D -->
+	<script type="text/javascript" src="js/rendu2d/RenduEntite.js"></script>	
+	<script type="text/javascript" src="js/rendu2d/RenduMonde.js"></script>	
+	
+	<!-- Modèle du jeu -->
 	<script type="text/javascript" src="js/monde/Monde.js"></script>
 	<script type="text/javascript" src="js/monde/entites/Entite.js"></script>
 	<script type="text/javascript" src="js/monde/entites/Nourriture.js"></script>
@@ -44,9 +51,11 @@
 	<script type="text/javascript" src="js/monde/VariableVitale.js"></script>
 	<script type="text/javascript" src="js/monde/Environnement.js"></script>
 	<script type="text/javascript" src="js/monde/Metabolisme.js"></script>
-	<script type="text/javascript" src="js/monde/Action.js"></script>
-	<script type="text/javascript" src="js/rendu2d/RenduEntite.js"></script>	
-	<script type="text/javascript" src="js/rendu2d/RenduMonde.js"></script>	
+	<script type="text/javascript" src="js/monde/actions/Action.js"></script>
+	
+	<!-- Réseau de neuronnes -->
+	<script type="text/javascript" src="js/nnet/numeric.js"></script>	
+	<script type="text/javascript" src="js/nnet/ReseauNeuronnes.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>	
 </body>
 </html>

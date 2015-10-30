@@ -1,0 +1,1 @@
+var reseau = new nnet.ReseauNeurone();

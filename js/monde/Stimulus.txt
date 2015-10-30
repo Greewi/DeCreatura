@@ -1,0 +1,10 @@
+(function(){
+
+if(!window.creatura)
+	window.creatura={};
+
+creatura.Stimulus = function(){
+	
+};
+	
+})();

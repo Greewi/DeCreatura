@@ -1,9 +1,6 @@
 package net.feerie.creatura.shared.creature.organes;
 
-import java.util.EnumMap;
-
-import net.feerie.creatura.shared.creature.Nutriments;
-import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.creature.Organisme;
 
 /**
  * Cet organe digère les aliments. C'est ici que va tout ce que mange la
@@ -11,29 +8,23 @@ import net.feerie.creatura.shared.entites.Creature;
  * 
  * @author greewi
  */
-public class Estomac implements Organe
+public class Estomac extends Organe
 {
-	private Creature creature;
-	private EnumMap<Nutriments, Integer> contenu;
-	private int dechets;
 	private int capacite;
 	
 	/**
 	 * @param creature la créature à laquelle appartient cet estomac
-	 * @param capacite la capacité de l'estomac
+	 * @param capacite la capacité de l'estomac (seuil de satiété)
 	 */
-	public Estomac(Creature creature, int capacite)
+	public Estomac(Organisme organisme, int capacite)
 	{
-		this.creature = creature;
-		this.contenu = new EnumMap<>(Nutriments.class);
+		super(organisme);
 		this.capacite = capacite;
-		this.dechets = 0;
 	}
 	
 	@Override
-	public void metAJour(int frame)
+	public void effectueCycleMetabolique()
 	{
 		// TODO Auto-generated method stub
-		
 	}
 }

@@ -178,14 +178,14 @@ Manger :
 * la créature mange ce qu'elle a en main
 
 ### Organes
-* Système digestif : reçoit les aliments mangés par la créature et les digère. Les nutriments digérés sont transmis au système sanguin et les déchets sont stockés en attente d'être évacués ;
+* Estomac : reçoit les aliments mangés par la créature et les digère. Les nutriments digérés sont transmis au système sanguin et les déchets sont stockés en attente d'être évacués ;
 * Système sanguin : stocke les nutriments prêts à être utilisés et les déchets de fonctionnement des autres organes ;
-* Système rénal : extrait les déchets du système sanguin et les stocke en attendant de les évacuer ;
+* Reins : extrait les déchets du système sanguin et les stocke en attendant de les évacuer ;
 * Système sensoriel : compile les informations de l'environnement et certaines informations internes pour les transformer en signaux utilisables par le cerveau ;
 * Cerveau : traite les signaux du système sensoriel et donne des ordres au système moteur ;
 * Système moteur : fait agir la créature (déplacement et autres actions) ;
-* Graisses : stoque les *Lipides* et améliore l'isolation thermique.
-* Pelage : améliore l'isolation thermique.
+* Tissu adipeux : stoque les *Lipides* et améliore l'isolation thermique.
+* Peau : protège les autres organes de l'environnement.
 
 ### ADN
 

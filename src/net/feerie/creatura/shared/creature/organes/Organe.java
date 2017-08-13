@@ -14,7 +14,7 @@ public abstract class Organe
 {
 	private final EnumMap<Substance, Integer> substances;
 	private final Organisme organisme;
-	private final TypeOrgane type; 
+	private final TypeOrgane type;
 	
 	/**
 	 * @param organisme l'organisme auquel appartient cet organe
@@ -46,9 +46,9 @@ public abstract class Organe
 	}
 	
 	/**
-	 * Ajoute uen substance dans l'organe
+	 * Ajoute une substance dans l'organe
 	 * 
-	 * @param substance la substance à ajouter
+	 * @param substance la {@link Substance} à ajouter
 	 * @param quantite la quantité de substance à ajouter (si négatif, le
 	 *        montant absolu sera retiré de l'organe)
 	 */
@@ -58,6 +58,17 @@ public abstract class Organe
 		quantite += quantiteActuelle;
 		if (quantite < 0)
 			quantite = 0;
+		substances.put(substance, quantite);
+	}
+	
+	/**
+	 * Défini la quantité de sustance dans l'organe
+	 * 
+	 * @param substance la {@link Substance} à modifier
+	 * @param quantite la quantité de sustance à définir
+	 */
+	public void setSubstance(Substance substance, int quantite)
+	{
 		substances.put(substance, quantite);
 	}
 	

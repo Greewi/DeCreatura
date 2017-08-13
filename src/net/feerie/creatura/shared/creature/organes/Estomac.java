@@ -18,7 +18,7 @@ public class Estomac extends Organe
 	 */
 	public Estomac(Organisme organisme, int capacite)
 	{
-		super(organisme);
+		super(organisme, TypeOrgane.ESTOMAC);
 		this.capacite = capacite;
 	}
 	

@@ -12,8 +12,9 @@ public class Cerveau extends Organe
 	
 	public Cerveau(Organisme organisme)
 	{
-		super(organisme);
+		super(organisme, TypeOrgane.CERVEAU);
 	}
+	
 	
 	@Override
 	public void effectueCycleMetabolique()

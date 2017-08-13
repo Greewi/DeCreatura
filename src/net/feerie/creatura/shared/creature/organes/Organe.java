@@ -14,13 +14,15 @@ public abstract class Organe
 {
 	private final EnumMap<Substance, Integer> substances;
 	private final Organisme organisme;
+	private final TypeOrgane type; 
 	
 	/**
 	 * @param organisme l'organisme auquel appartient cet organe
 	 */
-	public Organe(Organisme organisme)
+	public Organe(Organisme organisme, TypeOrgane type)
 	{
 		this.organisme = organisme;
+		this.type = type;
 		this.substances = new EnumMap<>(Substance.class);
 	}
 	
@@ -57,6 +59,16 @@ public abstract class Organe
 		if (quantite < 0)
 			quantite = 0;
 		substances.put(substance, quantite);
+	}
+	
+	/**
+	 * Renvoie le type de l'organe
+	 * 
+	 * @return le type de l'organe
+	 */
+	public TypeOrgane getType()
+	{
+		return type;
 	}
 	
 	/**

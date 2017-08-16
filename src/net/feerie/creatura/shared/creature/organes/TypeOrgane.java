@@ -9,6 +9,7 @@ public enum TypeOrgane
 {
 	CERVEAU,
 	ESTOMAC,
+	INTESTINS,
 	PEAU,
 	REINS,
 	SYSTEME_MOTEUR,

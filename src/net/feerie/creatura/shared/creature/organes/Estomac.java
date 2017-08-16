@@ -1,14 +1,11 @@
 package net.feerie.creatura.shared.creature.organes;
 
-import static net.feerie.creatura.shared.creature.Substance.CHOLECYSTOKININE;
-import static net.feerie.creatura.shared.creature.Substance.EAU;
-import static net.feerie.creatura.shared.creature.Substance.GLUCIDES;
-import static net.feerie.creatura.shared.creature.Substance.LIPIDES;
-import static net.feerie.creatura.shared.creature.Substance.PROTEINES;
+import static net.feerie.creatura.shared.creature.Substance.*;
 
 import java.util.EnumSet;
 
 import net.feerie.creatura.shared.creature.Organisme;
+import net.feerie.creatura.shared.creature.PaquetSubstance;
 import net.feerie.creatura.shared.creature.Substance;
 
 /**
@@ -23,11 +20,15 @@ public class Estomac extends Organe
 	/**
 	 * Quantité de substance digérée par cycle
 	 */
-	private final int QUANTITE_PAR_CYCLE = 40;
+	static final int QUANTITE_PAR_CYCLE = 40;
 	/**
 	 * Quantité de glucide consommé par cycle de digestion
 	 */
-	private final int COUT_DIGESTION = 3;
+	static final int COUT_DIGESTION = 3;
+	/**
+	 * La liste des substances digérées par l'estomac
+	 */
+	static final EnumSet<Substance> SUBSTANCES_A_DIGERER = EnumSet.of(EAU, GLUCIDES, LIPIDES, PROTEINES);
 	
 	/**
 	 * @param creature la créature à laquelle appartient cet estomac
@@ -80,10 +81,10 @@ public class Estomac extends Organe
 	private void effectueDigestion(Organe systemeSanguin)
 	{
 		// Calcul de la quantité de substance pouvant être digérée totale
-		EnumSet<Substance> subtancesADigerer = EnumSet.of(EAU, GLUCIDES, LIPIDES, PROTEINES);
+		PaquetSubstance susbtancesADigerer = collecteSubstances(SUBSTANCES_A_DIGERER, QUANTITE_PAR_CYCLE);
 		int totaleSubstancesADigerer = 0;
-		for (Substance substance : subtancesADigerer)
-			totaleSubstancesADigerer += getSubstance(substance);
+		for (Substance substance : SUBSTANCES_A_DIGERER)
+			totaleSubstancesADigerer += susbtancesADigerer.get(substance);
 		
 		// S'il n'y a pas assez de nutriment à digérer ou pas assez de glucide dans le sang pour faire fonctionner l'estomac on ne fait rien
 		if (totaleSubstancesADigerer < QUANTITE_PAR_CYCLE || systemeSanguin.getSubstance(GLUCIDES) < COUT_DIGESTION)
@@ -91,23 +92,9 @@ public class Estomac extends Organe
 		
 		//On consomme le glucide
 		systemeSanguin.ajouteSubstance(GLUCIDES, -COUT_DIGESTION);
+		systemeSanguin.ajouteSubstance(TOXINES, COUT_DIGESTION);
 		
 		//On fait passer dans le sang les substances digérées (proportionnellement aux quantités dans l'estomac)
-		int sommeSubstanceTraitee = 0;
-		int sommeSubstanceDigeree = 0;
-		for (Substance substance : subtancesADigerer)
-		{
-			int substanceDansEstomac = getSubstance(substance);
-			
-			// Pour éviter des perces à cause des divisions entières on effectue le calcul suivant
-			int totalNormalementDigere = (sommeSubstanceTraitee + substanceDansEstomac) * QUANTITE_PAR_CYCLE / totaleSubstancesADigerer;
-			int quantiteADigerer = totalNormalementDigere - sommeSubstanceDigeree;
-			sommeSubstanceTraitee += substanceDansEstomac;
-			sommeSubstanceDigeree += quantiteADigerer;
-			
-			// On transfert effectivement la substance
-			ajouteSubstance(substance, -quantiteADigerer);
-			systemeSanguin.ajouteSubstance(substance, quantiteADigerer);
-		}
+		transfereSubstancesVersOrgane(SUBSTANCES_A_DIGERER, QUANTITE_PAR_CYCLE, systemeSanguin);
 	}
 }

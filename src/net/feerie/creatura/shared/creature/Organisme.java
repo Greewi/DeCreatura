@@ -20,8 +20,9 @@ public class Organisme
 		organes = new EnumMap<>(TypeOrgane.class);
 		addOrgane(new Cerveau(this));
 		addOrgane(new Estomac(this, 1000));
+		addOrgane(new Intestins(this, 1000));
 		addOrgane(new Peau(this));
-		addOrgane(new Reins(this));
+		addOrgane(new Reins(this, 1000));
 		addOrgane(new SystemeSensoriel(this));
 		addOrgane(new SystemeSanguin(this));
 		addOrgane(new SystemeMoteur(this));

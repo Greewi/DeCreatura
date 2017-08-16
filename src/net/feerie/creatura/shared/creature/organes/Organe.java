@@ -1,8 +1,9 @@
 package net.feerie.creatura.shared.creature.organes;
 
-import java.util.EnumMap;
+import java.util.EnumSet;
 
 import net.feerie.creatura.shared.creature.Organisme;
+import net.feerie.creatura.shared.creature.PaquetSubstance;
 import net.feerie.creatura.shared.creature.Substance;
 
 /**
@@ -12,7 +13,7 @@ import net.feerie.creatura.shared.creature.Substance;
  */
 public abstract class Organe
 {
-	private final EnumMap<Substance, Integer> substances;
+	private final PaquetSubstance substances;
 	private final Organisme organisme;
 	private final TypeOrgane type;
 	
@@ -23,7 +24,7 @@ public abstract class Organe
 	{
 		this.organisme = organisme;
 		this.type = type;
-		this.substances = new EnumMap<>(Substance.class);
+		this.substances = new PaquetSubstance();
 	}
 	
 	protected Organisme getOrganisme()
@@ -39,10 +40,7 @@ public abstract class Organe
 	 */
 	public int getSubstance(Substance substance)
 	{
-		Integer quantite = substances.get(substance);
-		if (quantite == null)
-			return 0;
-		return quantite.intValue();
+		return substances.get(substance);
 	}
 	
 	/**
@@ -70,6 +68,75 @@ public abstract class Organe
 	public void setSubstance(Substance substance, int quantite)
 	{
 		substances.put(substance, quantite);
+	}
+	
+	/**
+	 * Récupère une liste de substances depuis un sous ensemble. Les substances
+	 * désirées sont données en paramètre ainsi que la quantité maximale totale
+	 * à renvoyer. Cette méthode ne modifie pas les quantités de substance
+	 * contenues dans l'organe.
+	 * 
+	 * @param substancesACollecter l'ensemble des substances à collecter
+	 * @param quantiteTotalACollecter la quantité totale de substance à renvoyer
+	 *        (la somme de toutes les substances renvoyés)
+	 * @return les substances collectées
+	 */
+	public PaquetSubstance collecteSubstances(EnumSet<Substance> substancesACollecter, int quantiteTotalACollecter)
+	{
+		PaquetSubstance substancesCollectees = new PaquetSubstance();
+		if (quantiteTotalACollecter < 0)
+			quantiteTotalACollecter = 0;
+		
+		///On calcule la quantité totale des substances demandées dans l'organe
+		int totalSubstancesDansOrgane = 0;
+		for (Substance substance : substancesACollecter)
+			totalSubstancesDansOrgane += getSubstance(substance);
+		
+		//On collecte les substances
+		int sommeSubstancesTraitees = 0;
+		int sommeSubstancesCollectees = 0;
+		for (Substance substance : substancesACollecter)
+		{
+			int substanceDansOrgane = getSubstance(substance);
+			
+			// Pour éviter des pertes à cause des divisions entières on effectue le calcul suivant
+			// On calcule la quantité totale normalent collectée après ce tour de boucle et on retire ce qui a déjà été collecté
+			int quantiteCollecteeProchaine = (sommeSubstancesTraitees + substanceDansOrgane) * quantiteTotalACollecter / totalSubstancesDansOrgane;
+			int quantiteACollecter = quantiteCollecteeProchaine - sommeSubstancesCollectees;
+			
+			// Mise à jour des compteurs
+			sommeSubstancesTraitees += substanceDansOrgane;
+			sommeSubstancesCollectees += quantiteACollecter;
+			
+			// On collecte la substance
+			substancesCollectees.put(substance, quantiteACollecter);
+		}
+		
+		return substancesCollectees;
+	}
+	
+	/**
+	 * Transfere une certaine quantité de substance parmi une liste donnée vers
+	 * un autre organe.
+	 * 
+	 * @param substancesATransferer la liste des substances à transférer
+	 * @param quantiteTotalATransferer la quantité totale à transférer (les
+	 *        substances seront transférer au pro-rata de cet organe)
+	 * @param organe l'organe vers lequel transférer les substances
+	 * @return la quantité totale de substances effectivement transférée
+	 */
+	public int transfereSubstancesVersOrgane(EnumSet<Substance> substancesATransferer, int quantiteTotalATransferer, Organe organe)
+	{
+		PaquetSubstance substancesCollectees = collecteSubstances(substancesATransferer, quantiteTotalATransferer);
+		int quantiteTotale = 0;
+		for (Substance substance : substancesATransferer)
+		{
+			int quantite = substancesCollectees.get(substance);
+			this.ajouteSubstance(substance, -quantite);
+			organe.ajouteSubstance(substance, quantite);
+			quantiteTotale += quantite;
+		}
+		return quantiteTotale;
 	}
 	
 	/**

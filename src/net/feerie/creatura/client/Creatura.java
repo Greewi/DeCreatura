@@ -1,6 +1,13 @@
 package net.feerie.creatura.client;
 
-import java.util.EnumMap;
+import com.google.gwt.animation.client.AnimationScheduler;
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootPanel;
 
 import net.feerie.creatura.client.rendu2d.RenduMonde;
 import net.feerie.creatura.shared.Environnement;
@@ -12,19 +19,11 @@ import net.feerie.creatura.shared.entites.Litiere;
 import net.feerie.creatura.shared.entites.Nourriture;
 import net.feerie.creatura.shared.entites.TypeNourriture;
 import net.feerie.creatura.shared.entites.Zone;
-import net.feerie.creatura.shared.organisme.Besoin;
-import net.feerie.creatura.shared.organisme.TypeBesoin;
-import net.feerie.creatura.shared.organisme.TypeVariableVitale;
-import net.feerie.creatura.shared.organisme.VariableVitale;
-
-import com.google.gwt.animation.client.AnimationScheduler;
-import com.google.gwt.canvas.client.Canvas;
-import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.RootPanel;
+import net.feerie.creatura.shared.organisme.Substance;
+import net.feerie.creatura.shared.organisme.organes.Organe;
+import net.feerie.creatura.shared.organisme.organes.TypeOrgane;
+import net.feerie.creatura.shared.organisme.sens.SystemeSensoriel;
+import net.feerie.creatura.shared.organisme.sens.TypeCanalSensoriel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -42,7 +41,6 @@ public class Creatura implements EntryPoint
 	//UI
 	private HTML uiInformations;
 	private HTML uiVariables;
-	private EnumMap<TypeVariableVitale, Double> ancienneVariables;
 	
 	public void onModuleLoad()
 	{
@@ -58,9 +56,6 @@ public class Creatura implements EntryPoint
 		RootPanel.get("informations").add(uiInformations);
 		uiVariables = new HTML();
 		RootPanel.get("variables").add(uiVariables);
-		ancienneVariables = new EnumMap<>(TypeVariableVitale.class);
-		for (TypeVariableVitale type : TypeVariableVitale.values())
-			ancienneVariables.put(type, 0.0);
 		
 		//Construction du monde
 		this.monde = new Monde(new Environnement(0, 0, "#000000"));
@@ -72,18 +67,18 @@ public class Creatura implements EntryPoint
 		monde.ajouteZone(new Zone(monde, new Position(75, 75), new Dimension(50, 50), new Environnement(12, 1, "#A6FFEF")));
 		
 		//Ajout d'une litierre
-		monde.ajouteEntite(new Litiere(monde, 3000, new Position(75, 25)));
+		monde.nouvelleEntite(new Litiere(monde, 3000, new Position(75, 25)));
 		
 		//Ajout d'une créature
 		this.creature = new Creature(monde, new Position(50, 50));
-		monde.ajouteEntite(creature);
+		monde.nouvelleEntite(creature);
 		
 		//Ajout de la nourriture
 		for (int i = 0; i < 100; i++)
 		{
 			TypeNourriture[] types = TypeNourriture.values();
 			TypeNourriture type = types[Random.nextInt(types.length)];
-			monde.ajouteEntite(new Nourriture(monde, type, new Position(Random.nextInt(100), Random.nextInt(100))));
+			monde.nouvelleEntite(new Nourriture(monde, type, new Position(Random.nextInt(100), Random.nextInt(100))));
 		}
 		
 		//Boucle de rendu
@@ -128,26 +123,33 @@ public class Creatura implements EntryPoint
 			htmlInfos.append("<li>Action : ").append(creature.getActionActuelle().getType()).append("</li>");
 		else
 			htmlInfos.append("<li>Action : aucune</li>");
+		htmlInfos.append("</ul>");
 		htmlInfos.append("<hr/>");
-		for (TypeBesoin type : TypeBesoin.values())
+		htmlInfos.append("<ul>");
+		SystemeSensoriel systemeSensoriel = (SystemeSensoriel) creature.getOrganisme().getOrgane(TypeOrgane.SYSTEME_SENSORIEL);
+		for (TypeCanalSensoriel canal : TypeCanalSensoriel.values())
 		{
-			Besoin besoin = creature.getBesoin(type);
-			htmlInfos.append("<li>").append(type).append(" : ").append(Math.round(besoin.get() * 100)).append("%</li>");
+			int valeur = systemeSensoriel.getValeurCanal(canal);
+			htmlInfos.append("<li>").append(canal).append(" : ").append(valeur).append("%</li>");
 		}
 		htmlInfos.append("</ul>");
 		//Variables
 		StringBuilder htmlVariables = new StringBuilder();
-		htmlVariables.append("<ul>");
-		htmlVariables.append("<li>Variables</li>");
-		htmlVariables.append("<hr/>");
-		for (TypeVariableVitale type : TypeVariableVitale.values())
+		for (TypeOrgane typeOrgane : TypeOrgane.values())
 		{
-			VariableVitale variable = creature.getVariableVitale(type);
-			double delta = Math.round((variable.get() - ancienneVariables.get(type)) * 100) / 100.0;
-			ancienneVariables.put(type, variable.get());
-			htmlVariables.append("<li>").append(type).append(" : ").append(Math.round(variable.get())).append("/").append(variable.getIdeal()).append(delta >= 0 ? "+" : "").append(delta).append("</li>");
+			Organe organe = creature.getOrganisme().getOrgane(typeOrgane);
+			htmlVariables.append(organe.getType());
+			htmlVariables.append("<br/>");
+			htmlVariables.append("<ul>");
+			for(Substance substance : Substance.values())
+			{
+				int quantite = organe.getSubstance(substance);
+				if(quantite>0)
+				htmlVariables.append("<li>").append(substance).append(" : ").append(quantite).append("</li>");
+			}
+			htmlVariables.append("</ul>");
+			htmlVariables.append("<hr/>");
 		}
-		htmlVariables.append("</ul>");
 		
 		//On affiche les informations
 		uiInformations.setHTML(htmlInfos.toString());

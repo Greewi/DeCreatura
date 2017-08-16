@@ -41,4 +41,13 @@ public class PaquetSubstance
 	{
 		substances.put(substance, quantite);
 	}
+	
+	@Override
+	public String toString()
+	{
+		String str = "Paquet de substances : ";
+		for(Substance substance : substances.keySet())
+			str+= substance+"("+substances.get(substance)+")  ";
+		return str;
+	}
 }

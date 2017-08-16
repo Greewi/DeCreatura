@@ -7,7 +7,9 @@ import net.feerie.creatura.shared.entites.Dechet;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.Litiere;
 import net.feerie.creatura.shared.entites.TypeEntite;
-import net.feerie.creatura.shared.organisme.TypeVariableVitale;
+import net.feerie.creatura.shared.organisme.Substance;
+import net.feerie.creatura.shared.organisme.organes.Organe;
+import net.feerie.creatura.shared.organisme.organes.TypeOrgane;
 
 /**
  * Représente l'action de faire popo (oui. Chier...)
@@ -46,18 +48,24 @@ public class ActionPopo extends Action
 		if (frame < debut + 120)
 			return true;
 		
+		//On collecte les déchets de la créature
+		int total = 0;
+		Organe intestins = creature.getOrganisme().getOrgane(TypeOrgane.INTESTINS);
+		for (Substance substance : Substance.values())
+		{
+			int quantite = intestins.getSubstance(substance);
+			total += quantite;
+			intestins.ajouteSubstance(substance, -quantite);
+		}
+		
 		//On créé des déchets dans le monde
-		double quantite = creature.getVariableVitale(TypeVariableVitale.DECHETS).get();
 		if (cible.getType() == TypeEntite.LITIERE)
 		{
 			Litiere litiere = (Litiere) cible;
-			litiere.ajouteDechets(quantite);
+			litiere.ajouteDechets(total);
 		}
 		else
-			monde.ajouteEntite(new Dechet(monde, quantite, new Position(cible.getPosition())));
-		
-		//On "vide" la créature
-		creature.getVariableVitale(TypeVariableVitale.DECHETS).set(0);
+			monde.nouvelleEntite(new Dechet(monde, total, new Position(cible.getPosition())));
 		
 		return false;
 	}

@@ -2,6 +2,7 @@ package net.feerie.creatura.shared;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.entites.Entite;
@@ -16,6 +17,7 @@ import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
 public class Monde
 {
 	private HashMap<Integer, Entite> entites = new HashMap<>();
+	private List<Entite> nouvellesEntites = new ArrayList<>();
 	private int IDEntiteSuivante = 1;
 	private ArrayList<Zone> zones = new ArrayList<>();
 	private Environnement environnementParDefaut;
@@ -57,11 +59,16 @@ public class Monde
 	 * 
 	 * @param entite l'entité à ajouter
 	 */
-	public void ajouteEntite(Entite entite)
+	void ajouteEntite(Entite entite)
 	{
 		entites.put(entite.getID(), entite);
 		for (ObservateurEntiteAjoutee observateur : observateursEntiteAjoutee)
 			observateur.onEntiteAjoutee(entite);
+	}
+	
+	public void nouvelleEntite(Entite entite)
+	{
+		nouvellesEntites.add(entite);
 	}
 	
 	/**
@@ -141,6 +148,9 @@ public class Monde
 	{
 		for (Entite entite : entites.values())
 			entite.metAJour(frame);
+		//Ajout des nouvelles entités
+		for(Entite entite : nouvellesEntites)
+			ajouteEntite(entite);
 		//Nettoyage des entités disparues
 		for (Entite entite : new ArrayList<>(entites.values()))
 			if (!entite.existe())

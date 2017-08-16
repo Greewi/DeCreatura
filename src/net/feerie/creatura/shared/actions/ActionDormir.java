@@ -2,8 +2,9 @@ package net.feerie.creatura.shared.actions;
 
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
-import net.feerie.creatura.shared.organisme.TypeVariableVitale;
-import net.feerie.creatura.shared.organisme.VariableVitale;
+import net.feerie.creatura.shared.organisme.Substance;
+import net.feerie.creatura.shared.organisme.organes.Organe;
+import net.feerie.creatura.shared.organisme.organes.TypeOrgane;
 
 public class ActionDormir extends Action
 {
@@ -30,12 +31,10 @@ public class ActionDormir extends Action
 		if (!cible.existe())
 			return false;
 		
-		int sommeilGagnee = 1 + (frame - this.debut) / 10;
-		VariableVitale fatigue = creature.getVariableVitale(TypeVariableVitale.FATIGUE);
-		fatigue.ajoute(sommeilGagnee);
-		//Si la créature n'a plus sommeil on la réveille
-		if (fatigue.get() == fatigue.getIdeal())
+		Organe systemeSanguin = creature.getOrganisme().getOrgane(TypeOrgane.SYSTEME_SANGUIN);
+		if (systemeSanguin.getSubstance(Substance.NORALDRENALINE) >= 100)
 			return false;
+		systemeSanguin.transformeSubstance(Substance.PROTEINES, Substance.NORALDRENALINE, 1);
 		return true;
 	}
 	

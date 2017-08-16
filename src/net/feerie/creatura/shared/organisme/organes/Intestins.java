@@ -4,6 +4,8 @@ import java.util.EnumSet;
 
 import net.feerie.creatura.shared.organisme.Organisme;
 import net.feerie.creatura.shared.organisme.Substance;
+import net.feerie.creatura.shared.organisme.sens.SystemeSensoriel;
+import net.feerie.creatura.shared.organisme.sens.TypeCanalSensoriel;
 
 /**
  * Cette classe récupère les déchets issus de la digestion mais aussi filtrés

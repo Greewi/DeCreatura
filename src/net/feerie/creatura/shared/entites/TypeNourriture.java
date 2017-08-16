@@ -8,15 +8,15 @@ package net.feerie.creatura.shared.entites;
 public enum TypeNourriture
 {
 	
-	TOMATE("Tomate", "#EB4B4B", 40, 10, 3, 930),
-	CERISE("Cerise", "#BA3442", 160, 10, 10, 800),
-	PRUNE("Prune", "#832B8F", 130, 10, 6, 850),
-	FRAMBOISE("Framboise", "#ED268A", 110, 10, 110, 860),
-	FRAISE("Fraise", "#F0401D", 3, 6, 3, 910),
-	NOIX("Noix", "#A3754D", 130, 150, 650, 40),
-	CACAHUETE("Cacahuete", "#C9BB7F", 90, 230, 400, 70),
-	NOISETTE("Noisette", "#D18834", 160, 150, 600, 50),
-	MAIS("Mais", "#D7DE12", 200, 30, 10, 150);
+	TOMATE("Tomate", "#EB4B4B", 200, 200, 100, 0),
+	CERISE("Cerise", "#BA3442", 300, 100, 100, 0),
+	PRUNE("Prune", "#832B8F", 300, 100, 100, 0),
+	FRAMBOISE("Framboise", "#ED268A", 400, 50, 50, 0),
+	FRAISE("Fraise", "#F0401D", 200, 200, 100, 0),
+	NOIX("Noix", "#A3754D", 100, 300, 100, 0),
+	CACAHUETE("Cacahuete", "#C9BB7F", 100, 200, 200, 0),
+	NOISETTE("Noisette", "#D18834", 100, 100, 300, 0),
+	MAIS("Mais", "#D7DE12", 300, 100, 100, 0);
 	
 	/**
 	 * @return le nom du type de nourriture

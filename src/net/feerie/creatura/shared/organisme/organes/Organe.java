@@ -60,14 +60,43 @@ public abstract class Organe
 	}
 	
 	/**
-	 * Défini la quantité de sustance dans l'organe
+	 * Transforme une certaine quantite de substance en une autre
 	 * 
-	 * @param substance la {@link Substance} à modifier
-	 * @param quantite la quantité de sustance à définir
+	 * @param substanceConsomme la substance qui sera transformée
+	 * @param substanceProduite la susbtance produite
+	 * @param quantite la quantité de substance à convertir
 	 */
-	public void setSubstance(Substance substance, int quantite)
+	public void transformeSubstance(Substance substanceConsomme, Substance substanceProduite, int quantite)
 	{
-		substances.put(substance, quantite);
+		if (quantite <= 0)
+			return;
+		
+		int quantiteActuelle = getSubstance(substanceConsomme);
+		if (quantite > quantiteActuelle)
+			quantite = quantiteActuelle;
+		
+		this.ajouteSubstance(substanceConsomme, -quantite);
+		this.ajouteSubstance(substanceProduite, quantite);
+	}
+	
+	/**
+	 * Transfert une quantite de substance de cet organe vers un autre
+	 * 
+	 * @param substance la substance à transférer
+	 * @param quantite la quantité de susbtance à transférer
+	 * @param destination l'organe vers lequel transférer la substance
+	 */
+	public void transfertSubstance(Substance substance, int quantite, Organe destination)
+	{
+		if (quantite <= 0)
+			return;
+		
+		int quantiteActuelle = getSubstance(substance);
+		if (quantite > quantiteActuelle)
+			quantite = quantiteActuelle;
+		
+		this.ajouteSubstance(substance, -quantite);
+		destination.ajouteSubstance(substance, -quantite);
 	}
 	
 	/**

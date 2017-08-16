@@ -1,6 +1,11 @@
 package net.feerie.creatura.shared.organisme.organes;
 
-import static net.feerie.creatura.shared.organisme.Substance.*;
+import static net.feerie.creatura.shared.organisme.Substance.CHOLECYSTOKININE;
+import static net.feerie.creatura.shared.organisme.Substance.EAU;
+import static net.feerie.creatura.shared.organisme.Substance.GLUCIDES;
+import static net.feerie.creatura.shared.organisme.Substance.LIPIDES;
+import static net.feerie.creatura.shared.organisme.Substance.PROTEINES;
+import static net.feerie.creatura.shared.organisme.Substance.TOXINES;
 
 import java.util.EnumSet;
 
@@ -67,10 +72,7 @@ public class Estomac extends Organe
 		
 		//Si on doit produire de la Cholecystokinine on transforme des proteines
 		if (quantiteAProduire > 0)
-		{
-			systemeSanguin.ajouteSubstance(PROTEINES, -quantiteAProduire);
-			systemeSanguin.ajouteSubstance(CHOLECYSTOKININE, quantiteAProduire);
-		}
+			systemeSanguin.transformeSubstance(PROTEINES, CHOLECYSTOKININE, quantiteAProduire);
 	}
 	
 	/**
@@ -82,17 +84,16 @@ public class Estomac extends Organe
 	{
 		// Calcul de la quantité de substance pouvant être digérée totale
 		PaquetSubstance susbtancesADigerer = collecteSubstances(SUBSTANCES_A_DIGERER, QUANTITE_PAR_CYCLE);
-		int totaleSubstancesADigerer = 0;
+		int totalSubstancesADigerer = 0;
 		for (Substance substance : SUBSTANCES_A_DIGERER)
-			totaleSubstancesADigerer += susbtancesADigerer.get(substance);
+			totalSubstancesADigerer += susbtancesADigerer.get(substance);
 		
 		// S'il n'y a pas assez de nutriment à digérer ou pas assez de glucide dans le sang pour faire fonctionner l'estomac on ne fait rien
-		if (totaleSubstancesADigerer < QUANTITE_PAR_CYCLE || systemeSanguin.getSubstance(GLUCIDES) < COUT_DIGESTION)
+		if (totalSubstancesADigerer < QUANTITE_PAR_CYCLE)// || systemeSanguin.getSubstance(GLUCIDES) < COUT_DIGESTION)
 			return;
 		
 		//On consomme le glucide
-		systemeSanguin.ajouteSubstance(GLUCIDES, -COUT_DIGESTION);
-		systemeSanguin.ajouteSubstance(TOXINES, COUT_DIGESTION);
+		systemeSanguin.transformeSubstance(GLUCIDES, TOXINES, COUT_DIGESTION);
 		
 		//On fait passer dans le sang les substances digérées (proportionnellement aux quantités dans l'estomac)
 		transfereSubstancesVersOrgane(SUBSTANCES_A_DIGERER, QUANTITE_PAR_CYCLE, systemeSanguin);

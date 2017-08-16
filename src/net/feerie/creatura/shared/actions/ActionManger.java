@@ -4,7 +4,9 @@ import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.Nourriture;
 import net.feerie.creatura.shared.entites.TypeEntite;
-import net.feerie.creatura.shared.organisme.TypeVariableVitale;
+import net.feerie.creatura.shared.organisme.Substance;
+import net.feerie.creatura.shared.organisme.organes.Organe;
+import net.feerie.creatura.shared.organisme.organes.TypeOrgane;
 
 /**
  * Représente l'action de manger
@@ -44,10 +46,11 @@ public class ActionManger extends Action
 		if (cible.getType() == TypeEntite.NOURRITURE)
 		{
 			Nourriture nourriture = (Nourriture) cible;
-			creature.getVariableVitale(TypeVariableVitale.SUCRES_DIGESTION).ajoute(nourriture.getSucres());
-			creature.getVariableVitale(TypeVariableVitale.PROTEINES_DIGESTION).ajoute(nourriture.getProteines());
-			creature.getVariableVitale(TypeVariableVitale.GRAS_DIGESTION).ajoute(nourriture.getGras());
-			creature.getVariableVitale(TypeVariableVitale.EAU_DIGESTION).ajoute(nourriture.getEau());
+			Organe estomac = creature.getOrganisme().getOrgane(TypeOrgane.ESTOMAC);
+			estomac.ajouteSubstance(Substance.EAU, nourriture.getEau());
+			estomac.ajouteSubstance(Substance.GLUCIDES, nourriture.getSucres());
+			estomac.ajouteSubstance(Substance.LIPIDES, nourriture.getGras());
+			estomac.ajouteSubstance(Substance.PROTEINES, nourriture.getProteines());
 			cible.detruit();
 		}
 		return false;

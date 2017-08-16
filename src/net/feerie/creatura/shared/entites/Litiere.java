@@ -60,7 +60,7 @@ public class Litiere extends Entite
 		else
 		{
 			Position positionDechet = Rectangle.creeDepuisCentre(getPosition(), getTaille()).getPositionAleatoire();
-			monde.ajouteEntite(new Dechet(monde, quantite, positionDechet));
+			monde.nouvelleEntite(new Dechet(monde, quantite, positionDechet));
 		}
 	}
 	

@@ -1,7 +1,8 @@
 package net.feerie.creatura.shared.entites;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
+
+import com.google.gwt.user.client.Random;
 
 import net.feerie.creatura.shared.Environnement;
 import net.feerie.creatura.shared.Monde;
@@ -12,13 +13,10 @@ import net.feerie.creatura.shared.actions.ActionPopo;
 import net.feerie.creatura.shared.actions.ActionSeDeplacer;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
-import net.feerie.creatura.shared.organisme.Besoin;
-import net.feerie.creatura.shared.organisme.Metabolisme;
-import net.feerie.creatura.shared.organisme.TypeBesoin;
-import net.feerie.creatura.shared.organisme.TypeVariableVitale;
-import net.feerie.creatura.shared.organisme.VariableVitale;
-
-import com.google.gwt.user.client.Random;
+import net.feerie.creatura.shared.organisme.Organisme;
+import net.feerie.creatura.shared.organisme.organes.TypeOrgane;
+import net.feerie.creatura.shared.organisme.sens.SystemeSensoriel;
+import net.feerie.creatura.shared.organisme.sens.TypeCanalSensoriel;
 
 /**
  * Représente une créature
@@ -30,18 +28,16 @@ public class Creature extends Entite
 	private Action action;
 	private Environnement environnementActuel;
 	
-	private final Metabolisme metabolisme;
-	private final EnumMap<TypeBesoin, Besoin> besoins;
+	private final Organisme organisme;
+	private SystemeSensoriel systemeSensoriel;
+	private long dateDernierCycleMetabolique = 0; 
 	
 	public Creature(Monde monde, Position position)
 	{
 		super(monde, position, new Dimension(5.0, 5.0));
-		//Metabolisme
-		this.metabolisme = new Metabolisme(this);
-		//Besoins
-		besoins = new EnumMap<>(TypeBesoin.class);
-		for (TypeBesoin typeBesoin : TypeBesoin.values())
-			besoins.put(typeBesoin, new Besoin(typeBesoin, 0, this));
+		this.organisme = new Organisme();		
+		this.systemeSensoriel = (SystemeSensoriel) this.organisme.getOrgane(TypeOrgane.SYSTEME_SENSORIEL);
+		
 		//Action actuelle
 		action = null;
 	}
@@ -55,21 +51,22 @@ public class Creature extends Entite
 	}
 	
 	/**
-	 * @param typeBesoin le type du besoin demandé
-	 * @return le besoin demandé
+	 * Renvoie la valeur d'un canal sensoriel
+	 * @param canal le canal sensoriel désiré
+	 * @return la valeur du canal sensoriel
 	 */
-	public Besoin getBesoin(TypeBesoin typeBesoin)
+	public int getValeurCanalSensoriel(TypeCanalSensoriel canal)
 	{
-		return besoins.get(typeBesoin);
+		return systemeSensoriel.getValeurCanal(canal);
 	}
 	
 	/**
-	 * @param type le type de la variable vitale demandée
-	 * @return la variable vitale demandée
+	 * Renvoie l'organisme de la créature
+	 * @return l'organisme de la créature
 	 */
-	public VariableVitale getVariableVitale(TypeVariableVitale type)
+	public Organisme getOrganisme()
 	{
-		return metabolisme.get(type);
+		return this.organisme;
 	}
 	
 	/**
@@ -112,48 +109,14 @@ public class Creature extends Entite
 		environnementActuel = monde.getEnvironnement(getPosition());
 		
 		//Mise à jour du metabolisme
-		this.metabolisme.metAJour();
-		
-		//Mise à jour des besoins
-		this.metAJourBesoins();
+
+		long dateActuelle = System.currentTimeMillis();
+		if(dateActuelle >= dateDernierCycleMetabolique+500)
+		{
+			this.organisme.effectueCycleMetabolique();
+			dateDernierCycleMetabolique = dateActuelle;
+		}
 	}
-	
-	private void metAJourBesoins()
-	{
-		//Nutriments
-		double eauMin = metabolisme.get(TypeVariableVitale.EAU).getIdeal() / 4;
-		double eauActuel = metabolisme.get(TypeVariableVitale.EAU).get() + metabolisme.get(TypeVariableVitale.EAU_DIGESTION).get();
-		this.besoins.get(TypeBesoin.SOIF).set(1 - (eauActuel - eauMin) / (3.0 * eauMin));
-		
-		double sucresMin = metabolisme.get(TypeVariableVitale.SUCRES).getIdeal() / 4;
-		double sucresActuel = metabolisme.get(TypeVariableVitale.SUCRES).get() + metabolisme.get(TypeVariableVitale.SUCRES_DIGESTION).get();
-		this.besoins.get(TypeBesoin.SUCRES).set(1 - (sucresActuel - sucresMin) / (3.0 * sucresMin));
-		
-		double proteinesMin = metabolisme.get(TypeVariableVitale.PROTEINES).getIdeal() / 4;
-		double proteinesActuel = metabolisme.get(TypeVariableVitale.PROTEINES).get() + metabolisme.get(TypeVariableVitale.PROTEINES_DIGESTION).get();
-		this.besoins.get(TypeBesoin.PROTEINES).set(1 - (proteinesActuel - proteinesMin) / (3.0 * proteinesMin));
-		
-		double grasMin = metabolisme.get(TypeVariableVitale.GRAS).getIdeal() / 4;
-		double grasActuel = metabolisme.get(TypeVariableVitale.GRAS).get() + metabolisme.get(TypeVariableVitale.GRAS_DIGESTION).get();
-		this.besoins.get(TypeBesoin.GRAS).set(1 - (grasActuel - grasMin) / (3.0 * grasMin));
-		
-		//Dechets
-		double dechetsMax = 3000;
-		this.besoins.get(TypeBesoin.POPO).set(metabolisme.get(TypeVariableVitale.DECHETS).get() / dechetsMax);
-		
-		//Chaud/Froid
-		double temperatureActuelle = metabolisme.get(TypeVariableVitale.TEMPERATURE).get();
-		double temperatureIdeale = metabolisme.get(TypeVariableVitale.TEMPERATURE).getIdeal();
-		this.besoins.get(TypeBesoin.CHAUD).set(0);
-		this.besoins.get(TypeBesoin.FROID).set(0);
-		if (temperatureActuelle > temperatureIdeale)
-			this.besoins.get(TypeBesoin.FROID).set((temperatureActuelle - temperatureIdeale) / 2);
-		else if (temperatureActuelle < temperatureIdeale)
-			this.besoins.get(TypeBesoin.CHAUD).set((temperatureIdeale - temperatureActuelle) / 2);
-		
-		//Sommeil
-		this.besoins.get(TypeBesoin.FATIGUE).set(1 - metabolisme.get(TypeVariableVitale.FATIGUE).get() / metabolisme.get(TypeVariableVitale.FATIGUE).getIdeal());
-	};
 	
 	/**
 	 * Détermine la prochaine action à entreprendre
@@ -164,17 +127,17 @@ public class Creature extends Entite
 		ArrayList<Entite> entites = monde.getListeEntites();
 		Entite focus = entites.get(Random.nextInt(entites.size()));
 		
-		if (focus.getType() == TypeEntite.NOURRITURE && getBesoin(TypeBesoin.SUCRES).get() > 0.5)
+		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
 			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (focus.getType() == TypeEntite.NOURRITURE && getBesoin(TypeBesoin.PROTEINES).get() > 0.5)
+		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
 			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (focus.getType() == TypeEntite.NOURRITURE && getBesoin(TypeBesoin.GRAS).get() > 0.5)
+		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
 			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (focus.getType() == TypeEntite.NOURRITURE && getBesoin(TypeBesoin.SOIF).get() > 0.5)
+		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
 			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (getBesoin(TypeBesoin.POPO).get() > 0.7)
+		if (systemeSensoriel.getValeurCanal(TypeCanalSensoriel.INTESTINS)>70)
 			return new ActionSeDeplacer(this, focus, new ActionPopo(monde, this, focus));
-		if (getBesoin(TypeBesoin.FATIGUE).get() > 0.9)
+		if (systemeSensoriel.getValeurCanal(TypeCanalSensoriel.ENERGIE)<10)
 			return new ActionSeDeplacer(this, focus, new ActionDormir(this, focus));
 		return null;
 	};

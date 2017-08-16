@@ -51,8 +51,7 @@ public class Reins extends Organe
 		Organe systemeSanguin = getOrganisme().getOrgane(TypeOrgane.SYSTEME_SANGUIN);
 		
 		//On consomme le glucide
-		systemeSanguin.ajouteSubstance(GLUCIDES, -COUT_PAR_CYCLE);
-		systemeSanguin.ajouteSubstance(TOXINES, COUT_PAR_CYCLE);
+		systemeSanguin.transformeSubstance(GLUCIDES, TOXINES, COUT_PAR_CYCLE);
 		
 		// On collecte les toxines stockés dans le systeme sanguin
 		int totalACollecter = QUANTITE_PAR_CYCLE > capacite - totalSubstance ? capacite - totalSubstance : QUANTITE_PAR_CYCLE;

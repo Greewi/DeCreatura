@@ -1,9 +1,9 @@
 package net.feerie.creatura.shared.actions;
 
-import net.feerie.creatura.shared.creature.TypeVariableVitale;
-import net.feerie.creatura.shared.creature.VariableVitale;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.organisme.TypeVariableVitale;
+import net.feerie.creatura.shared.organisme.VariableVitale;
 
 public class ActionDormir extends Action
 {

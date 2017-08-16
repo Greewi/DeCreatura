@@ -2,12 +2,12 @@ package net.feerie.creatura.shared.actions;
 
 import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Position;
-import net.feerie.creatura.shared.creature.TypeVariableVitale;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Dechet;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.Litiere;
 import net.feerie.creatura.shared.entites.TypeEntite;
+import net.feerie.creatura.shared.organisme.TypeVariableVitale;
 
 /**
  * Représente l'action de faire popo (oui. Chier...)

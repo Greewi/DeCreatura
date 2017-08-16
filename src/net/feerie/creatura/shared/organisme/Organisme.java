@@ -1,8 +1,8 @@
-package net.feerie.creatura.shared.creature;
+package net.feerie.creatura.shared.organisme;
 
 import java.util.EnumMap;
 
-import net.feerie.creatura.shared.creature.organes.*;
+import net.feerie.creatura.shared.organisme.organes.*;
 
 /**
  * Représente un organisme, un objet vivant composé d'organes. C'est la partie

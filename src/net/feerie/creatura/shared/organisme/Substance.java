@@ -1,4 +1,4 @@
-package net.feerie.creatura.shared.creature;
+package net.feerie.creatura.shared.organisme;
 
 /**
  * Cette énumération défini les differentes substances impliquée dans le

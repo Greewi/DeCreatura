@@ -1,6 +1,6 @@
-package net.feerie.creatura.shared.creature.organes;
+package net.feerie.creatura.shared.organisme.organes;
 
-import net.feerie.creatura.shared.creature.Organisme;
+import net.feerie.creatura.shared.organisme.Organisme;
 
 /**
  * Cet organe stock les graisses et apporte une insolation thermique

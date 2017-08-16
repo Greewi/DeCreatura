@@ -1,9 +1,9 @@
-package net.feerie.creatura.shared.creature.organes;
+package net.feerie.creatura.shared.organisme.organes;
 
 import java.util.EnumSet;
 
-import net.feerie.creatura.shared.creature.Organisme;
-import net.feerie.creatura.shared.creature.Substance;
+import net.feerie.creatura.shared.organisme.Organisme;
+import net.feerie.creatura.shared.organisme.Substance;
 
 /**
  * Cette classe récupère les déchets issus de la digestion mais aussi filtrés

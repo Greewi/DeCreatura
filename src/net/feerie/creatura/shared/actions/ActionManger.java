@@ -1,10 +1,10 @@
 package net.feerie.creatura.shared.actions;
 
-import net.feerie.creatura.shared.creature.TypeVariableVitale;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.Nourriture;
 import net.feerie.creatura.shared.entites.TypeEntite;
+import net.feerie.creatura.shared.organisme.TypeVariableVitale;
 
 /**
  * Représente l'action de manger

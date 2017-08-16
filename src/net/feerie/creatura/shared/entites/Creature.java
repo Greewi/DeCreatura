@@ -12,11 +12,11 @@ import net.feerie.creatura.shared.actions.ActionPopo;
 import net.feerie.creatura.shared.actions.ActionSeDeplacer;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
-import net.feerie.creatura.shared.creature.Besoin;
-import net.feerie.creatura.shared.creature.Metabolisme;
-import net.feerie.creatura.shared.creature.TypeBesoin;
-import net.feerie.creatura.shared.creature.TypeVariableVitale;
-import net.feerie.creatura.shared.creature.VariableVitale;
+import net.feerie.creatura.shared.organisme.Besoin;
+import net.feerie.creatura.shared.organisme.Metabolisme;
+import net.feerie.creatura.shared.organisme.TypeBesoin;
+import net.feerie.creatura.shared.organisme.TypeVariableVitale;
+import net.feerie.creatura.shared.organisme.VariableVitale;
 
 import com.google.gwt.user.client.Random;
 

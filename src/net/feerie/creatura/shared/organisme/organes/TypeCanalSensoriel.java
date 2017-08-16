@@ -1,4 +1,4 @@
-package net.feerie.creatura.shared.creature.organes;
+package net.feerie.creatura.shared.organisme.organes;
 
 public enum TypeCanalSensoriel
 {

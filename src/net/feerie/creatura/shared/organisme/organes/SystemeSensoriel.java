@@ -1,8 +1,8 @@
-package net.feerie.creatura.shared.creature.organes;
+package net.feerie.creatura.shared.organisme.organes;
 
 import java.util.EnumMap;
 
-import net.feerie.creatura.shared.creature.Organisme;
+import net.feerie.creatura.shared.organisme.Organisme;
 
 /**
  * Cet organe collecte les informations sensorielles de la créature et les

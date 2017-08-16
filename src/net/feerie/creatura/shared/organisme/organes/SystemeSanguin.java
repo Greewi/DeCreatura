@@ -1,6 +1,6 @@
-package net.feerie.creatura.shared.creature.organes;
+package net.feerie.creatura.shared.organisme.organes;
 
-import net.feerie.creatura.shared.creature.Organisme;
+import net.feerie.creatura.shared.organisme.Organisme;
 
 /**
  * C'est par cet organe que transit les substances du corps de la créature.

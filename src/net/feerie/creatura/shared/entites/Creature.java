@@ -160,6 +160,12 @@ public class Creature extends Entite
 				Moodle moodle = getMoodle(typeMoodle);
 				moodle.nouveauCycle();
 			}
+			
+			//Cap de santé
+			if(sante>100)
+				sante = 100;
+			if(sante<0)
+				sante = 0;
 		}
 	}
 	

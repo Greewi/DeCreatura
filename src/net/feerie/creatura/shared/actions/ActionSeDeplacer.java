@@ -2,7 +2,6 @@ package net.feerie.creatura.shared.actions;
 
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.commons.Vecteur;
-import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 
 /**

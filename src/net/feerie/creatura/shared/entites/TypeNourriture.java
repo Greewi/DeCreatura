@@ -1,7 +1,7 @@
 package net.feerie.creatura.shared.entites;
 
 /**
- * Représente un type de nourriture
+ * ReprÃ©sente un type de nourriture
  * 
  * @author greewi
  */
@@ -27,7 +27,7 @@ public enum TypeNourriture
 	}
 	
 	/**
-	 * @return la quantité d'eau contenue dans ce type de nourriture
+	 * @return la quantitÃ© d'eau contenue dans ce type de nourriture
 	 */
 	public int getEau()
 	{
@@ -35,7 +35,7 @@ public enum TypeNourriture
 	}
 	
 	/**
-	 * @return la quantité de sucres contenue dans ce type de nourriture
+	 * @return la quantitÃ© de sucres contenue dans ce type de nourriture
 	 */
 	public int getSucres()
 	{
@@ -43,7 +43,7 @@ public enum TypeNourriture
 	}
 	
 	/**
-	 * @return la quantité de proteines contenue dans ce type de nourriture
+	 * @return la quantitÃ© de proteines contenue dans ce type de nourriture
 	 */
 	public int getProteines()
 	{
@@ -51,7 +51,7 @@ public enum TypeNourriture
 	}
 	
 	/**
-	 * @return la quantité de gras contenue dans ce type de nourriture
+	 * @return la quantitÃ© de gras contenue dans ce type de nourriture
 	 */
 	public int getGras()
 	{

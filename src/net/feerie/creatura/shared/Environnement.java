@@ -1,8 +1,8 @@
 package net.feerie.creatura.shared;
 
 /**
- * Représente les données envrionnementales d'une zone ou celles affectant une
- * créature
+ * ReprÃ©sente les donnÃ©es envrionnementales d'une zone ou celles affectant une
+ * crÃ©ature
  */
 public class Environnement
 {
@@ -13,8 +13,8 @@ public class Environnement
 	/**
 	 * Constructeur
 	 * 
-	 * @param temperature la température (en degrés celsius)
-	 * @param luminosite la luminosité (de 0.0f à 1.0f)
+	 * @param temperature la tempÃ©rature (en degrÃ©s celsius)
+	 * @param luminosite la luminositÃ© (de 0.0f Ã  1.0f)
 	 * @param couleur le code couleur de l'environnement
 	 */
 	public Environnement(int temperature, double luminosite, String couleur)
@@ -26,7 +26,7 @@ public class Environnement
 	}
 	
 	/**
-	 * @return la température de l'environnement
+	 * @return la tempÃ©rature de l'environnement
 	 */
 	public int getTemperature()
 	{
@@ -34,7 +34,7 @@ public class Environnement
 	}
 	
 	/**
-	 * @return la luminosité de l'environnement
+	 * @return la luminositÃ© de l'environnement
 	 */
 	public double getLuminosite()
 	{

@@ -1,78 +1,110 @@
 package net.feerie.creatura.shared.entites;
 
-import java.util.ArrayList;
-
-import com.google.gwt.user.client.Random;
+import java.util.EnumMap;
 
 import net.feerie.creatura.shared.Environnement;
 import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.actions.Action;
-import net.feerie.creatura.shared.actions.ActionDormir;
-import net.feerie.creatura.shared.actions.ActionManger;
-import net.feerie.creatura.shared.actions.ActionPopo;
-import net.feerie.creatura.shared.actions.ActionSeDeplacer;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
-import net.feerie.creatura.shared.organisme.Organisme;
-import net.feerie.creatura.shared.organisme.organes.TypeOrgane;
-import net.feerie.creatura.shared.organisme.sens.SystemeSensoriel;
-import net.feerie.creatura.shared.organisme.sens.TypeCanalSensoriel;
+import net.feerie.creatura.shared.creature.ia.IA;
+import net.feerie.creatura.shared.creature.ia.IABasique;
+import net.feerie.creatura.shared.creature.moodles.Moodle;
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 
 /**
- * Repr�sente une cr�ature
+ * Représente une créature
  * 
  * @author greewi
  */
 public class Creature extends Entite
 {
+	private final static long PERIODE_CYCLE_METABOLIQUE = 3000l;
+	
 	private Action action;
 	private Environnement environnementActuel;
+	private final IA ia;
 	
-	private final Organisme organisme;
-	private SystemeSensoriel systemeSensoriel;
-	private long dateDernierCycleMetabolique = 0; 
+	private long dateDernierCycleMetabolique;
+	private int sante;
+	private final EnumMap<TypeMoodle, Moodle> moodles;
 	
 	public Creature(Monde monde, Position position)
 	{
 		super(monde, position, new Dimension(5.0, 5.0));
-		this.organisme = new Organisme();		
-		this.systemeSensoriel = (SystemeSensoriel) this.organisme.getOrgane(TypeOrgane.SYSTEME_SENSORIEL);
 		
-		//Action actuelle
-		action = null;
+		//Action et environnement
+		this.action = null;
+		this.environnementActuel = monde.getEnvironnement(position);
+		this.ia = new IABasique(this);
+		
+		//Sant�
+		this.sante = 100;
+		this.moodles = new EnumMap<>(TypeMoodle.class);
+		this.dateDernierCycleMetabolique = System.currentTimeMillis();
 	}
 	
 	/**
-	 * @return l'environnement actuelle de la cr�ature
-	 */
-	public Environnement getEnvironnementActuel()
-	{
-		return environnementActuel;
-	}
-	
-	/**
-	 * Renvoie la valeur d'un canal sensoriel
-	 * @param canal le canal sensoriel d�sir�
-	 * @return la valeur du canal sensoriel
-	 */
-	public int getValeurCanalSensoriel(TypeCanalSensoriel canal)
-	{
-		return systemeSensoriel.getValeurCanal(canal);
-	}
-	
-	/**
-	 * Renvoie l'organisme de la cr�ature
-	 * @return l'organisme de la cr�ature
-	 */
-	public Organisme getOrganisme()
-	{
-		return this.organisme;
-	}
-	
-	/**
-	 * D�fini l'action actuelle que doit entreprendre cette cr�ature
+	 * Renvoie le niveau de santé de la créature
 	 * 
-	 * @param action l'action que doit entreprendre cette cr�ature
+	 * @return le niveau de santé de la créature
+	 */
+	public int getSante()
+	{
+		return sante;
+	}
+	
+	/**
+	 * Réduit la santé de la créature
+	 * 
+	 * @param montant le montant de santé à réduire
+	 */
+	public void reduitSante(int montant)
+	{
+		sante -= montant;
+		if (sante <= 0)
+			sante = 0;
+	}
+	
+	/**
+	 * Détermine si la créature est vivante.
+	 * 
+	 * @return <tt>true</tt> si la créature est vivante
+	 */
+	public boolean estVivante()
+	{
+		return sante > 0;
+	}
+	
+	/**
+	 * Récupére un moodle
+	 * 
+	 * @param moodle le type du moodle à récupérer
+	 * @return le moodle
+	 */
+	public Moodle getMoodle(TypeMoodle moodle)
+	{
+		if (!moodles.containsKey(moodle))
+			moodles.put(moodle, moodle.instancie(this));
+		return moodles.get(moodle);
+	}
+	
+	/**
+	 * Détermine si la créature est affecté par un moodle.
+	 * 
+	 * @param moodle le type du moodle dont on cherche à savoir si la créature
+	 *        est affectée par.
+	 * @return <tt>true</tt> si la créature est affectée par le moodle
+	 */
+	public boolean estAffectePar(TypeMoodle moodle)
+	{
+		return getMoodle(moodle).estActif();
+	}
+	
+	/**
+	 * Défini l'action actuelle que doit entreprendre cette créature
+	 * 
+	 * @param action l'action que doit entreprendre cette créature
 	 */
 	public void setActionActuelle(Action action)
 	{
@@ -80,7 +112,7 @@ public class Creature extends Entite
 	}
 	
 	/**
-	 * @return l'action actuellement entreprise par la cr�ature
+	 * @return l'action actuellement entreprise par la créature
 	 */
 	public Action getActionActuelle()
 	{
@@ -96,49 +128,90 @@ public class Creature extends Entite
 	@Override
 	public void metAJour(int frame)
 	{
-		//IA et ex�cution des actions
+		if (!estVivante())
+		{
+			action = null;
+			return;
+		}
+		
+		//IA et exécution des actions
 		if (action != null)
 		{
 			if (!action.metAJour(frame))
 				this.action = null;
 		}
 		else if (frame % 10 == 0)
-			this.action = determineAction(frame);
+			this.action = ia.decideProchaineAction();
 		
-		//Mise � jour de l'environnement
+		//Mise à jour de l'environnement
 		environnementActuel = monde.getEnvironnement(getPosition());
 		
-		//Mise � jour du metabolisme
-
-		long dateActuelle = System.currentTimeMillis();
-		if(dateActuelle >= dateDernierCycleMetabolique+500)
+		//Mise à jour du metabolisme
+		if (dateDernierCycleMetabolique + PERIODE_CYCLE_METABOLIQUE < System.currentTimeMillis())
 		{
-			this.organisme.effectueCycleMetabolique();
-			dateDernierCycleMetabolique = dateActuelle;
+			dateDernierCycleMetabolique += PERIODE_CYCLE_METABOLIQUE;
+			
+			//Gain sante
+			sante++;
+			
+			//MAJ Moodle
+			for (TypeMoodle typeMoodle : TypeMoodle.values())
+			{
+				Moodle moodle = getMoodle(typeMoodle);
+				moodle.nouveauCycle();
+			}
 		}
 	}
 	
 	/**
-	 * D�termine la prochaine action � entreprendre
+	 * Renvoie le monde dans lequel �volue la cr�ature
+	 * 
+	 * @return le monde dans lequel �volue la cr�ature
 	 */
-	private Action determineAction(int frame)
+	public Monde getMonde()
 	{
-		//Focus al�atoire
-		ArrayList<Entite> entites = monde.getListeEntites();
-		Entite focus = entites.get(Random.nextInt(entites.size()));
-		
-		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
-			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
-			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
-			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (focus.getType() == TypeEntite.NOURRITURE && systemeSensoriel.getValeurCanal(TypeCanalSensoriel.SATIETE) < 20)
-			return new ActionSeDeplacer(this, focus, new ActionManger(this, focus));
-		if (systemeSensoriel.getValeurCanal(TypeCanalSensoriel.INTESTINS)>70)
-			return new ActionSeDeplacer(this, focus, new ActionPopo(monde, this, focus));
-		if (systemeSensoriel.getValeurCanal(TypeCanalSensoriel.ENERGIE)<10)
-			return new ActionSeDeplacer(this, focus, new ActionDormir(this, focus));
-		return null;
-	};
+		return monde;
+	}
+	
+	/**
+	 * R�cup�re l'environnement actuel
+	 * 
+	 * @return l'environnement actuel
+	 */
+	public Environnement getEnvironnement()
+	{
+		return environnementActuel;
+	}
+	
+	/**
+	 * Recherche l'entite d'un type donn� le plus proche
+	 * 
+	 * @param typeEntite le type de l'entit�
+	 * @return l'entit� trouv�e ou <tt>null</tt>
+	 */
+	public Entite cherche(TypeEntite typeEntite)
+	{
+		Entite entite = null;
+		double distance = 100000000000.0;
+		for (Entite e : monde.getListeEntites())
+			if (e.getType() == typeEntite && getDistanceCarre(e) < distance)
+			{
+				entite = e;
+				distance = getDistanceCarre(e);
+			}
+		return entite;
+	}
+	
+	/**
+	 * Calcule la distance carrée avec une autre entité
+	 * 
+	 * @param entite l'entité avec laquelle calculer la distance carrée
+	 * @return la distance au carrée entre les deux entité
+	 */
+	private double getDistanceCarre(Entite entite)
+	{
+		Position p1 = entite.getPosition();
+		Position p2 = getPosition();
+		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+	}
 }

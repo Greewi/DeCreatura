@@ -1,21 +1,17 @@
 package net.feerie.creatura.shared.actions;
 
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
-import net.feerie.creatura.shared.entites.Entite;
-import net.feerie.creatura.shared.organisme.Substance;
-import net.feerie.creatura.shared.organisme.organes.Organe;
-import net.feerie.creatura.shared.organisme.organes.TypeOrgane;
 
 public class ActionDormir extends Action
 {
 	
 	/**
-	 * @param creature la créature qui dort
-	 * @param cible l'entité sur laquelle la créature tente de dormir
+	 * @param creature la crÃ©ature qui dort
 	 */
-	public ActionDormir(Creature creature, Entite cible)
+	public ActionDormir(Creature creature)
 	{
-		super(creature, cible);
+		super(creature);
 	}
 	
 	@Override
@@ -27,15 +23,7 @@ public class ActionDormir extends Action
 	@Override
 	public boolean metAJour(int frame)
 	{
-		//Si la cible n'existe plus on arrête
-		if (!cible.existe())
-			return false;
-		
-		Organe systemeSanguin = creature.getOrganisme().getOrgane(TypeOrgane.SYSTEME_SANGUIN);
-		if (systemeSanguin.getSubstance(Substance.NORALDRENALINE) >= 100)
-			return false;
-		systemeSanguin.transformeSubstance(Substance.PROTEINES, Substance.NORALDRENALINE, 1);
-		return true;
+		getCreature().getMoodle(TypeMoodle.FATIGUE).decharge(3);
+		return getCreature().estAffectePar(TypeMoodle.FATIGUE);
 	}
-	
 }

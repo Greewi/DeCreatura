@@ -1,30 +1,30 @@
 package net.feerie.creatura.shared.actions;
 
 import net.feerie.creatura.shared.entites.Creature;
-import net.feerie.creatura.shared.entites.Entite;
 
 /**
- * Représente une action entreprise par une créature. Les actions ciblent
- * toujours une entité.
+ * ReprÃ©sente une action entreprise par une crÃ©ature.
  * 
  * @author greewi
  */
 public abstract class Action
 {
-	protected final Creature creature;
-	protected final Entite cible;
+	private final Creature creature;
 	protected int debut;
 	
 	/**
-	 * @param creature la créature réalisant l'action
-	 * @param cible la cible de l'action
-	 * @param debut la frame de début de l'action
+	 * @param creature la crÃ©ature rÃ©alisant l'action
+	 * @param debut la frame de dÃ©but de l'action
 	 */
-	public Action(Creature creature, Entite cible)
+	public Action(Creature creature)
 	{
 		this.creature = creature;
-		this.cible = cible;
 		this.debut = -1;
+	}
+	
+	protected Creature getCreature()
+	{
+		return creature;
 	}
 	
 	/**
@@ -43,10 +43,10 @@ public abstract class Action
 	public abstract TypeAction getType();
 	
 	/**
-	 * Met à jour l'action, pouvant potentiellement la terminer.
+	 * Met Ã  jour l'action, pouvant potentiellement la terminer.
 	 * 
-	 * @param frame le numéro de la frame de la mise à jour
-	 * @return <tt>true</tt> si et seulement si l'action n'est pas terminée.
+	 * @param frame le numÃ©ro de la frame de la mise Ã  jour
+	 * @return <tt>true</tt> si et seulement si l'action n'est pas terminÃ©e.
 	 */
 	public abstract boolean metAJour(int frame);
 }

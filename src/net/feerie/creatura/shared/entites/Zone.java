@@ -7,7 +7,7 @@ import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.commons.Rectangle;
 
 /**
- * Représente une zone (un endroit, une salle) dans le monde (étend
+ * ReprÃ©sente une zone (un endroit, une salle) dans le monde (Ã©tend
  * creatura.Entite)
  * 
  * @author greewi
@@ -18,7 +18,7 @@ public class Zone extends Entite
 	private Environnement environnement;
 	
 	/**
-	 * @param monde le monde de l'entité
+	 * @param monde le monde de l'entitÃ©
 	 * @param position la position de la zone (centre de la zone)
 	 * @param taille la taille de la zone
 	 * @param environnement l'environnement de la zone
@@ -31,12 +31,12 @@ public class Zone extends Entite
 	}
 	
 	/**
-	 * Détermine si la zone contient la position donnée
+	 * DÃ©termine si la zone contient la position donnÃ©e
 	 * 
 	 * @param position la position dont on veut savoir si elle est contenue dans
 	 *        la zone
 	 * @return <tt>true</tt> si et seulement si la zone contient la position
-	 *         demandée
+	 *         demandï¿½e
 	 */
 	public boolean contient(Position position)
 	{

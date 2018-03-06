@@ -6,7 +6,7 @@ import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.commons.Rectangle;
 
 /**
- * Représente une litière (là où on espère que la créature fera ses besoins)
+ * ReprÃ©sente une litiÃ¨re (lÃ  ou on espÃ¨re que la crÃ©ature fera ses besoins)
  * 
  * @author greewi
  */
@@ -17,9 +17,9 @@ public class Litiere extends Entite
 	private double contenu;
 	
 	/**
-	 * @param monde le monde ce cette entité
-	 * @param capacite la capacité de cette litière
-	 * @param position la potion de l'entité
+	 * @param monde le monde ce cette entitÃ©
+	 * @param capacite la capacitÃ© de cette litiÃ¨re
+	 * @param position la potion de l'entitÃ©
 	 */
 	public Litiere(Monde monde, int capacite, Position position)
 	{
@@ -30,7 +30,7 @@ public class Litiere extends Entite
 	}
 	
 	/**
-	 * @return la capacité de cette litiere
+	 * @return la capacitÃ© de cette litiere
 	 */
 	public double getCapacite()
 	{
@@ -46,21 +46,21 @@ public class Litiere extends Entite
 	}
 	
 	/**
-	 * Ajoute un déchet dans la litière. Si la litière est pleine, crée un
-	 * déchet dans le monde.
+	 * Ajoute un dÃ©chet dans la litiÃ¨re. Si la litiÃ¨re est pleine, crÃ©e un
+	 * dÃ©chet dans le monde.
 	 * 
-	 * @param quantite la quantité de déchet à créer
+	 * @param quantite la quantitÃ© de dÃ©chet Ã  crÃ©er
 	 */
-	public void ajouteDechets(double quantite)
+	public void ajouteDechets()
 	{
-		//Si la litière n'est pas pleine on stock le déchet
-		if (contenu + quantite <= capacite)
-			contenu += quantite;
-		//Si la litiere est pleine on créé un déchet dans le monde
+		//Si la litiÃ¨re n'est pas pleine on stock le dÃ©chet
+		if (contenu + 1 <= capacite)
+			contenu++;
+		//Si la litiere est pleine on crÃ©Ã© un dÃ©chet dans le monde
 		else
 		{
 			Position positionDechet = Rectangle.creeDepuisCentre(getPosition(), getTaille()).getPositionAleatoire();
-			monde.nouvelleEntite(new Dechet(monde, quantite, positionDechet));
+			monde.nouvelleEntite(new Dechet(monde, positionDechet));
 		}
 	}
 	

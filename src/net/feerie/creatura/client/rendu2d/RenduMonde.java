@@ -10,7 +10,7 @@ import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
 import com.google.gwt.canvas.dom.client.Context2d;
 
 /**
- * Représente le rendu d'un monde. Se charger de dessiner le monde.
+ * ReprÃ©sente le rendu d'un monde. Se charger de dessiner le monde.
  * 
  * @author greewi
  */
@@ -23,7 +23,7 @@ public class RenduMonde
 	private final HashMap<Integer, RenduEntite> rendusEntites;
 	
 	/**
-	 * @param monde le monde à dessiner
+	 * @param monde le monde Ã  dessiner
 	 * @param contexte le contexte dns lequel dessiner
 	 */
 	public RenduMonde(Monde monde, final Context2d contexte)
@@ -31,7 +31,7 @@ public class RenduMonde
 		this.monde = monde;
 		this.contexte = contexte;
 		rendusEntites = new HashMap<>();
-		//On attache les observateurs sur les événements du monde pour mettre à jour la vue 
+		//On attache les observateurs sur les ï¿½vï¿½nements du monde pour mettre ï¿½ jour la vue 
 		monde.onEntiteAjoutee(new ObservateurEntiteAjoutee()
 		{
 			@Override
@@ -53,7 +53,7 @@ public class RenduMonde
 	}
 	
 	/**
-	 * Détruit ce moteur de rendu
+	 * DÃ©truit ce moteur de rendu
 	 */
 	public void detruit()
 	{

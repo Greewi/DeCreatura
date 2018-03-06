@@ -8,7 +8,7 @@ import net.feerie.creatura.shared.entites.Zone;
 import com.google.gwt.canvas.dom.client.Context2d;
 
 /**
- * Représente un rendu d'entité. Cette classe s'occupe de dessiner les entités
+ * ReprÃ©sente un rendu d'entitÃ©. Cette classe s'occupe de dessiner les entitÃ©s
  * 
  * @author greewi
  */
@@ -19,8 +19,8 @@ public class RenduEntite
 	private final String couleur;
 	
 	/**
-	 * @param entite l'entite à dessiner
-	 * @param contexte le contexte dans lequeul dessiner
+	 * @param entite l'entite Ã  dessiner
+	 * @param contexte le contexte dans lequel dessiner
 	 */
 	public RenduEntite(Entite entite, Context2d contexte)
 	{
@@ -33,18 +33,18 @@ public class RenduEntite
 			this.couleur = ((Nourriture) entite).getCouleur();
 		else if (entite.getType() == TypeEntite.ZONE)
 			this.couleur = ((Zone) entite).getCouleur();
-		else if (entite.getType() == TypeEntite.DECHET)
+		else if (entite.getType() == TypeEntite.POPO)
 			this.couleur = "#161610";
 		else
 			this.couleur = "#737373";
 	}
 	
 	/**
-	 * détruit ce rendu
+	 * dÃ©truit ce rendu
 	 */
 	public void detruit()
 	{
-		//rien à faire pour le moment
+		//rien Ã  faire pour le moment
 	}
 	
 	/**

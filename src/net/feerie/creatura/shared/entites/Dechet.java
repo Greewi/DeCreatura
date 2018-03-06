@@ -5,37 +5,26 @@ import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
 
 /**
- * Représente un déchet (une crotte)
+ * ReprÃ©sente un dÃ©chet (une crotte)
  * 
  * @author greewi
  */
 public class Dechet extends Entite
 {
-	private double quantite;
 	
 	/**
-	 * @param monde le monde de cette entité
-	 * @param quantite la quantité de déchet
-	 * @param position la position de cette entité
+	 * @param monde le monde de cette entitÃ©
+	 * @param position la position de cette entitÃ©
 	 */
-	public Dechet(Monde monde, double quantite, Position position)
+	public Dechet(Monde monde, Position position)
 	{
-		super(monde, position, new Dimension(quantite / 1000.0, quantite / 1000.0));
-		this.quantite = quantite;
-	}
-	
-	/**
-	 * @returnla quantité de déchet contenu dans ce déchet
-	 */
-	public double getQuantite()
-	{
-		return quantite;
+		super(monde, position, new Dimension(20, 20));
 	}
 	
 	@Override
 	public TypeEntite getType()
 	{
-		return TypeEntite.DECHET;
+		return TypeEntite.POPO;
 	}
 	
 	@Override

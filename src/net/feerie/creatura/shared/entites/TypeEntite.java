@@ -4,7 +4,7 @@ public enum TypeEntite
 {
 	CREATURE,
 	NOURRITURE,
-	DECHET,
+	POPO,
 	LITIERE,
 	ZONE;
 }

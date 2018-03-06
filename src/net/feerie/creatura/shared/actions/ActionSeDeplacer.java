@@ -2,28 +2,30 @@ package net.feerie.creatura.shared.actions;
 
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.commons.Vecteur;
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
-import net.feerie.creatura.shared.entites.Entite;
 
 /**
- * Représente une action de déplacement
+ * Reprï¿½sente une action de dÃ©placement
  * 
  * @author greewi
  */
 public class ActionSeDeplacer extends Action
 {
 	private final Action actionAEnchainer;
+	private final Position destination;
 	private final double vitesse = 0.5;
 	
 	/**
-	 * @param creature la créature se déplçant
-	 * @param cible l'entité vers laquelle se déplace la créature
-	 * @param actionAEnchainer l'action à effetuer une fois arrivée sur place.
-	 *        <tt>null</tt> si aucune action n'est à faire.
+	 * @param creature la crÃ©ature se dÃ©plaÃ§ant
+	 * @param destination la position vers laquelle se dÃ©place la crÃ©ature
+	 * @param actionAEnchainer l'action Ã  effetuer une fois arrivÃ©e sur place.
+	 *        <tt>null</tt> si aucune action n'est Ã  faire.
 	 */
-	public ActionSeDeplacer(Creature creature, Entite cible, Action actionAEnchainer)
+	public ActionSeDeplacer(Creature creature, Position destination, Action actionAEnchainer)
 	{
-		super(creature, cible);
+		super(creature);
+		this.destination = destination;
 		this.actionAEnchainer = actionAEnchainer;
 	}
 	
@@ -39,20 +41,20 @@ public class ActionSeDeplacer extends Action
 		//On avance d'une frame
 		boolean arrive = avance();
 		
-		//Si on est arrivé, on se place bien sur le point d'arrivée et on effectuer l'action en attente
+		//Si on est arrivÃ©, on se place bien sur le point d'arrivÃ©e et on effectuer l'action en attente
 		if (arrive)
 		{
-			creature.setPosition(new Position(cible.getPosition()));
+			getCreature().setPosition(new Position(destination));
 			if (actionAEnchainer != null)
 			{
-				creature.setActionActuelle(actionAEnchainer);
+				getCreature().setActionActuelle(actionAEnchainer);
 				actionAEnchainer.debute(frame);
 				return true;
 			}
 			else
 				return false;
 		}
-		//Si on n'est pas encore arrivé il faudra continuer à la prochaine frame
+		//Si on n'est pas encore arrivÃ© il faudra continuer Ã  la prochaine frame
 		else
 			return true;
 	}
@@ -60,26 +62,22 @@ public class ActionSeDeplacer extends Action
 	/**
 	 * Avance d'une frame
 	 * 
-	 * @param frame le numéro de la frame actuelle
-	 * @return <tt>true</tt> si et seulement si le déplaement est terminé.
+	 * @param frame le numÃ©ro de la frame actuelle
+	 * @return <tt>true</tt> si et seulement si le dÃ©plaement est terminÃ©.
 	 */
 	private boolean avance()
 	{
-		//Si la cible n'existe plus on arrête
-		if (!cible.existe())
-			return true;
-		
-		Position position = creature.getPosition();
-		Vecteur direction = new Vecteur(position, cible.getPosition());
+		Position position = getCreature().getPosition();
+		Vecteur direction = new Vecteur(position, destination);
 		double distance = direction.getNorme();
 		
-		//Si on est arrivé, on s'arrête
+		//Si on est arrivï¿½, on s'arrï¿½te
 		if (distance < 0.0001)
 			return true;
 		
 		double vitesse = (this.vitesse < distance) ? this.vitesse : distance;
 		position = position.translate(direction.multiplie(vitesse / distance));
-		creature.setPosition(position);
+		getCreature().setPosition(position);
 		return false;
 	}
 	

@@ -15,11 +15,11 @@ public abstract class Entite
 	/**
 	 * Constructeur
 	 * 
-	 * @param monde le monde auquel appartient l'entité
-	 * @param x la position x de l'entité
-	 * @param y la position y de l'entité
-	 * @param l la longueur de l'entité
-	 * @param h la hauteur de l'entité
+	 * @param monde le monde auquel appartient l'entitÃ©
+	 * @param x la position x de l'entitÃ©
+	 * @param y la position y de l'entitÃ©
+	 * @param l la longueur de l'entitÃ©
+	 * @param h la hauteur de l'entitÃ©
 	 */
 	public Entite(Monde monde, Position position, Dimension taille)
 	{
@@ -31,7 +31,7 @@ public abstract class Entite
 	}
 	
 	/**
-	 * @return l'ID de cette entité
+	 * @return l'ID de cette entitÃ©
 	 */
 	public int getID()
 	{
@@ -39,7 +39,7 @@ public abstract class Entite
 	}
 	
 	/**
-	 * @return la position de cette entité
+	 * @return la position de cette entitÃ©
 	 */
 	public Position getPosition()
 	{
@@ -47,7 +47,7 @@ public abstract class Entite
 	}
 	
 	/**
-	 * modifie la position de cette entité
+	 * modifie la position de cette entitÃ©
 	 * 
 	 * @param position la nouvelle position
 	 */
@@ -57,7 +57,7 @@ public abstract class Entite
 	}
 	
 	/**
-	 * @return la taille de cette entité
+	 * @return la taille de cette entitÃ©
 	 */
 	public Dimension getTaille()
 	{
@@ -65,12 +65,12 @@ public abstract class Entite
 	}
 	
 	/**
-	 * @return le type de cette entité (voir {@link TypeEntite})
+	 * @return le type de cette entitÃ© (voir {@link TypeEntite})
 	 */
 	public abstract TypeEntite getType();
 	
 	/**
-	 * Détruit l'entité. Appellée par {@link Monde} !
+	 * DÃ©truit l'entitÃ©. AppellÃ©e par {@link Monde} !
 	 */
 	public void detruit()
 	{
@@ -78,9 +78,9 @@ public abstract class Entite
 	}
 	
 	/**
-	 * Détermie si cette entité existe encore
+	 * DÃ©termie si cette entitÃ© existe encore
 	 * 
-	 * @return <tt>true</tt> si et seulement si cette entité existe encore
+	 * @return <tt>true</tt> si et seulement si cette entitÃ© existe encore
 	 */
 	public boolean existe()
 	{
@@ -88,9 +88,9 @@ public abstract class Entite
 	}
 	
 	/**
-	 * Met à jour l'entité
+	 * Met Ã  jour l'entitï¿½
 	 * 
-	 * @param frame le numéro de la frame actuelle
+	 * @param frame le numÃ©ro de la frame actuelle
 	 */
 	public abstract void metAJour(int frame);
 }

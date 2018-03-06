@@ -1,7 +1,7 @@
 package net.feerie.creatura.shared.commons;
 
 /**
- * Représente un vecteur
+ * ReprÃ©sente un vecteur
  * 
  * @author greewi
  */
@@ -15,8 +15,8 @@ public class Vecteur
 	}
 	
 	/**
-	 * @param x la coordonnée x du vecteur
-	 * @param y la coordonnée y du vecteur
+	 * @param x la coordonnÃ©e x du vecteur
+	 * @param y la coordonnÃ©e y du vecteur
 	 */
 	public Vecteur(double x, double y)
 	{
@@ -25,10 +25,10 @@ public class Vecteur
 	}
 	
 	/**
-	 * Construit le vecteur à partir d'une position de départ et une position de
+	 * Construit le vecteur Ã  partir d'une position de dÃ©part et une position de
 	 * fin
 	 * 
-	 * @param debut la position de départ du vecteur
+	 * @param debut la position de dÃ©part du vecteur
 	 * @param fin la position de fin du vecteur
 	 */
 	public Vecteur(Position debut, Position fin)
@@ -49,8 +49,8 @@ public class Vecteur
 	 * Multiplie ce vecteur par un nombre et le renvoie. Ne modifie pas ce
 	 * vecteur.
 	 * 
-	 * @param facteur le nombre à déplacer
-	 * @return le vecteur multiplié par le fecteur.
+	 * @param facteur le nombre Ã  dÃ©placer
+	 * @return le vecteur multipliÃ© par le fecteur.
 	 */
 	public Vecteur multiplie(double facteur)
 	{

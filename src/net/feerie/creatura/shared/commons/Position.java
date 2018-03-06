@@ -1,7 +1,7 @@
 package net.feerie.creatura.shared.commons;
 
 /**
- * Représente une position
+ * Reprï¿½sente une position
  * 
  * @author greewi
  */
@@ -17,7 +17,7 @@ public class Position
 	/**
 	 * Constructeur par copie
 	 * 
-	 * @param position la position à copier
+	 * @param position la position Ã  copier
 	 */
 	public Position(Position position)
 	{
@@ -26,8 +26,8 @@ public class Position
 	}
 	
 	/**
-	 * @param x la coordonnée x de la position
-	 * @param y la coordonnée y de la position
+	 * @param x la coordonnÃ©e x de la position
+	 * @param y la coordonnÃ©e y de la position
 	 */
 	public Position(double x, double y)
 	{
@@ -39,7 +39,7 @@ public class Position
 	 * Effectue une translation (ne modifie pas cette position)
 	 * 
 	 * @param v le vecteur de translation
-	 * @return la position translatée
+	 * @return la position translatÃ©e
 	 */
 	public Position translate(Vecteur v)
 	{

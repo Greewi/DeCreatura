@@ -12,7 +12,7 @@ import net.feerie.creatura.shared.events.ObservateurEntiteAjoutee;
 import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
 
 /**
- * Représente le monde. Il contiendra les entités.
+ * ReprÃ©sente le monde. Il contiendra les entitÃ©s.
  */
 public class Monde
 {
@@ -21,7 +21,7 @@ public class Monde
 	private int IDEntiteSuivante = 1;
 	private ArrayList<Zone> zones = new ArrayList<>();
 	private Environnement environnementParDefaut;
-	//Observateurs d'événements
+	//Observateurs d'Ã©vÃ©nements
 	private final ArrayList<ObservateurEntiteAjoutee> observateursEntiteAjoutee = new ArrayList<>();
 	private final ArrayList<ObservateurEntiteSupprimee> observateursEntiteSuprimee = new ArrayList<>();
 	
@@ -34,9 +34,9 @@ public class Monde
 	}
 	
 	/**
-	 * Génère et renvoie un nouvel ID d'entité
+	 * GÃ©nÃ©re et renvoie un nouvel ID d'entitÃ©
 	 * 
-	 * @return l'ID généré
+	 * @return l'ID gÃ©nÃ©rÃ©
 	 */
 	public int genereIDEntite()
 	{
@@ -44,10 +44,10 @@ public class Monde
 	}
 	
 	/**
-	 * Renvoie une entité
+	 * Renvoie une entitÃ©
 	 * 
-	 * @param ID l'ID de l'entité qu'on veut avoir
-	 * @return l'entité correspondant à l'IA ou <tt>null</tt> sinon.
+	 * @param ID l'ID de l'entitÃ© qu'on veut avoir
+	 * @return l'entitÃ© correspondant Ã  l'ID ou <tt>null</tt> sinon.
 	 */
 	public Entite getEntite(int ID)
 	{
@@ -55,9 +55,9 @@ public class Monde
 	}
 	
 	/**
-	 * Ajoute une entité
+	 * Ajoute une entitÃ©
 	 * 
-	 * @param entite l'entité à ajouter
+	 * @param entite l'entitÃ© Ã  ajouter
 	 */
 	void ajouteEntite(Entite entite)
 	{
@@ -72,9 +72,9 @@ public class Monde
 	}
 	
 	/**
-	 * Supprime une entité (ne supprimera pas une Zone !)
+	 * Supprime une entitÃ© (ne supprimera pas une Zone !)
 	 * 
-	 * @param ID l'ID de l'entité à supprimer
+	 * @param ID l'ID de l'entitÃ© Ã  supprimer
 	 */
 	public void supprimeEntite(int ID)
 	{
@@ -90,9 +90,9 @@ public class Monde
 	}
 	
 	/**
-	 * Renvoie la liste des entités contenues dans le monde
+	 * Renvoie la liste des entitÃ©s contenues dans le monde
 	 * 
-	 * @return la liste des entités contenues dans le monde
+	 * @return la liste des entitÃ©s contenues dans le monde
 	 */
 	public ArrayList<Entite> getListeEntites()
 	{
@@ -100,10 +100,10 @@ public class Monde
 	}
 	
 	/**
-	 * Renvoie la zone contenant les coordonnées passées en paramètre
+	 * Renvoie la zone contenant les coordonnÃ©es passÃ©es en paramÃ¨tre
 	 * 
-	 * @param position la position évaluée
-	 * @return la zone contenant les coordonnées ou <tt>null</tt>
+	 * @param position la position Ã©valuÃ©e
+	 * @return la zone contenant les coordonnÃ©es ou <tt>null</tt>
 	 */
 	public Zone getZone(Position position)
 	{
@@ -116,7 +116,7 @@ public class Monde
 	/**
 	 * Ajoute une zone dans le monde
 	 * 
-	 * @param zone la zone à ajouter
+	 * @param zone la zone Ã  ajouter
 	 */
 	public void ajouteZone(Zone zone)
 	{
@@ -125,9 +125,9 @@ public class Monde
 	}
 	
 	/**
-	 * Détermine l'environnement à la position donnée
+	 * DÃ©termine l'environnement Ã  la position donnÃ©e
 	 * 
-	 * @param position la position où on souhaite connaitre l'environnement
+	 * @param position la position oÃ¹ on souhaite connaitre l'environnement
 	 * @return l'environnement de la position
 	 */
 	public Environnement getEnvironnement(Position position)
@@ -140,27 +140,27 @@ public class Monde
 	}
 	
 	/**
-	 * Met le monde à jour .
+	 * Met le monde Ã  jour .
 	 * 
-	 * @param frame le numéro de la nouvelle frame
+	 * @param frame le numÃ©ro de la nouvelle frame
 	 */
 	public void metAJour(int frame)
 	{
 		for (Entite entite : entites.values())
 			entite.metAJour(frame);
-		//Ajout des nouvelles entités
+		//Ajout des nouvelles entitÃ©s
 		for(Entite entite : nouvellesEntites)
 			ajouteEntite(entite);
-		//Nettoyage des entités disparues
+		//Nettoyage des entitÃ©s disparues
 		for (Entite entite : new ArrayList<>(entites.values()))
 			if (!entite.existe())
 				supprimeEntite(entite.getID());
 	}
 	
 	/**
-	 * Ajoute un observateur sur les événements d'ajout d'entite
+	 * Ajoute un observateur sur les Ã©vÃ©nements d'ajout d'entite
 	 * 
-	 * @param observateur un observateur qui écoutera les ajouts d'entites
+	 * @param observateur un observateur qui Ã©coutera les ajouts d'entites
 	 */
 	public void onEntiteAjoutee(ObservateurEntiteAjoutee observateur)
 	{
@@ -168,9 +168,9 @@ public class Monde
 	}
 	
 	/**
-	 * Ajoute un observateur sur les événements de suppressions d'entite
+	 * Ajoute un observateur sur les Ã©vÃ©nements de suppressions d'entite
 	 * 
-	 * @param observateur un observateur qui écoutera les supressions d'entites
+	 * @param observateur un observateur qui Ã©coutera les supressions d'entites
 	 */
 	public void onEntiteSupprimee(ObservateurEntiteSupprimee observateur)
 	{

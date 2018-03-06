@@ -1,7 +1,7 @@
 package net.feerie.creatura.shared.commons;
 
 /**
- * Représente des dimensions
+ * ReprÃ©sente des dimensions
  * 
  * @author greewi
  */
@@ -28,7 +28,7 @@ public class Dimension
 	/**
 	 * Constructeur par copie
 	 * 
-	 * @param dimension la Dimention à copier
+	 * @param dimension la Dimention Ã  copier
 	 */
 	public Dimension(Dimension dimension)
 	{

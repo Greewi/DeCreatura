@@ -3,7 +3,7 @@ package net.feerie.creatura.shared.commons;
 import com.google.gwt.user.client.Random;
 
 /**
- * Représente un rectangle (ou une zone rectangulaire)
+ * ReprÃ©sente un rectangle (ou une zone rectangulaire)
  * 
  * @author greewi
  */
@@ -13,12 +13,12 @@ public class Rectangle
 	public Dimension dimension;
 	
 	/**
-	 * Créé un rectangle depuis les coordonnées de son coin haut-gauche et de
+	 * CrÃ©Ã© un rectangle depuis les coordonnÃ©es de son coin haut-gauche et de
 	 * ses dimensions
 	 * 
 	 * @param position la position du coin haut-gauche
 	 * @param dimension les dimentions du rectangle
-	 * @return le rectangle créé
+	 * @return le rectangle crÃ©Ã©
 	 */
 	public static Rectangle creeDepuisCoinHautGauche(Position position, Dimension dimension)
 	{
@@ -26,11 +26,11 @@ public class Rectangle
 	}
 	
 	/**
-	 * Créé un rectangle centré sur un point avec des dimensions précisées
+	 * CrÃ©Ã© un rectangle centrÃ© sur un point avec des dimensions prï¿½cisï¿½es
 	 * 
 	 * @param centre le centre du rectangle
 	 * @param dimension les dimensions du rectangle
-	 * @return le rectangle créé
+	 * @return le rectangle crÃ©Ã©
 	 */
 	public static Rectangle creeDepuisCentre(Position centre, Dimension dimension)
 	{
@@ -38,7 +38,7 @@ public class Rectangle
 	}
 	
 	/**
-	 * Détermine si le rectangle contient le point donné
+	 * DÃ©termine si le rectangle contient le point donnÃ©
 	 * 
 	 * @param position la position dont on veut savoir si elle est contenue dans
 	 *        le rectangle
@@ -51,9 +51,9 @@ public class Rectangle
 	}
 	
 	/**
-	 * Génère une position aléatoire contenue dans le rectangle
+	 * GÃ©nÃ¨re une position alÃ©atoire contenue dans le rectangle
 	 * 
-	 * @return la position générée
+	 * @return la position gÃ©nÃ©rÃ©e
 	 */
 	public Position getPositionAleatoire()
 	{

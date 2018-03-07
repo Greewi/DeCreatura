@@ -5,15 +5,36 @@ import net.feerie.creatura.shared.commons.Vecteur;
 import net.feerie.creatura.shared.entites.Creature;
 
 /**
- * Repr�sente une action de déplacement
+ * Représente une action de déplacement
  * 
  * @author greewi
  */
 public class ActionSeDeplacer extends Action
 {
-	private final Action actionAEnchainer;
-	private final Position destination;
+	private Action actionAEnchainer;
+	private Position destination;
 	private final double vitesse = 0.5;
+	
+	/**
+	 * @param creature la créature se déplaçant
+	 */
+	public ActionSeDeplacer(Creature creature)
+	{
+		super(creature);
+		this.destination = null;
+		this.actionAEnchainer = null;
+	}
+	
+	/**
+	 * @param creature la créature se déplaçant
+	 * @param destination la position vers laquelle se déplace la créature
+	 */
+	public ActionSeDeplacer(Creature creature, Position destination)
+	{
+		super(creature);
+		this.destination = destination;
+		this.actionAEnchainer = null;
+	}
 	
 	/**
 	 * @param creature la créature se déplaçant
@@ -28,6 +49,26 @@ public class ActionSeDeplacer extends Action
 		this.actionAEnchainer = actionAEnchainer;
 	}
 	
+	/**
+	 * Définis la destination
+	 * 
+	 * @param destination
+	 */
+	public void setDestination(Position destination)
+	{
+		this.destination = destination;
+	}
+	
+	/**
+	 * Défini l'action à enchainer une fois le déplacement terminé
+	 * 
+	 * @param actionAEnchainer
+	 */
+	public void setActionAEnchainer(Action actionAEnchainer)
+	{
+		this.actionAEnchainer = actionAEnchainer;
+	}
+	
 	@Override
 	public TypeAction getType()
 	{
@@ -37,6 +78,9 @@ public class ActionSeDeplacer extends Action
 	@Override
 	public boolean metAJour(int frame)
 	{
+		if (destination == null)
+			return false;
+		
 		//On avance d'une frame
 		boolean arrive = avance();
 		

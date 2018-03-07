@@ -4,14 +4,18 @@ import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.ButtonElement;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 
 import net.feerie.creatura.client.rendu2d.RenduMonde;
+import net.feerie.creatura.shared.Console;
 import net.feerie.creatura.shared.Environnement;
 import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Dimension;
@@ -19,8 +23,11 @@ import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.creature.moodles.Moodle;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.EntiteEau;
 import net.feerie.creatura.shared.entites.Litiere;
 import net.feerie.creatura.shared.entites.Nourriture;
+import net.feerie.creatura.shared.entites.TypeEntite;
 import net.feerie.creatura.shared.entites.TypeNourriture;
 import net.feerie.creatura.shared.entites.Zone;
 
@@ -39,7 +46,11 @@ public class Creatura implements EntryPoint
 	private int numeroFrame;
 	private int taille;
 	//UI
+	private Outil outilActuel;
 	private HTML uiInformations;
+	private ButtonElement boutonPlacerNourriture;
+	private ButtonElement boutonSecher;
+	private ButtonElement boutonNettoyer;
 	
 	public void onModuleLoad()
 	{
@@ -54,6 +65,9 @@ public class Creatura implements EntryPoint
 		//Initialisation de l'UI
 		uiInformations = new HTML();
 		RootPanel.get("informations").add(uiInformations);
+		boutonPlacerNourriture = (ButtonElement) Document.get().getElementById("boutonPlacerNourriture");
+		boutonSecher = (ButtonElement) Document.get().getElementById("boutonSecher");
+		boutonNettoyer = (ButtonElement) Document.get().getElementById("boutonNettoyer");
 		
 		//Construction du monde
 		this.monde = new Monde(new Environnement(0, 0, "#000000"));
@@ -65,19 +79,22 @@ public class Creatura implements EntryPoint
 		monde.ajouteZone(new Zone(monde, new Position(75, 75), new Dimension(50, 50), new Environnement(7, 1, "#A6FFEF")));
 		
 		//Ajout d'une litierre
-		monde.nouvelleEntite(new Litiere(monde, 3000, new Position(Random.nextInt(100), Random.nextInt(100))));
+		monde.nouvelleEntite(new Litiere(monde, 10, new Position(90, 10)));
 		
-		//Ajout d'une créature
-		this.creature = new Creature(monde, new Position(Random.nextInt(100), Random.nextInt(100)));
-		monde.nouvelleEntite(creature);
+		//Ajout d'un point d'eau
+		monde.nouvelleEntite(new EntiteEau(monde, new Position(15, 85)));
 		
 		//Ajout de la nourriture
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 0; i++)
 		{
 			TypeNourriture[] types = TypeNourriture.values();
 			TypeNourriture type = types[Random.nextInt(types.length)];
 			monde.nouvelleEntite(new Nourriture(monde, type, new Position(Random.nextInt(100), Random.nextInt(100))));
 		}
+		
+		//Ajout d'une créature
+		this.creature = new Creature(monde, new Position(25, 50));
+		monde.nouvelleEntite(creature);
 		
 		//Boucle de rendu
 		numeroFrame = 0;
@@ -89,17 +106,54 @@ public class Creatura implements EntryPoint
 	
 	private final void initialiseEvenement()
 	{
-		this.canvas.addClickHandler(new ClickHandler()
+		outilActuel = new OutilPlacerNourriture();
+		boutonPlacerNourriture.addClassName("actif");
+		canvas.addClickHandler(new ClickHandler()
 		{
-			
 			@Override
 			public void onClick(ClickEvent event)
 			{
-				double x = event.getRelativeX(event.getRelativeElement()) * 100.0 / taille;
-				double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
-				TypeNourriture[] types = TypeNourriture.values();
-				TypeNourriture type = types[Random.nextInt(types.length)];
-				monde.nouvelleEntite(new Nourriture(monde, type, new Position(x, y)));
+				if (outilActuel != null)
+					outilActuel.onClick(event);
+			}
+		});
+		
+		Button.wrap(boutonPlacerNourriture).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				Console.log("Click sur boutonPlacerNourriture");
+				boutonPlacerNourriture.addClassName("actif");
+				boutonSecher.removeClassName("actif");
+				boutonNettoyer.removeClassName("actif");
+				outilActuel = new OutilPlacerNourriture();
+			}
+		});
+		
+		Button.wrap(boutonSecher).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				Console.log("Click sur boutonSecher");
+				boutonPlacerNourriture.removeClassName("actif");
+				boutonSecher.addClassName("actif");
+				boutonNettoyer.removeClassName("actif");
+				outilActuel = new OutilSecher();
+			}
+		});
+		
+		Button.wrap(boutonNettoyer).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				Console.log("Click sur boutonNettoyer");
+				boutonPlacerNourriture.removeClassName("actif");
+				boutonSecher.removeClassName("actif");
+				boutonNettoyer.addClassName("actif");
+				outilActuel = new OutilNettoyer();
 			}
 		});
 	}
@@ -159,5 +213,59 @@ public class Creatura implements EntryPoint
 		
 		//On affiche les informations
 		uiInformations.setHTML(htmlInfos.toString());
+	}
+	
+	private interface Outil
+	{
+		public void onClick(ClickEvent event);
+	}
+	
+	private class OutilPlacerNourriture implements Outil
+	{
+		@Override
+		public void onClick(ClickEvent event)
+		{
+			double x = event.getRelativeX(event.getRelativeElement()) * 100.0 / taille;
+			double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
+			TypeNourriture[] types = TypeNourriture.values();
+			TypeNourriture type = types[Random.nextInt(types.length)];
+			monde.nouvelleEntite(new Nourriture(monde, type, new Position(x, y)));
+		}
+	}
+	
+	private class OutilSecher implements Outil
+	{
+		@Override
+		public void onClick(ClickEvent event)
+		{
+			double x = event.getRelativeX(event.getRelativeElement()) * 100.0 / taille;
+			double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
+			double xc = creature.getPosition().x;
+			double yc = creature.getPosition().y;
+			double rayon = creature.getTaille().l / 2;
+			
+			if ((x - xc) * (x - xc) + (y - yc) * (y - yc) <= rayon * rayon)
+			{
+				creature.getMoodle(TypeMoodle.MOUILLE).desactive();
+			}
+		}
+	}
+	
+	private class OutilNettoyer implements Outil
+	{
+		@Override
+		public void onClick(ClickEvent event)
+		{
+			double x = event.getRelativeX(event.getRelativeElement()) * 100.0 / taille;
+			double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
+			
+			for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
+			{
+				if (entite.getType() == TypeEntite.NOURRITURE || entite.getType() == TypeEntite.POPO)
+					entite.detruit();
+				else if (entite.getType() == TypeEntite.LITIERE)
+					((Litiere) entite).vide();
+			}
+		}
 	}
 }

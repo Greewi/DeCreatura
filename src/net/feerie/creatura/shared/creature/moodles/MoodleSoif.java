@@ -24,8 +24,9 @@ public class MoodleSoif extends Moodle
 	@Override
 	public void nouveauCycle()
 	{
-		charge(3);
 		if (estActif())
 			getCreature().reduitSante(1);
+		
+		charge(3);
 	}
 }

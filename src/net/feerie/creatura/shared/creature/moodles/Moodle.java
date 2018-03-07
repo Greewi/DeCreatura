@@ -28,7 +28,9 @@ public abstract class Moodle
 	public abstract TypeMoodle getType();
 	
 	/**
-	 * Effectue un nouveau cycle métabolique
+	 * Effectue un nouveau cycle métabolique Note : il est préférable
+	 * d'appliquer les effets avant de charger le moodle de sorte à laisser le
+	 * temps à la créature de réagir.
 	 */
 	public void nouveauCycle()
 	{

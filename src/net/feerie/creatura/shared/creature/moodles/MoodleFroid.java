@@ -24,11 +24,12 @@ public class MoodleFroid extends Moodle
 	@Override
 	public void nouveauCycle()
 	{
+		if (estActif())
+			getCreature().getMoodle(TypeMoodle.FAIM).charge(5);
+		
 		if (getCreature().getEnvironnement().getTemperature() < 10)
 			charge(10);
 		else
-			decharge(10);
-		if (estActif())
-			getCreature().getMoodle(TypeMoodle.FAIM).charge(5);
+			decharge(20);
 	}
 }

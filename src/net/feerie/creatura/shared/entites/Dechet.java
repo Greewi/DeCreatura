@@ -18,7 +18,7 @@ public class Dechet extends Entite
 	 */
 	public Dechet(Monde monde, Position position)
 	{
-		super(monde, position, new Dimension(20, 20));
+		super(monde, position, new Dimension(2, 2));
 	}
 	
 	@Override

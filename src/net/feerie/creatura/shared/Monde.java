@@ -55,6 +55,34 @@ public class Monde
 	}
 	
 	/**
+	 * Récupère la liste des entités à une position
+	 * 
+	 * @param position
+	 * @return
+	 */
+	public List<Entite> getEntiteAPosition(Position position)
+	{
+		double xc = position.x;
+		double yc = position.y;
+		
+		List<Entite> entites = new ArrayList<>();
+		for (Entite e : getListeEntites())
+		{
+			if (e.getType() == TypeEntite.ZONE)
+				continue;
+			
+			double xe = e.getPosition().x;
+			double ye = e.getPosition().y;
+			double rayon = e.getTaille().l / 2;
+			
+			if ((xc - xe) * (xc - xe) + (yc - ye) * (yc - ye) <= rayon * rayon)
+				entites.add(e);
+		}
+		
+		return entites;
+	}
+	
+	/**
 	 * Ajoute une entité
 	 * 
 	 * @param entite l'entité à ajouter
@@ -149,7 +177,7 @@ public class Monde
 		for (Entite entite : entites.values())
 			entite.metAJour(frame);
 		//Ajout des nouvelles entités
-		for(Entite entite : nouvellesEntites)
+		for (Entite entite : nouvellesEntites)
 			ajouteEntite(entite);
 		//Nettoyage des entités disparues
 		for (Entite entite : new ArrayList<>(entites.values()))

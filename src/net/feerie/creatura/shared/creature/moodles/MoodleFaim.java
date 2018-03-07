@@ -24,8 +24,9 @@ public class MoodleFaim extends Moodle
 	@Override
 	public void nouveauCycle()
 	{
-		charge(2);
 		if (estActif())
 			getCreature().reduitSante(1);
+		
+		charge(2);
 	}
 }

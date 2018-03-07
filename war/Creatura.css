@@ -9,4 +9,30 @@ html, html body {
 	top: 0px;
 	padding: 10px;
 	background-color: rgba(255, 255, 255, 0.65);
+	border-bottom-right-radius: 10px;
+}
+
+#outils {
+	width: 200px;
+	position: absolute;
+	bottom: 0px;
+	right:0px;
+	padding: 10px;
+	background-color: rgba(255, 255, 255, 0.65);
+	border-top-left-radius: 10px;
+}
+
+#outils button {
+	width : 200px;
+	margin : 5px 0 0 0;
+	padding : 5px 0 5px 0;
+	background : #555555;
+	border : none;
+	border-radius : 5px;
+	color : #AAAAAA;
+}
+
+#outils button.actif {
+	color : #FFFFFF;
+	background : #999999;
 }

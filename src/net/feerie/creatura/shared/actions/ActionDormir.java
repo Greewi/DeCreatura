@@ -23,7 +23,6 @@ public class ActionDormir extends Action
 	@Override
 	public boolean metAJour(int frame)
 	{
-		getCreature().getMoodle(TypeMoodle.FATIGUE).decharge(3);
 		return getCreature().estAffectePar(TypeMoodle.FATIGUE);
 	}
 }

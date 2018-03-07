@@ -4,6 +4,7 @@ public enum TypeAction
 {
 	SE_DEPLACER("Se Deplace"),
 	MANGER("Mange"),
+	BOIRE("Boit"),
 	FAIRE_POPO("Fait Popo"),
 	DORMIR("Dort");
 	

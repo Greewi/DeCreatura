@@ -34,11 +34,11 @@ public class ActionManger extends Action
 	@Override
 	public boolean metAJour(int frame)
 	{
-		//Si la cible n'existe plus on arr�te
+		//Si la cible n'existe plus on arrète
 		if (!cible.existe())
 			return false;
 		
-		//Si la cr�ature n'a pas fini de manger on continue
+		//Si la créature n'a pas fini de manger on continue
 		if (frame < this.debut + 60)
 			return true;
 		
@@ -47,8 +47,7 @@ public class ActionManger extends Action
 		{
 			cible.detruit();
 			getCreature().getMoodle(TypeMoodle.FAIM).decharge(50);
-			getCreature().getMoodle(TypeMoodle.SOIF).desactive();
-			getCreature().getMoodle(TypeMoodle.POPO).charge(25);
+			getCreature().getMoodle(TypeMoodle.POPO).charge(30);
 		}
 		return false;
 	}

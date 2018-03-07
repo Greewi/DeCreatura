@@ -3,10 +3,12 @@ package net.feerie.creatura.shared.creature.ia;
 import com.google.gwt.user.client.Random;
 
 import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.actions.ActionBoire;
 import net.feerie.creatura.shared.actions.ActionDormir;
 import net.feerie.creatura.shared.actions.ActionManger;
 import net.feerie.creatura.shared.actions.ActionPopo;
 import net.feerie.creatura.shared.actions.ActionSeDeplacer;
+import net.feerie.creatura.shared.actions.ActionSeDeplacerVersEntite;
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.commons.Vecteur;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
@@ -27,7 +29,7 @@ public class IABasique implements IA
 	{
 		this.creature = creature;
 	}
-
+	
 	@Override
 	public Action decideProchaineAction()
 	{
@@ -35,13 +37,13 @@ public class IABasique implements IA
 		{
 			Entite nourriture = creature.cherche(TypeEntite.NOURRITURE);
 			if (nourriture != null)
-				return new ActionSeDeplacer(creature, nourriture.getPosition(), new ActionManger(creature, nourriture));
+				return new ActionSeDeplacerVersEntite(creature, nourriture, new ActionManger(creature, nourriture));
 		}
 		if (creature.estAffectePar(TypeMoodle.SOIF))
 		{
-			Entite eau = creature.cherche(TypeEntite.NOURRITURE);
+			Entite eau = creature.cherche(TypeEntite.EAU);
 			if (eau != null)
-				return new ActionSeDeplacer(creature, eau.getPosition(), new ActionManger(creature, eau));
+				return new ActionSeDeplacerVersEntite(creature, eau, new ActionBoire(creature, eau));
 		}
 		if (creature.estAffectePar(TypeMoodle.POPO))
 		{
@@ -60,11 +62,9 @@ public class IABasique implements IA
 			double norme = vecteur.getNorme();
 			if (norme > 25)
 				destination = creature.getPosition().translate(vecteur.multiplie(25 / norme));
-			creature.getMoodle(TypeMoodle.ENNUI).decharge(Random.nextInt(10)+15);
-			return new ActionSeDeplacer(creature, destination, null);
+			return new ActionSeDeplacer(creature, destination);
 		}
 		
-		creature.getMoodle(TypeMoodle.ENNUI).charge(5);
 		return null;
 	}
 }

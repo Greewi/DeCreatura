@@ -1,7 +1,6 @@
 package net.feerie.creatura.shared;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.google.gwt.core.client.GWT;
 
 /**
  * Effectue des sorties dans la console du navigateur
@@ -10,7 +9,7 @@ import java.util.logging.Logger;
  */
 public class Console
 {
-	private static Logger logger = java.util.logging.Logger.getLogger("Console");
+	//private static Logger logger = java.util.logging.Logger.getLogger("Console");
 	
 	/**
 	 * Écrit un message dans la console du navigateur
@@ -19,6 +18,7 @@ public class Console
 	 */
 	public static void log(String message)
 	{
-		logger.log(Level.SEVERE, message);
+		GWT.log(message);
+		//logger.log(Level.SEVERE, message);
 	}
 }

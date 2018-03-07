@@ -65,6 +65,19 @@ public abstract class Entite
 	}
 	
 	/**
+	 * Calcule la distance carrée avec une autre entité
+	 * 
+	 * @param entite l'entité avec laquelle calculer la distance carrée
+	 * @return la distance au carrée entre les deux entité
+	 */
+	public double getDistanceCarre(Entite entite)
+	{
+		Position p1 = entite.getPosition();
+		Position p2 = getPosition();
+		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+	}
+	
+	/**
 	 * @return le type de cette entité (voir {@link TypeEntite})
 	 */
 	public abstract TypeEntite getType();

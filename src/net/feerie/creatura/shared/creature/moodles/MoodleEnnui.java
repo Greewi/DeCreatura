@@ -20,4 +20,13 @@ public class MoodleEnnui extends Moodle
 	{
 		return TypeMoodle.ENNUI;
 	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		if (getCreature().getActionActuelle() == null)
+			charge(10);
+		else
+			decharge(24);
+	}
 }

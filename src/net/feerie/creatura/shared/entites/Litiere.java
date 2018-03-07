@@ -64,6 +64,14 @@ public class Litiere extends Entite
 		}
 	}
 	
+	/**
+	 * Vide la litière
+	 */
+	public void vide()
+	{
+		contenu = 0;
+	}
+	
 	@Override
 	public TypeEntite getType()
 	{

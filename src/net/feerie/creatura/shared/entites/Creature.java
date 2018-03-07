@@ -19,15 +19,17 @@ import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
  */
 public class Creature extends Entite
 {
-	private final static long PERIODE_CYCLE_METABOLIQUE = 3000l;
+	private final static long PERIODE_CYCLE_IA = 300l;
+	private final static long PERIODE_CYCLE_METABOLIQUE = PERIODE_CYCLE_IA * 10;
 	
 	private Action action;
 	private Environnement environnementActuel;
 	private final IA ia;
+	private long dateDernierCycleIA;
 	
-	private long dateDernierCycleMetabolique;
 	private int sante;
 	private final EnumMap<TypeMoodle, Moodle> moodles;
+	private long dateDernierCycleMetabolique;
 	
 	public Creature(Monde monde, Position position)
 	{
@@ -37,11 +39,12 @@ public class Creature extends Entite
 		this.action = null;
 		this.environnementActuel = monde.getEnvironnement(position);
 		this.ia = new IABasique(this);
+		this.dateDernierCycleIA = System.currentTimeMillis();
 		
 		//Sant�
 		this.sante = 100;
 		this.moodles = new EnumMap<>(TypeMoodle.class);
-		this.dateDernierCycleMetabolique = System.currentTimeMillis();
+		this.dateDernierCycleMetabolique = this.dateDernierCycleIA;
 	}
 	
 	/**
@@ -134,14 +137,20 @@ public class Creature extends Entite
 			return;
 		}
 		
-		//IA et exécution des actions
+		//Execution des actions
 		if (action != null)
 		{
 			if (!action.metAJour(frame))
 				this.action = null;
 		}
-		else if (frame % 10 == 0)
-			this.action = ia.decideProchaineAction();
+		
+		//IA
+		if (dateDernierCycleIA + PERIODE_CYCLE_IA < System.currentTimeMillis())
+		{
+			dateDernierCycleIA += PERIODE_CYCLE_IA;
+			if (action == null)
+				action = ia.decideProchaineAction();
+		}
 		
 		//Mise à jour de l'environnement
 		environnementActuel = monde.getEnvironnement(getPosition());
@@ -162,9 +171,9 @@ public class Creature extends Entite
 			}
 			
 			//Cap de santé
-			if(sante>100)
+			if (sante > 100)
 				sante = 100;
-			if(sante<0)
+			if (sante < 0)
 				sante = 0;
 		}
 	}
@@ -206,18 +215,5 @@ public class Creature extends Entite
 				distance = getDistanceCarre(e);
 			}
 		return entite;
-	}
-	
-	/**
-	 * Calcule la distance carrée avec une autre entité
-	 * 
-	 * @param entite l'entité avec laquelle calculer la distance carrée
-	 * @return la distance au carrée entre les deux entité
-	 */
-	private double getDistanceCarre(Entite entite)
-	{
-		Position p1 = entite.getPosition();
-		Position p2 = getPosition();
-		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
 	}
 }

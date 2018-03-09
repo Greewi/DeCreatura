@@ -64,9 +64,4 @@ public class Zone extends Entite
 	{
 		return TypeEntite.ZONE;
 	}
-	
-	@Override
-	public void metAJour(int frame)
-	{
-	}
 }

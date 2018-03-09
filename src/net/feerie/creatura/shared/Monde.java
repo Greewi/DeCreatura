@@ -16,8 +16,7 @@ import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
  */
 public class Monde
 {
-	private HashMap<Integer, Entite> entites = new HashMap<>();
-	private List<Entite> nouvellesEntites = new ArrayList<>();
+	private final HashMap<Integer, Entite> entites = new HashMap<>();
 	private int IDEntiteSuivante = 1;
 	private ArrayList<Zone> zones = new ArrayList<>();
 	private Environnement environnementParDefaut;
@@ -96,7 +95,7 @@ public class Monde
 	
 	public void nouvelleEntite(Entite entite)
 	{
-		nouvellesEntites.add(entite);
+		ajouteEntite(entite);
 	}
 	
 	/**
@@ -167,22 +166,20 @@ public class Monde
 			return zone.getEnvironnement();
 	}
 	
-	/**
-	 * Met le monde à jour .
-	 * 
-	 * @param frame le numéro de la nouvelle frame
-	 */
-	public void metAJour(int frame)
+	private final List<Entite> entitesTic = new ArrayList<>();
+	
+	public void effectueTic(boolean cycleIA, boolean cycleMetabolique)
 	{
-		for (Entite entite : entites.values())
-			entite.metAJour(frame);
-		//Ajout des nouvelles entités
-		for (Entite entite : nouvellesEntites)
-			ajouteEntite(entite);
-		//Nettoyage des entités disparues
-		for (Entite entite : new ArrayList<>(entites.values()))
-			if (!entite.existe())
-				supprimeEntite(entite.getID());
+		entitesTic.clear();
+		entitesTic.addAll(this.entites.values());
+		for (Entite entite : entitesTic)
+			entite.effectueTic();
+		if (cycleIA)
+			for (Entite entite : entitesTic)
+				entite.effectueCycleIA();
+		if (cycleMetabolique)
+			for (Entite entite : entitesTic)
+				entite.effectueCycleMetabolique();
 	}
 	
 	/**

@@ -13,6 +13,7 @@ public class ActionBoire extends Action
 	{
 		super(creature);
 		this.cible = cible;
+		setDuree(6);
 	}
 	
 	@Override
@@ -22,17 +23,9 @@ public class ActionBoire extends Action
 	}
 	
 	@Override
-	public boolean metAJour(int frame)
+	public boolean termine()
 	{
-		//Si la cible n'existe plus on arrète
-		if (!cible.existe())
-			return false;
-		
-		//Si la créature n'a pas fini de manger on continue
-		if (frame < this.debut + 60)
-			return true;
-		
-		//Sinon on applique les effets
+		//Si c'est de l'eau on applique les effets
 		if (cible.getType() == TypeEntite.EAU)
 		{
 			getCreature().getMoodle(TypeMoodle.SOIF).desactive();
@@ -40,5 +33,4 @@ public class ActionBoire extends Action
 		}
 		return false;
 	}
-	
 }

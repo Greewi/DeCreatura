@@ -23,6 +23,7 @@ public class ActionManger extends Action
 	{
 		super(creature);
 		this.cible = cible;
+		setDuree(4);
 	}
 	
 	@Override
@@ -32,17 +33,9 @@ public class ActionManger extends Action
 	}
 	
 	@Override
-	public boolean metAJour(int frame)
+	public boolean termine()
 	{
-		//Si la cible n'existe plus on arrète
-		if (!cible.existe())
-			return false;
-		
-		//Si la créature n'a pas fini de manger on continue
-		if (frame < this.debut + 60)
-			return true;
-		
-		//Sinon on applique les effets
+		//Si c'est de la nourriture on applique les effets
 		if (cible.getType() == TypeEntite.NOURRITURE)
 		{
 			cible.detruit();
@@ -51,4 +44,5 @@ public class ActionManger extends Action
 		}
 		return false;
 	}
+	
 }

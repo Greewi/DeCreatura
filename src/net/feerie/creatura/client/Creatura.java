@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import net.feerie.creatura.client.rendu2d.RenduMonde;
 import net.feerie.creatura.shared.Console;
 import net.feerie.creatura.shared.Environnement;
+import net.feerie.creatura.shared.Metronome;
 import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
@@ -25,8 +26,8 @@ import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.EntiteEau;
-import net.feerie.creatura.shared.entites.Litiere;
-import net.feerie.creatura.shared.entites.Nourriture;
+import net.feerie.creatura.shared.entites.EntiteLitiere;
+import net.feerie.creatura.shared.entites.EntiteNourriture;
 import net.feerie.creatura.shared.entites.TypeEntite;
 import net.feerie.creatura.shared.entites.TypeNourriture;
 import net.feerie.creatura.shared.entites.Zone;
@@ -38,12 +39,12 @@ public class Creatura implements EntryPoint
 {
 	//Modele
 	private Monde monde;
+	private Metronome metronome;
 	private Creature creature;
 	//Vue
 	private Canvas canvas;
 	private Context2d contexte;
 	private RenduMonde vueMonde;
-	private int numeroFrame;
 	private int taille;
 	//UI
 	private Outil outilActuel;
@@ -71,6 +72,7 @@ public class Creatura implements EntryPoint
 		
 		//Construction du monde
 		this.monde = new Monde(new Environnement(0, 0, "#000000"));
+		this.metronome = new Metronome(monde);
 		this.vueMonde = new RenduMonde(monde, contexte);
 		
 		//Ajout des zones
@@ -79,7 +81,7 @@ public class Creatura implements EntryPoint
 		monde.ajouteZone(new Zone(monde, new Position(75, 75), new Dimension(50, 50), new Environnement(7, 1, "#A6FFEF")));
 		
 		//Ajout d'une litierre
-		monde.nouvelleEntite(new Litiere(monde, 10, new Position(90, 10)));
+		monde.nouvelleEntite(new EntiteLitiere(monde, 10, new Position(90, 10)));
 		
 		//Ajout d'un point d'eau
 		monde.nouvelleEntite(new EntiteEau(monde, new Position(15, 85)));
@@ -89,7 +91,7 @@ public class Creatura implements EntryPoint
 		{
 			TypeNourriture[] types = TypeNourriture.values();
 			TypeNourriture type = types[Random.nextInt(types.length)];
-			monde.nouvelleEntite(new Nourriture(monde, type, new Position(Random.nextInt(100), Random.nextInt(100))));
+			monde.nouvelleEntite(new EntiteNourriture(monde, type, new Position(Random.nextInt(100), Random.nextInt(100))));
 		}
 		
 		//Ajout d'une créature
@@ -97,7 +99,6 @@ public class Creatura implements EntryPoint
 		monde.nouvelleEntite(creature);
 		
 		//Boucle de rendu
-		numeroFrame = 0;
 		BoucleRendu boucleRendu = new BoucleRendu();
 		AnimationScheduler.get().requestAnimationFrame(boucleRendu);
 		
@@ -163,8 +164,10 @@ public class Creatura implements EntryPoint
 		@Override
 		public void execute(double timestamp)
 		{
+			long dateActuelle = System.currentTimeMillis();
+			
 			//Mise à jour du monde
-			monde.metAJour(numeroFrame++);
+			metronome.nouvelleFrame();
 			
 			//Affichage du canvas
 			canvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
@@ -175,7 +178,7 @@ public class Creatura implements EntryPoint
 				contexte.scale(canvas.getCoordinateSpaceHeight() / 100.0, canvas.getCoordinateSpaceHeight() / 100.0);
 			
 			//Dessin du monde
-			vueMonde.dessine(timestamp);
+			vueMonde.dessine(dateActuelle);
 			
 			//Mise à jour de l'UI
 			metAJourUI();
@@ -229,7 +232,7 @@ public class Creatura implements EntryPoint
 			double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
 			TypeNourriture[] types = TypeNourriture.values();
 			TypeNourriture type = types[Random.nextInt(types.length)];
-			monde.nouvelleEntite(new Nourriture(monde, type, new Position(x, y)));
+			monde.nouvelleEntite(new EntiteNourriture(monde, type, new Position(x, y)));
 		}
 	}
 	
@@ -264,7 +267,7 @@ public class Creatura implements EntryPoint
 				if (entite.getType() == TypeEntite.NOURRITURE || entite.getType() == TypeEntite.POPO)
 					entite.detruit();
 				else if (entite.getType() == TypeEntite.LITIERE)
-					((Litiere) entite).vide();
+					((EntiteLitiere) entite).vide();
 			}
 		}
 	}

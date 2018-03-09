@@ -1,6 +1,5 @@
 package net.feerie.creatura.shared.actions;
 
-import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 
 public class ActionDormir extends Action
@@ -12,6 +11,7 @@ public class ActionDormir extends Action
 	public ActionDormir(Creature creature)
 	{
 		super(creature);
+		setDuree(30);
 	}
 	
 	@Override
@@ -21,8 +21,8 @@ public class ActionDormir extends Action
 	}
 	
 	@Override
-	public boolean metAJour(int frame)
+	public boolean termine()
 	{
-		return getCreature().estAffectePar(TypeMoodle.FATIGUE);
+		return false;
 	}
 }

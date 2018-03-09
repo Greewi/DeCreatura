@@ -21,10 +21,4 @@ public class EntiteEau extends Entite
 	{
 		return TypeEntite.EAU;
 	}
-	
-	@Override
-	public void metAJour(int frame)
-	{
-		//Inerte pour le moment
-	}
 }

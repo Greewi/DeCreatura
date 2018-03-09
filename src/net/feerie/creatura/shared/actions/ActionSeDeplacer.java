@@ -12,8 +12,9 @@ import net.feerie.creatura.shared.entites.Creature;
 public class ActionSeDeplacer extends Action
 {
 	private Action actionAEnchainer;
+	private Position depart;
 	private Position destination;
-	private final double vitesse = 0.5;
+	private final int vitesse = 10; //Pixels par tics
 	
 	/**
 	 * @param creature la créature se déplaçant
@@ -21,6 +22,7 @@ public class ActionSeDeplacer extends Action
 	public ActionSeDeplacer(Creature creature)
 	{
 		super(creature);
+		this.depart = creature.getPosition();
 		this.destination = null;
 		this.actionAEnchainer = null;
 	}
@@ -32,8 +34,10 @@ public class ActionSeDeplacer extends Action
 	public ActionSeDeplacer(Creature creature, Position destination)
 	{
 		super(creature);
+		this.depart = creature.getPosition();
 		this.destination = destination;
 		this.actionAEnchainer = null;
+		calculeTrajet();
 	}
 	
 	/**
@@ -45,8 +49,10 @@ public class ActionSeDeplacer extends Action
 	public ActionSeDeplacer(Creature creature, Position destination, Action actionAEnchainer)
 	{
 		super(creature);
+		this.depart = creature.getPosition();
 		this.destination = destination;
 		this.actionAEnchainer = actionAEnchainer;
+		calculeTrajet();
 	}
 	
 	/**
@@ -57,6 +63,27 @@ public class ActionSeDeplacer extends Action
 	public void setDestination(Position destination)
 	{
 		this.destination = destination;
+		calculeTrajet();
+	}
+	
+	/**
+	 * Renvoie la position de départ de la créature
+	 * 
+	 * @return la position de départ de la créature
+	 */
+	public Position getDepart()
+	{
+		return depart;
+	}
+	
+	/**
+	 * Renvoie la position d'arrivée de la créature
+	 * 
+	 * @return la position d'arrivée de la créature
+	 */
+	public Position getDestination()
+	{
+		return destination;
 	}
 	
 	/**
@@ -69,6 +96,13 @@ public class ActionSeDeplacer extends Action
 		this.actionAEnchainer = actionAEnchainer;
 	}
 	
+	private void calculeTrajet()
+	{
+		Vecteur direction = new Vecteur(depart, destination);
+		double distance = direction.getNorme();
+		setDuree((int) Math.ceil(distance / vitesse));
+	}
+	
 	@Override
 	public TypeAction getType()
 	{
@@ -76,52 +110,28 @@ public class ActionSeDeplacer extends Action
 	}
 	
 	@Override
-	public boolean metAJour(int frame)
+	public boolean effectueTic()
 	{
-		if (destination == null)
-			return false;
-		
-		//On avance d'une frame
-		boolean arrive = avance();
-		
-		//Si on est arrivé, on se place bien sur le point d'arrivée et on effectuer l'action en attente
-		if (arrive)
+		dureeEcoulee++;
+		double progression = getProgression();
+		Position positionActuelle = new Position((1 - progression) * depart.x + progression * destination.x, (1 - progression) * depart.y + progression * destination.y);
+		getCreature().setPosition(positionActuelle);
+		if (dureeEcoulee >= dureeTotale)
+			return termine();
+		return true;
+	}
+	
+	@Override
+	public boolean termine()
+	{
+		getCreature().setPosition(new Position(destination));
+		if (actionAEnchainer != null)
 		{
-			getCreature().setPosition(new Position(destination));
-			if (actionAEnchainer != null)
-			{
-				getCreature().setActionActuelle(actionAEnchainer);
-				actionAEnchainer.debute(frame);
-				return true;
-			}
-			else
-				return false;
+			getCreature().setActionActuelle(actionAEnchainer);
+			actionAEnchainer.debute();
+			return true;
 		}
-		//Si on n'est pas encore arrivé il faudra continuer à la prochaine frame
 		else
-			return true;
+			return false;
 	}
-	
-	/**
-	 * Avance d'une frame
-	 * 
-	 * @param frame le numéro de la frame actuelle
-	 * @return <tt>true</tt> si et seulement si le déplaement est terminé.
-	 */
-	private boolean avance()
-	{
-		Position position = getCreature().getPosition();
-		Vecteur direction = new Vecteur(position, destination);
-		double distance = direction.getNorme();
-		
-		//Si on est arriv�, on s'arr�te
-		if (distance < 0.0001)
-			return true;
-		
-		double vitesse = (this.vitesse < distance) ? this.vitesse : distance;
-		position = position.translate(direction.multiplie(vitesse / distance));
-		getCreature().setPosition(position);
-		return false;
-	}
-	
 }

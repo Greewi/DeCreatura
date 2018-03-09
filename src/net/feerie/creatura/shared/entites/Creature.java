@@ -19,17 +19,13 @@ import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
  */
 public class Creature extends Entite
 {
-	private final static long PERIODE_CYCLE_IA = 300l;
-	private final static long PERIODE_CYCLE_METABOLIQUE = PERIODE_CYCLE_IA * 10;
 	
 	private Action action;
 	private Environnement environnementActuel;
 	private final IA ia;
-	private long dateDernierCycleIA;
 	
 	private int sante;
 	private final EnumMap<TypeMoodle, Moodle> moodles;
-	private long dateDernierCycleMetabolique;
 	
 	public Creature(Monde monde, Position position)
 	{
@@ -39,12 +35,12 @@ public class Creature extends Entite
 		this.action = null;
 		this.environnementActuel = monde.getEnvironnement(position);
 		this.ia = new IABasique(this);
-		this.dateDernierCycleIA = System.currentTimeMillis();
 		
-		//Sant�
+		//Santé
 		this.sante = 100;
 		this.moodles = new EnumMap<>(TypeMoodle.class);
-		this.dateDernierCycleMetabolique = this.dateDernierCycleIA;
+		
+		getMoodle(TypeMoodle.ENNUI).active();
 	}
 	
 	/**
@@ -129,37 +125,34 @@ public class Creature extends Entite
 	}
 	
 	@Override
-	public void metAJour(int frame)
+	public void effectueTic()
 	{
-		if (!estVivante())
+		if (estVivante())
 		{
-			action = null;
-			return;
-		}
-		
-		//Execution des actions
-		if (action != null)
-		{
-			if (!action.metAJour(frame))
-				this.action = null;
-		}
-		
-		//IA
-		if (dateDernierCycleIA + PERIODE_CYCLE_IA < System.currentTimeMillis())
-		{
-			dateDernierCycleIA += PERIODE_CYCLE_IA;
-			if (action == null)
-				action = ia.decideProchaineAction();
-		}
-		
-		//Mise à jour de l'environnement
-		environnementActuel = monde.getEnvironnement(getPosition());
-		
-		//Mise à jour du metabolisme
-		if (dateDernierCycleMetabolique + PERIODE_CYCLE_METABOLIQUE < System.currentTimeMillis())
-		{
-			dateDernierCycleMetabolique += PERIODE_CYCLE_METABOLIQUE;
+			Entite eauProche = cherche(TypeEntite.EAU);
+			if (eauProche != null && getDistanceCarre(eauProche) < eauProche.getTaille().l * eauProche.getTaille().l / 4.0 + 4)
+				getMoodle(TypeMoodle.MOUILLE).active();
 			
+			if (action != null)
+				if (!action.effectueTic())
+					this.action = null;
+		}
+		else
+			action = null;
+	}
+	
+	@Override
+	public void effectueCycleIA()
+	{
+		if (estVivante())
+			action = ia.decideProchaineAction();
+	}
+	
+	@Override
+	public void effectueCycleMetabolique()
+	{
+		if (estVivante())
+		{
 			//Gain sante
 			sante++;
 			

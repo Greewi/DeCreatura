@@ -87,6 +87,7 @@ public abstract class Entite
 	 */
 	public void detruit()
 	{
+		monde.supprimeEntite(ID);
 		estDetruit = true;
 	}
 	
@@ -101,9 +102,26 @@ public abstract class Entite
 	}
 	
 	/**
-	 * Met à jour l'entit�
-	 * 
-	 * @param frame le numéro de la frame actuelle
+	 * Met à jour l'entité
 	 */
-	public abstract void metAJour(int frame);
+	public void effectueTic()
+	{
+		//Rien à faire par défaut
+	}
+	
+	/**
+	 * Met à jour l'entité
+	 */
+	public void effectueCycleIA()
+	{
+		//Rien à faire par défaut		
+	}
+	
+	/**
+	 * Met à jour l'entité
+	 */
+	public void effectueCycleMetabolique()
+	{
+		//Rien à faire par défaut
+	}
 }

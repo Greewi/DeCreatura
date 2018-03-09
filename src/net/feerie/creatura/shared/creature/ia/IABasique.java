@@ -33,6 +33,9 @@ public class IABasique implements IA
 	@Override
 	public Action decideProchaineAction()
 	{
+		if (creature.getActionActuelle() != null)
+			return creature.getActionActuelle();
+		
 		if (creature.estAffectePar(TypeMoodle.FAIM))
 		{
 			Entite nourriture = creature.cherche(TypeEntite.NOURRITURE);

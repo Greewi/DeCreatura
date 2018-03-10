@@ -6,7 +6,6 @@ import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.EntiteLitiere;
 import net.feerie.creatura.shared.entites.EntiteNourriture;
 import net.feerie.creatura.shared.entites.TypeEntite;
-import net.feerie.creatura.shared.entites.Zone;
 
 /**
  * Représente un rendu d'entité. Cette classe s'occupe de dessiner les entités
@@ -30,12 +29,10 @@ public class RenduEntite implements RenduElement
 		
 		if (entite.getType() == TypeEntite.CREATURE)
 			this.couleur = "#FF7300";
+		else if (entite.getType() == TypeEntite.ARBRE)
+			this.couleur = "#275b24";
 		else if (entite.getType() == TypeEntite.NOURRITURE)
 			this.couleur = ((EntiteNourriture) entite).getCouleur();
-		else if (entite.getType() == TypeEntite.EAU)
-			this.couleur = "#11AAFF";
-		else if (entite.getType() == TypeEntite.ZONE)
-			this.couleur = ((Zone) entite).getCouleur();
 		else if (entite.getType() == TypeEntite.POPO)
 			this.couleur = "#303010";
 		else
@@ -57,24 +54,32 @@ public class RenduEntite implements RenduElement
 	 * @param timestamp
 	 */
 	@Override
-	public void dessine(long dateActuelle)
+	public void dessine(long dateActuelle, double progressionTic)
 	{
-		contexte.setFillStyle(couleur);
+		double x = ((1 - progressionTic) * entite.position.x + progressionTic * entite.positionProchainTic.x);
+		double z = ((1 - progressionTic) * entite.position.z + progressionTic * entite.positionProchainTic.z);
+		int l = entite.getTaille().l;
+		int h = entite.getTaille().h;
+		
 		if (entite.getType() == TypeEntite.LITIERE)
 		{
-			contexte.fillRect(entite.getPosition().x - entite.getTaille().l / 2, entite.getPosition().y - entite.getTaille().h / 2, entite.getTaille().l, entite.getTaille().h);
+			contexte.setFillStyle(couleur);
+			contexte.fillRect(x - l / 2, z, l, h);
 			double taux = ((EntiteLitiere) entite).getContenu() / ((EntiteLitiere) entite).getCapacite();
-			double l = entite.getTaille().l * taux;
-			double h = entite.getTaille().h * taux;
+			l *= 0.9;
+			h *= taux;
 			contexte.setFillStyle("#505013");
-			contexte.fillRect(entite.getPosition().x - l / 2, entite.getPosition().y - h / 2, l, h);
+			contexte.fillRect(x - l / 2, z, l, h);
 		}
-		else if (entite.getType() == TypeEntite.ZONE)
-			contexte.fillRect(entite.getPosition().x - entite.getTaille().l / 2, entite.getPosition().y - entite.getTaille().h / 2, entite.getTaille().l, entite.getTaille().h);
+		else if (entite.getType() == TypeEntite.EAU)
+		{
+			//L'eau n'est pas rendu ici (voir RenduZone)
+		}
 		else
 		{
+			contexte.setFillStyle(couleur);
 			contexte.beginPath();
-			contexte.arc(entite.getPosition().x, entite.getPosition().y, entite.getTaille().l / 2, 0, 20);
+			contexte.arc(x, z + h / 2, l / 2, 0, 20);
 			contexte.closePath();
 			contexte.fill();
 		}

@@ -1,5 +1,6 @@
 package net.feerie.creatura.shared.actions;
 
+import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
@@ -13,7 +14,7 @@ import net.feerie.creatura.shared.entites.TypeEntite;
  * 
  * @author greewi
  */
-public class ActionPopo extends Action
+public class ActionPopo extends AbstractActionAvecDuree
 {
 	private final Entite cible;
 	
@@ -25,7 +26,7 @@ public class ActionPopo extends Action
 	{
 		super(creature);
 		this.cible = cible;
-		setDuree(6);
+		setDuree(Constantes.ACTION_POPO_DUREE);
 	}
 	
 	@Override
@@ -47,8 +48,8 @@ public class ActionPopo extends Action
 			litiere.ajouteDechets();
 		}
 		else
-			getCreature().getMonde().nouvelleEntite(new EntiteDechet(getCreature().getMonde(), new Position(cible.getPosition())));
+			getCreature().getMonde().nouvelleEntite(new EntiteDechet(getCreature().getMonde(), new Position(cible.position)));
 		
 		return false;
-	}	
+	}
 }

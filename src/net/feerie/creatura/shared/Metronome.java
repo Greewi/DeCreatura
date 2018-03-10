@@ -1,5 +1,7 @@
 package net.feerie.creatura.shared;
 
+import net.feerie.creatura.shared.monde.Monde;
+
 /**
  * Cette classe sert à cadenser le rythme de la simulation
  * 
@@ -7,9 +9,6 @@ package net.feerie.creatura.shared;
  */
 public class Metronome
 {
-	public final static long PERIODE_TIC = 300l;
-	public final static long PERIODE_CYCLE_IA = 1;
-	public final static long PERIODE_CYCLE_METABOLIQUE = 10;
 	private long dateDernierTic;
 	private long ticDernierCycleIA;
 	private long ticDernierCycleMetabolique;
@@ -29,28 +28,38 @@ public class Metronome
 	}
 	
 	/**
+	 * Renvoie la date du dernier tic en millisecondes
+	 * 
+	 * @return la date du dernier tic en millisecondes
+	 */
+	public long getDateDernierTic()
+	{
+		return dateDernierTic;
+	}
+	
+	/**
 	 * Exécute une nouvelle frame.
 	 */
 	public void nouvelleFrame()
 	{
 		long dateActuelle = System.currentTimeMillis();
 		
-		while (dateDernierTic + PERIODE_TIC <= dateActuelle)
+		while (dateDernierTic + Constantes.PERIODE_TIC <= dateActuelle)
 		{
-			dateDernierTic += PERIODE_TIC;
+			dateDernierTic += Constantes.PERIODE_TIC;
 			ticActuel++;
 			
 			boolean effectuerCycleIA = false;
-			if (ticDernierCycleIA + PERIODE_CYCLE_IA <= ticActuel)
+			if (ticDernierCycleIA + Constantes.PERIODE_CYCLE_IA <= ticActuel)
 			{
-				ticDernierCycleIA += PERIODE_CYCLE_IA;
+				ticDernierCycleIA += Constantes.PERIODE_CYCLE_IA;
 				effectuerCycleIA = true;
 			}
 			
 			boolean effectuerCycleMetabolique = false;
-			if (ticDernierCycleMetabolique + PERIODE_CYCLE_METABOLIQUE <= ticActuel)
+			if (ticDernierCycleMetabolique + Constantes.PERIODE_CYCLE_METABOLIQUE <= ticActuel)
 			{
-				ticDernierCycleMetabolique += PERIODE_CYCLE_METABOLIQUE;
+				ticDernierCycleMetabolique += Constantes.PERIODE_CYCLE_METABOLIQUE;
 				effectuerCycleMetabolique = true;
 			}
 			

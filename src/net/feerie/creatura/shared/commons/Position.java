@@ -7,8 +7,8 @@ package net.feerie.creatura.shared.commons;
  */
 public class Position
 {
-	public double x;
-	public double y;
+	public int x;
+	public int z;
 	
 	public Position()
 	{
@@ -22,17 +22,17 @@ public class Position
 	public Position(Position position)
 	{
 		this.x = position.x;
-		this.y = position.y;
+		this.z = position.z;
 	}
 	
 	/**
 	 * @param x la coordonnée x de la position
-	 * @param y la coordonnée y de la position
+	 * @param z la coordonnée z de la position
 	 */
-	public Position(double x, double y)
+	public Position(int x, int z)
 	{
 		this.x = x;
-		this.y = y;
+		this.z = z;
 	}
 	
 	/**
@@ -43,6 +43,6 @@ public class Position
 	 */
 	public Position translate(Vecteur v)
 	{
-		return new Position(x + v.x, y + v.y);
+		return new Position(x + v.x, z + v.z);
 	}
 }

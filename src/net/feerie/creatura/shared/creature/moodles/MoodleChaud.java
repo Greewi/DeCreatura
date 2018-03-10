@@ -1,5 +1,6 @@
 package net.feerie.creatura.shared.creature.moodles;
 
+import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.entites.Creature;
 
 /**
@@ -22,14 +23,32 @@ public class MoodleChaud extends Moodle
 	}
 	
 	@Override
-	public void nouveauCycle()
+	public void appliqueChargements()
 	{
-		if (estActif())
-			getCreature().getMoodle(TypeMoodle.SOIF).charge(5);
+		boolean faitChaud = getCreature().getEnvironnement().getTemperature() > Constantes.TEMPERATURE_CHAUD;
+		boolean faitFroid = getCreature().getEnvironnement().getTemperature() < Constantes.TEMPERATURE_FROID;
+		boolean mouille = getCreature().getMoodle(TypeMoodle.MOUILLE).estActif();
 		
-		if (getCreature().getEnvironnement().getTemperature() > 25)
-			charge(10);
+		if (faitChaud)
+		{
+			if (mouille)
+				charge(Constantes.CHAUD_CHARGEMENT_CHAUD_MOUILLE);
+			else
+				charge(Constantes.CHAUD_CHARGEMENT_CHAUD);
+		}
+		else if (faitFroid)
+		{
+			if (mouille)
+				decharge(Constantes.CHAUD_DECHARGEMENT_FROID_MOUILLE);
+			else
+				decharge(Constantes.CHAUD_DECHARGEMENT_FROID);
+		}
 		else
-			decharge(20);
+		{
+			if (mouille)
+				decharge(Constantes.CHAUD_DECHARGEMENT_TEMPERE_MOUILLE);
+			else
+				decharge(Constantes.CHAUD_DECHARGEMENT_TEMPERE);
+		}
 	}
 }

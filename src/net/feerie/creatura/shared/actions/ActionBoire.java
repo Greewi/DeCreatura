@@ -1,11 +1,12 @@
 package net.feerie.creatura.shared.actions;
 
+import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.TypeEntite;
 
-public class ActionBoire extends Action
+public class ActionBoire extends AbstractActionAvecDuree
 {
 	private final Entite cible;
 	
@@ -13,7 +14,7 @@ public class ActionBoire extends Action
 	{
 		super(creature);
 		this.cible = cible;
-		setDuree(6);
+		setDuree(Constantes.ACTION_BOIRE_DUREE);
 	}
 	
 	@Override
@@ -30,6 +31,7 @@ public class ActionBoire extends Action
 		{
 			getCreature().getMoodle(TypeMoodle.SOIF).desactive();
 			getCreature().getMoodle(TypeMoodle.POPO).charge(10);
+			getCreature().getMoodle(TypeMoodle.MOUILLE).active();
 		}
 		return false;
 	}

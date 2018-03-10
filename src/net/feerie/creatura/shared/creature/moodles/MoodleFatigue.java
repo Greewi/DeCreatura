@@ -1,6 +1,7 @@
 package net.feerie.creatura.shared.creature.moodles;
 
-import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.Constantes;
+import net.feerie.creatura.shared.actions.IAction;
 import net.feerie.creatura.shared.actions.TypeAction;
 import net.feerie.creatura.shared.entites.Creature;
 
@@ -24,16 +25,18 @@ public class MoodleFatigue extends Moodle
 	}
 	
 	@Override
-	public void nouveauCycle()
+	public void appliqueChargements()
 	{
-		Action actionActuelle = getCreature().getActionActuelle();
+		IAction actionActuelle = getCreature().getActionActuelle();
 		if (actionActuelle != null && actionActuelle.getType() == TypeAction.DORMIR)
-			decharge(5);
+			decharge(Constantes.FATIGUE_DECHARGEMENT_DODO);
 		else
-		{
-			if (estActif())
-				getCreature().reduitSante(1);
-			charge(1);
-		}
+			charge(Constantes.FATIGUE_CHARGEMENT_PASSIF);
+	}
+	
+	@Override
+	public void appliqueEffets()
+	{
+		getCreature().reduitSante(Constantes.FATIGUE_REDUCTION_SANTE);
 	}
 }

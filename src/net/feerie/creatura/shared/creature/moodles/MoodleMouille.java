@@ -1,5 +1,6 @@
 package net.feerie.creatura.shared.creature.moodles;
 
+import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.entites.Creature;
 
 /**
@@ -22,12 +23,8 @@ public class MoodleMouille extends Moodle
 	}
 	
 	@Override
-	public void nouveauCycle()
+	public void appliqueChargements()
 	{
-		if (estActif())
-		{
-			getCreature().getMoodle(TypeMoodle.FROID).charge(5);
-			getCreature().getMoodle(TypeMoodle.CHAUD).decharge(10);
-		}
+		decharge(Constantes.MOUILLE_DECHARGEMENT_PASSIF);
 	}
 }

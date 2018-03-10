@@ -7,8 +7,8 @@ package net.feerie.creatura.shared.commons;
  */
 public class Vecteur
 {
-	public double x;
-	public double y;
+	public int x;
+	public int z;
 	
 	public Vecteur()
 	{
@@ -16,12 +16,12 @@ public class Vecteur
 	
 	/**
 	 * @param x la coordonnée x du vecteur
-	 * @param y la coordonnée y du vecteur
+	 * @param z la coordonnée z du vecteur
 	 */
-	public Vecteur(double x, double y)
+	public Vecteur(int x, int z)
 	{
 		this.x = x;
-		this.y = y;
+		this.z = z;
 	}
 	
 	/**
@@ -34,7 +34,15 @@ public class Vecteur
 	public Vecteur(Position debut, Position fin)
 	{
 		this.x = fin.x - debut.x;
-		this.y = fin.y - debut.y;
+		this.z = fin.z - debut.z;
+	}
+	
+	/**
+	 * @return la norme au carree du vecteur
+	 */
+	public int getNormeCarree()
+	{
+		return x * x + z * z;
 	}
 	
 	/**
@@ -42,7 +50,7 @@ public class Vecteur
 	 */
 	public double getNorme()
 	{
-		return Math.sqrt(x * x + y * y);
+		return Math.sqrt(x * x + z * z);
 	}
 	
 	/**
@@ -50,10 +58,11 @@ public class Vecteur
 	 * vecteur.
 	 * 
 	 * @param facteur le nombre à déplacer
-	 * @return le vecteur multiplié par le fecteur.
+	 * @return le vecteur multiplié par le vecteur.
+	 * @deprecated
 	 */
 	public Vecteur multiplie(double facteur)
 	{
-		return new Vecteur(x * facteur, y * facteur);
+		return new Vecteur((int) (x * facteur), (int) (z * facteur));
 	}
 }

@@ -7,5 +7,5 @@ public enum TypeEntite
 	EAU,
 	POPO,
 	LITIERE,
-	ZONE;
+	ARBRE;
 }

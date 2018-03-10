@@ -1,15 +1,19 @@
 package net.feerie.creatura.client.rendu2d;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
-import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.EntiteArbre;
 import net.feerie.creatura.shared.entites.TypeEntite;
 import net.feerie.creatura.shared.events.ObservateurEntiteAjoutee;
 import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
+import net.feerie.creatura.shared.monde.Monde;
+import net.feerie.creatura.shared.monde.Zone;
 
 /**
  * Représente le rendu d'un monde. Se charger de dessiner le monde.
@@ -22,6 +26,7 @@ public class RenduMonde
 	private final Monde monde;
 	@SuppressWarnings("unused")
 	private final Context2d contexte;
+	private final List<RenduElement> rendusZones;
 	private final HashMap<Integer, RenduElement> rendusEntites;
 	
 	/**
@@ -41,6 +46,8 @@ public class RenduMonde
 			{
 				if (entite.getType() == TypeEntite.CREATURE)
 					rendusEntites.put(entite.getID(), new RenduCreature((Creature) entite, contexte));
+				else if (entite.getType() == TypeEntite.ARBRE)
+					rendusEntites.put(entite.getID(), new RenduArbre((EntiteArbre) entite, contexte));
 				else
 					rendusEntites.put(entite.getID(), new RenduEntite(entite, contexte));
 			}
@@ -55,6 +62,9 @@ public class RenduMonde
 					renduADetruire.detruit();
 			}
 		});
+		rendusZones = new ArrayList<RenduElement>();
+		for (Zone zone : monde.getCarte().getZones())
+			rendusZones.add(new RenduZone(zone, contexte));
 	}
 	
 	/**
@@ -65,16 +75,21 @@ public class RenduMonde
 		for (RenduElement rendu : rendusEntites.values())
 			rendu.detruit();
 		rendusEntites.clear();
+		rendusZones.clear();
 	}
 	
 	/**
 	 * Dessine le monde.
 	 * 
-	 * @param timestamp la date du rendu
+	 * @param dateActuelle la date actuelle en millisecondes
+	 * @param progressionTic la progression du tic actuel (de 0 à 1);
 	 */
-	public void dessine(long dateActuelle)
+	public void dessine(long dateActuelle, double progressionTic)
 	{
+		for (RenduElement rendu : rendusZones)
+			rendu.dessine(dateActuelle, progressionTic);
+		
 		for (RenduElement rendu : rendusEntites.values())
-			rendu.dessine(dateActuelle);
+			rendu.dessine(dateActuelle, progressionTic);
 	}
 }

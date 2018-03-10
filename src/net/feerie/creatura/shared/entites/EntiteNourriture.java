@@ -1,8 +1,8 @@
 package net.feerie.creatura.shared.entites;
 
-import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.monde.Monde;
 
 /**
  * Représente de la nourriture
@@ -11,7 +11,7 @@ import net.feerie.creatura.shared.commons.Position;
  */
 public class EntiteNourriture extends Entite
 {
-	TypeNourriture type;
+	private final TypeNourriture type;
 	
 	/**
 	 * @param monde le monde de l'entité
@@ -20,7 +20,7 @@ public class EntiteNourriture extends Entite
 	 */
 	public EntiteNourriture(Monde monde, TypeNourriture type, Position position)
 	{
-		super(monde, position, new Dimension(2.0, 2.0));
+		super(monde, position, new Dimension(20, 20));
 		this.type = type;
 	}
 	
@@ -36,5 +36,12 @@ public class EntiteNourriture extends Entite
 	public TypeEntite getType()
 	{
 		return TypeEntite.NOURRITURE;
+	}
+	
+	@Override
+	public void effectueTic()
+	{
+		super.effectueTic();
+		appliqueGravite();
 	}
 }

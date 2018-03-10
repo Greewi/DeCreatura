@@ -1,9 +1,9 @@
 package net.feerie.creatura.shared.entites;
 
-import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.commons.Rectangle;
+import net.feerie.creatura.shared.monde.Monde;
 
 /**
  * Représente une litière (là ou on espère que la créature fera ses besoins)
@@ -23,7 +23,7 @@ public class EntiteLitiere extends Entite
 	 */
 	public EntiteLitiere(Monde monde, int capacite, Position position)
 	{
-		super(monde, position, new Dimension(10.0, 10.0));
+		super(monde, position, new Dimension(100, 20));
 		this.monde = monde;
 		this.capacite = capacite;
 		this.contenu = 0;
@@ -59,7 +59,7 @@ public class EntiteLitiere extends Entite
 		//Si la litiere est pleine on créé un déchet dans le monde
 		else
 		{
-			Position positionDechet = Rectangle.creeDepuisCentre(getPosition(), getTaille()).getPositionAleatoire();
+			Position positionDechet = Rectangle.creeDepuisCentre(position, getTaille()).getPositionAleatoire();
 			monde.nouvelleEntite(new EntiteDechet(monde, positionDechet));
 		}
 	}

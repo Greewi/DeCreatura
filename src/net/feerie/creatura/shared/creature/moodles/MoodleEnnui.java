@@ -1,5 +1,6 @@
 package net.feerie.creatura.shared.creature.moodles;
 
+import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.entites.Creature;
 
 /**
@@ -22,11 +23,11 @@ public class MoodleEnnui extends Moodle
 	}
 	
 	@Override
-	public void nouveauCycle()
+	public void appliqueChargements()
 	{
 		if (getCreature().getActionActuelle() == null)
-			charge(10);
+			charge(Constantes.ENNUI_CHARGEMENT_INACTIF);
 		else
-			decharge(24);
+			decharge(Constantes.ENNUI_DECHARGEMENT_ACTIF);
 	}
 }

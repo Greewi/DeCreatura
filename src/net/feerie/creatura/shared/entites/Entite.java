@@ -1,15 +1,23 @@
 package net.feerie.creatura.shared.entites;
 
-import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.monde.Monde;
 
 public abstract class Entite
 {
+	/**
+	 * La position actuelle de la créature
+	 */
+	public final Position position;
+	/**
+	 * La position de la créature au prochain tic
+	 */
+	public final Position positionProchainTic;
 	protected final Monde monde;
 	private final int ID;
-	private Position position;
 	private Dimension taille;
+	private int vitesseVerticale;
 	private boolean estDetruit = false;
 	
 	/**
@@ -17,7 +25,7 @@ public abstract class Entite
 	 * 
 	 * @param monde le monde auquel appartient l'entité
 	 * @param x la position x de l'entité
-	 * @param y la position y de l'entité
+	 * @param z la position z de l'entité
 	 * @param l la longueur de l'entité
 	 * @param h la hauteur de l'entité
 	 */
@@ -26,7 +34,9 @@ public abstract class Entite
 		this.monde = monde;
 		this.ID = monde.genereIDEntite();
 		this.position = position;
+		this.positionProchainTic = new Position(position);
 		this.taille = taille;
+		this.vitesseVerticale = 0;
 		this.estDetruit = false;
 	}
 	
@@ -36,24 +46,6 @@ public abstract class Entite
 	public int getID()
 	{
 		return ID;
-	}
-	
-	/**
-	 * @return la position de cette entité
-	 */
-	public Position getPosition()
-	{
-		return new Position(position);
-	}
-	
-	/**
-	 * modifie la position de cette entité
-	 * 
-	 * @param position la nouvelle position
-	 */
-	public void setPosition(Position position)
-	{
-		this.position = position;
 	}
 	
 	/**
@@ -72,9 +64,9 @@ public abstract class Entite
 	 */
 	public double getDistanceCarre(Entite entite)
 	{
-		Position p1 = entite.getPosition();
-		Position p2 = getPosition();
-		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+		Position p1 = entite.position;
+		Position p2 = position;
+		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.z - p2.z) * (p1.z - p2.z);
 	}
 	
 	/**
@@ -106,7 +98,24 @@ public abstract class Entite
 	 */
 	public void effectueTic()
 	{
-		//Rien à faire par défaut
+		position.x = positionProchainTic.x;
+		position.z = positionProchainTic.z;
+	}
+	
+	/**
+	 * Applique un tic de gravité sur l'entite
+	 */
+	public void appliqueGravite()
+	{
+		int zSol = monde.getCarte().getHauteurSol(positionProchainTic);
+		vitesseVerticale += monde.getAccelerationGravite();
+		positionProchainTic.z -= vitesseVerticale;
+		
+		if (positionProchainTic.z < zSol)// Atterissage
+		{
+			vitesseVerticale = 0;
+			positionProchainTic.z = zSol;
+		}
 	}
 	
 	/**

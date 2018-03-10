@@ -1,5 +1,6 @@
 package net.feerie.creatura.shared.actions;
 
+import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
@@ -10,7 +11,7 @@ import net.feerie.creatura.shared.entites.TypeEntite;
  * 
  * @author greewi
  */
-public class ActionManger extends Action
+public class ActionManger extends AbstractActionAvecDuree
 {
 	private final Entite cible;
 	
@@ -23,7 +24,7 @@ public class ActionManger extends Action
 	{
 		super(creature);
 		this.cible = cible;
-		setDuree(4);
+		setDuree(Constantes.ACTION_MANGER_DUREE);
 	}
 	
 	@Override

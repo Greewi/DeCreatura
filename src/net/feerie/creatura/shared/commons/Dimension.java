@@ -7,8 +7,8 @@ package net.feerie.creatura.shared.commons;
  */
 public class Dimension
 {
-	public double l;
-	public double h;
+	public int l;
+	public int h;
 	
 	public Dimension()
 	{
@@ -19,7 +19,7 @@ public class Dimension
 	 * @param l la largeur
 	 * @param h la hauteur
 	 */
-	public Dimension(double l, double h)
+	public Dimension(int l, int h)
 	{
 		this.l = l;
 		this.h = h;

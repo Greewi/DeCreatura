@@ -1,8 +1,8 @@
 package net.feerie.creatura.shared.entites;
 
-import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.monde.Monde;
 
 /**
  * Représente un déchet (une crotte)
@@ -18,12 +18,19 @@ public class EntiteDechet extends Entite
 	 */
 	public EntiteDechet(Monde monde, Position position)
 	{
-		super(monde, position, new Dimension(2, 2));
+		super(monde, position, new Dimension(20, 20));
 	}
 	
 	@Override
 	public TypeEntite getType()
 	{
 		return TypeEntite.POPO;
+	}
+	
+	@Override
+	public void effectueTic()
+	{
+		super.effectueTic();
+		appliqueGravite();
 	}
 }

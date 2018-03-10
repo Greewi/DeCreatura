@@ -34,7 +34,7 @@ public class Rectangle
 	 */
 	public static Rectangle creeDepuisCentre(Position centre, Dimension dimension)
 	{
-		return new Rectangle(new Position(centre.x - dimension.l / 2, centre.y - dimension.h / 2), new Dimension(dimension));
+		return new Rectangle(new Position(centre.x - dimension.l / 2, centre.z - dimension.h / 2), new Dimension(dimension));
 	}
 	
 	/**
@@ -47,7 +47,7 @@ public class Rectangle
 	 */
 	public boolean contient(Position position)
 	{
-		return position.x >= this.position.x && position.y >= this.position.y && position.x <= this.position.x + this.dimension.l && position.y <= this.position.y + this.dimension.h;
+		return position.x >= this.position.x && position.z >= this.position.z && position.x <= this.position.x + this.dimension.l && position.z <= this.position.z + this.dimension.h;
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class Rectangle
 	 */
 	public Position getPositionAleatoire()
 	{
-		return new Position(position.x + Random.nextDouble() * dimension.l, position.y + Random.nextDouble() * dimension.h);
+		return new Position(position.x + (int) (Random.nextDouble() * dimension.l), position.z + (int) (Random.nextDouble() * dimension.h));
 	}
 	
 	private Rectangle(Position position, Dimension dimension)

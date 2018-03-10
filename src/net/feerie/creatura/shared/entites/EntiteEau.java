@@ -1,8 +1,8 @@
 package net.feerie.creatura.shared.entites;
 
-import net.feerie.creatura.shared.Monde;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.monde.Monde;
 
 /**
  * Représente une source d'eau où la créature peut boire
@@ -11,9 +11,9 @@ import net.feerie.creatura.shared.commons.Position;
  */
 public class EntiteEau extends Entite
 {
-	public EntiteEau(Monde monde, Position position)
+	public EntiteEau(Monde monde, Position position, Dimension dimension)
 	{
-		super(monde, position, new Dimension(30, 30));
+		super(monde, position, dimension);
 	}
 	
 	@Override

@@ -2,15 +2,15 @@ package net.feerie.creatura.shared.entites;
 
 import java.util.EnumMap;
 
-import net.feerie.creatura.shared.Environnement;
-import net.feerie.creatura.shared.Monde;
-import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.actions.IAction;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.creature.ia.IA;
 import net.feerie.creatura.shared.creature.ia.IABasique;
 import net.feerie.creatura.shared.creature.moodles.Moodle;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+import net.feerie.creatura.shared.monde.Environnement;
+import net.feerie.creatura.shared.monde.Monde;
 
 /**
  * Représente une créature
@@ -20,8 +20,7 @@ import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 public class Creature extends Entite
 {
 	
-	private Action action;
-	private Environnement environnementActuel;
+	private IAction action;
 	private final IA ia;
 	
 	private int sante;
@@ -29,11 +28,10 @@ public class Creature extends Entite
 	
 	public Creature(Monde monde, Position position)
 	{
-		super(monde, position, new Dimension(5.0, 5.0));
+		super(monde, position, new Dimension(50, 50));
 		
 		//Action et environnement
 		this.action = null;
-		this.environnementActuel = monde.getEnvironnement(position);
 		this.ia = new IABasique(this);
 		
 		//Santé
@@ -105,7 +103,7 @@ public class Creature extends Entite
 	 * 
 	 * @param action l'action que doit entreprendre cette créature
 	 */
-	public void setActionActuelle(Action action)
+	public void setActionActuelle(IAction action)
 	{
 		this.action = action;
 	}
@@ -113,7 +111,7 @@ public class Creature extends Entite
 	/**
 	 * @return l'action actuellement entreprise par la créature
 	 */
-	public Action getActionActuelle()
+	public IAction getActionActuelle()
 	{
 		return action;
 	}
@@ -127,18 +125,25 @@ public class Creature extends Entite
 	@Override
 	public void effectueTic()
 	{
+		super.effectueTic();
+		
+		//Application des effets d'environnement
+		if (position.z <= getMonde().getCarte().getHauteurEau(position))
+			getMoodle(TypeMoodle.MOUILLE).active();
+		
+		//Si la créature est vivante, elle fait des trucs
 		if (estVivante())
 		{
-			Entite eauProche = cherche(TypeEntite.EAU);
-			if (eauProche != null && getDistanceCarre(eauProche) < eauProche.getTaille().l * eauProche.getTaille().l / 4.0 + 4)
-				getMoodle(TypeMoodle.MOUILLE).active();
-			
 			if (action != null)
 				if (!action.effectueTic())
 					this.action = null;
 		}
+		//Sinon rien...
 		else
 			action = null;
+		
+		//On applique la gravité
+		appliqueGravite();
 	}
 	
 	@Override
@@ -160,8 +165,11 @@ public class Creature extends Entite
 			for (TypeMoodle typeMoodle : TypeMoodle.values())
 			{
 				Moodle moodle = getMoodle(typeMoodle);
-				moodle.nouveauCycle();
+				if (moodle.estActif())
+					moodle.appliqueEffets();
 			}
+			for (TypeMoodle typeMoodle : TypeMoodle.values())
+				getMoodle(typeMoodle).appliqueChargements();
 			
 			//Cap de santé
 			if (sante > 100)
@@ -188,7 +196,7 @@ public class Creature extends Entite
 	 */
 	public Environnement getEnvironnement()
 	{
-		return environnementActuel;
+		return monde.getCarte().getEnvironnement(position);
 	}
 	
 	/**

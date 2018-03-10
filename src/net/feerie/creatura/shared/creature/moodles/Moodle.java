@@ -28,11 +28,20 @@ public abstract class Moodle
 	public abstract TypeMoodle getType();
 	
 	/**
-	 * Effectue un nouveau cycle métabolique Note : il est préférable
-	 * d'appliquer les effets avant de charger le moodle de sorte à laisser le
-	 * temps à la créature de réagir.
+	 * Applique les chargements et déchargement des moodles (celui-ci y compris)
+	 * causé par ce moodle. Toujours appelé, que le moodle soit ou non actif.
 	 */
-	public void nouveauCycle()
+	public void appliqueChargements()
+	{
+		//Ne fait rien par défaut 
+	}
+	
+	/**
+	 * Applique les effects de ce moddle sans les effets de chargement et
+	 * déchangement des autres moodles. N'est pas appelée si le moddle n'est pas
+	 * actif.
+	 */
+	public void appliqueEffets()
 	{
 		//Ne fait rien par défaut 
 	}

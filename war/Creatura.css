@@ -10,6 +10,7 @@ html, html body {
 	padding: 10px;
 	background-color: rgba(255, 255, 255, 0.65);
 	border-bottom-right-radius: 10px;
+	z-index:20;
 }
 
 #outils {
@@ -20,6 +21,7 @@ html, html body {
 	padding: 10px;
 	background-color: rgba(255, 255, 255, 0.65);
 	border-top-left-radius: 10px;
+	z-index:20;
 }
 
 #outils button {
@@ -35,4 +37,9 @@ html, html body {
 #outils button.actif {
 	color : #FFFFFF;
 	background : #999999;
+}
+
+#canvas canvas {
+	position:absolute;
+	bottom : 0;
 }

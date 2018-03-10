@@ -2,9 +2,6 @@ package net.feerie.creatura.client.rendu2d;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
-import net.feerie.creatura.shared.actions.Action;
-import net.feerie.creatura.shared.actions.ActionSeDeplacer;
-import net.feerie.creatura.shared.actions.TypeAction;
 import net.feerie.creatura.shared.entites.Creature;
 
 public class RenduCreature implements RenduElement
@@ -35,28 +32,15 @@ public class RenduCreature implements RenduElement
 	 * @param timestamp
 	 */
 	@Override
-	public void dessine(long dateActuelle)
+	public void dessine(long dateActuelle, double progressionTic)
 	{
-		Action actionActuelle = creature.getActionActuelle();
-		
-		double x = creature.getPosition().x;
-		double y = creature.getPosition().y;
-		
-		if (actionActuelle != null && actionActuelle.getType() == TypeAction.SE_DEPLACER)
-		{
-			ActionSeDeplacer deplacement = (ActionSeDeplacer) actionActuelle;
-			double t = deplacement.getProgressionAffichage(dateActuelle);
-			double x0 = deplacement.getDepart().x;
-			double y0 = deplacement.getDepart().y;
-			double x1 = deplacement.getDestination().x;
-			double y1 = deplacement.getDestination().y;
-			x = (1 - t) * x0 + t * x1;
-			y = (1 - t) * y0 + t * y1;
-		}
-		
+		double x = ((1 - progressionTic) * creature.position.x + progressionTic * creature.positionProchainTic.x);
+		double z = ((1 - progressionTic) * creature.position.z + progressionTic * creature.positionProchainTic.z);
+		int l = creature.getTaille().l;
+		int h = creature.getTaille().h;
 		contexte.setFillStyle(couleur);
 		contexte.beginPath();
-		contexte.arc(x, y, creature.getTaille().l / 2, 0, 20);
+		contexte.arc(x, z + h / 2, l / 2, 0, 20);
 		contexte.closePath();
 		contexte.fill();
 	}

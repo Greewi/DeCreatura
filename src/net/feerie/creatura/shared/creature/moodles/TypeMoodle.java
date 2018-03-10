@@ -17,12 +17,28 @@ public enum TypeMoodle
 			return new MoodleFaim(creature);
 		}
 	},
+	FAMINE("Meurt de faim")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleFamine(creature);
+		}
+	},
 	SOIF("A soif")
 	{
 		@Override
 		public Moodle instancie(Creature creature)
 		{
 			return new MoodleSoif(creature);
+		}
+	},
+	DESHYDRATATION("Meurt de soif")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleDeshydratation(creature);
 		}
 	},
 	FATIGUE("Est fatigué")

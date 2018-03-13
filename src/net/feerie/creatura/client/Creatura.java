@@ -6,13 +6,13 @@ import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.dom.client.ButtonElement;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Random;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -27,11 +27,9 @@ import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.EntiteArbre;
+import net.feerie.creatura.shared.entites.EntiteDistributeurGranule;
 import net.feerie.creatura.shared.entites.EntiteEau;
 import net.feerie.creatura.shared.entites.EntiteLitiere;
-import net.feerie.creatura.shared.entites.EntiteNourriture;
-import net.feerie.creatura.shared.entites.TypeEntite;
-import net.feerie.creatura.shared.entites.TypeNourriture;
 import net.feerie.creatura.shared.monde.Carte;
 import net.feerie.creatura.shared.monde.Environnement;
 import net.feerie.creatura.shared.monde.Monde;
@@ -54,18 +52,14 @@ public class Creatura implements EntryPoint
 	private int hauteurFenetre;
 	private int largeurVue;
 	private int hauteurVue;
+	private int xVue;
 	//UI
-	private Outil outilActuel;
 	private HTML uiInformations;
-	private ButtonElement boutonPlacerNourriture;
-	private ButtonElement boutonSecher;
-	private ButtonElement boutonNettoyer;
-	private ButtonElement boutonSecouer;
 	
 	public void onModuleLoad()
 	{
-		largeurVue = 2000;
-		hauteurVue = 1000;
+		largeurVue = Window.getClientWidth();//2000;
+		hauteurVue = Window.getClientHeight();//1000;
 		largeurFenetre = Window.getClientWidth();
 		hauteurFenetre = Window.getClientHeight();
 		if (largeurFenetre / (double) largeurVue > hauteurFenetre / (double) hauteurVue)
@@ -83,17 +77,17 @@ public class Creatura implements EntryPoint
 		//Initialisation de l'UI
 		uiInformations = new HTML();
 		RootPanel.get("informations").add(uiInformations);
-		boutonPlacerNourriture = (ButtonElement) Document.get().getElementById("boutonPlacerNourriture");
-		boutonSecher = (ButtonElement) Document.get().getElementById("boutonSecher");
-		boutonNettoyer = (ButtonElement) Document.get().getElementById("boutonNettoyer");
-		boutonSecouer = (ButtonElement) Document.get().getElementById("boutonSecouer");
 		
 		//Construction du monde
 		Environnement eChaud = new Environnement(31, 1, "#FCFFA6");
 		Environnement eTempe = new Environnement(22, 1, "#A6FFAD");
 		Environnement eFroid = new Environnement(7, 1, "#A6FFEF");
-		ArrayList<Zone> zones = new ArrayList<>();
 		
+		int longeurOceanGauche = 800;
+		
+		ArrayList<Zone> zones = new ArrayList<>();
+		zones.add(new Zone(longeurOceanGauche, 0, 0, 150, eChaud));
+		zones.add(new Zone(200, 0, 100, 150, eChaud));
 		zones.add(new Zone(200, 100, 150, 150, eChaud));
 		zones.add(new Zone(100, 150, 170, 0, eChaud));
 		zones.add(new Zone(200, 170, 170, 0, eTempe));
@@ -105,6 +99,11 @@ public class Creatura implements EntryPoint
 		zones.add(new Zone(200, 180, 220, 0, eFroid));
 		zones.add(new Zone(200, 220, 240, 0, eFroid));
 		zones.add(new Zone(200, 240, 240, 0, eFroid));
+		zones.add(new Zone(200, 240, 220, 0, eFroid));
+		zones.add(new Zone(200, 220, 180, 0, eFroid));
+		zones.add(new Zone(100, 180, 60, 150, eFroid));
+		zones.add(new Zone(100, 60, 0, 150, eFroid));
+		zones.add(new Zone(longeurOceanGauche, 0, 0, 150, eFroid));
 		
 		Carte carte = new Carte(zones.toArray(new Zone[1]));
 		this.monde = new Monde(carte);
@@ -112,19 +111,25 @@ public class Creatura implements EntryPoint
 		this.vueMonde = new RenduMonde(monde, contexte);
 		
 		//Ajout d'une litierre
-		monde.nouvelleEntite(new EntiteLitiere(monde, 10, new Position(700, 150)));
+		monde.nouvelleEntite(new EntiteLitiere(monde, 10, new Position(850 + longeurOceanGauche, 150)));
+		
+		//Ajout d'un distributeur de granulés
+		monde.nouvelleEntite(new EntiteDistributeurGranule(monde, new Position(950 + longeurOceanGauche, 150), new Dimension(50, 150)));
 		
 		//Ajout d'un point d'eau
-		monde.nouvelleEntite(new EntiteEau(monde, new Position(100, 00), new Dimension(200, 150)));
+		monde.nouvelleEntite(new EntiteEau(monde, new Position(300 + longeurOceanGauche, 00), new Dimension(200, 150)));
 		
 		//Ajout des arbres
-		monde.nouvelleEntite(new EntiteArbre(monde, new Position(400, 170), new Dimension(100, 200)));
-		monde.nouvelleEntite(new EntiteArbre(monde, new Position(1100, 170), new Dimension(120, 260)));
-		monde.nouvelleEntite(new EntiteArbre(monde, new Position(1900, 240), new Dimension(80, 160)));
+		monde.nouvelleEntite(new EntiteArbre(monde, new Position(600 + longeurOceanGauche, 170), new Dimension(100, 200)));
+		monde.nouvelleEntite(new EntiteArbre(monde, new Position(1300 + longeurOceanGauche, 170), new Dimension(120, 260)));
+		monde.nouvelleEntite(new EntiteArbre(monde, new Position(2100 + longeurOceanGauche, 240), new Dimension(80, 160)));
 		
 		//Ajout d'une créature
-		this.creature = new Creature(monde, new Position(400, 170));
+		this.creature = new Creature(monde, new Position(400 + longeurOceanGauche, 170));
 		monde.nouvelleEntite(creature);
+		
+		//Placement de la camera
+		xVue = longeurOceanGauche;
 		
 		//Boucle de rendu
 		BoucleRendu boucleRendu = new BoucleRendu();
@@ -133,73 +138,75 @@ public class Creatura implements EntryPoint
 		initialiseEvenement();
 	}
 	
+	private int xVueInitial;
+	private int xSourisInitial;
+	private int ySourisInitial;
+	private boolean clicEnCours;
+	private boolean scrollEnCours;
+	
 	private final void initialiseEvenement()
 	{
-		outilActuel = new OutilPlacerNourriture();
-		boutonPlacerNourriture.addClassName("actif");
-		canvas.addClickHandler(new ClickHandler()
+		clicEnCours = false;
+		scrollEnCours = false;
+		canvas.addMouseDownHandler(new MouseDownHandler()
 		{
 			@Override
-			public void onClick(ClickEvent event)
+			public void onMouseDown(MouseDownEvent event)
 			{
-				if (outilActuel != null)
-					outilActuel.onClick(event);
+				xSourisInitial = event.getRelativeX(event.getRelativeElement());
+				ySourisInitial = event.getRelativeY(event.getRelativeElement());
+				clicEnCours = true;
+				xVueInitial = xVue;
 			}
 		});
 		
-		Button.wrap(boutonPlacerNourriture).addClickHandler(new ClickHandler()
+		canvas.addMouseUpHandler(new MouseUpHandler()
 		{
 			@Override
-			public void onClick(ClickEvent event)
+			public void onMouseUp(MouseUpEvent event)
 			{
-				Console.log("Click sur boutonPlacerNourriture");
-				boutonPlacerNourriture.addClassName("actif");
-				boutonSecher.removeClassName("actif");
-				boutonNettoyer.removeClassName("actif");
-				boutonSecouer.removeClassName("actif");
-				outilActuel = new OutilPlacerNourriture();
+				clicEnCours = false;
+				if (scrollEnCours)
+				{
+					scrollEnCours = false;
+				}
+				else
+				{
+					int x = xVue + (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
+					int y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
+					
+					Entite entiteASelectionner = null;
+					for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
+					{
+						if (entiteASelectionner == null || entite.getType().getPrioriteSelection() > entiteASelectionner.getType().getPrioriteSelection())
+							entiteASelectionner = entite;
+					}
+					if (entiteASelectionner != null)
+					{
+						String outilAOuvrir = entiteASelectionner.active(true);
+						Console.log("Outil à ouvrir : " + outilAOuvrir);
+					}
+				}
 			}
 		});
 		
-		Button.wrap(boutonSecher).addClickHandler(new ClickHandler()
+		canvas.addMouseMoveHandler(new MouseMoveHandler()
 		{
 			@Override
-			public void onClick(ClickEvent event)
+			public void onMouseMove(MouseMoveEvent event)
 			{
-				Console.log("Click sur boutonSecher");
-				boutonPlacerNourriture.removeClassName("actif");
-				boutonSecher.addClassName("actif");
-				boutonNettoyer.removeClassName("actif");
-				boutonSecouer.removeClassName("actif");
-				outilActuel = new OutilSecher();
-			}
-		});
-		
-		Button.wrap(boutonNettoyer).addClickHandler(new ClickHandler()
-		{
-			@Override
-			public void onClick(ClickEvent event)
-			{
-				Console.log("Click sur boutonNettoyer");
-				boutonPlacerNourriture.removeClassName("actif");
-				boutonSecher.removeClassName("actif");
-				boutonNettoyer.addClassName("actif");
-				boutonSecouer.removeClassName("actif");
-				outilActuel = new OutilNettoyer();
-			}
-		});
-		
-		Button.wrap(boutonSecouer).addClickHandler(new ClickHandler()
-		{
-			@Override
-			public void onClick(ClickEvent event)
-			{
-				Console.log("Click sur boutonSecouer");
-				boutonPlacerNourriture.removeClassName("actif");
-				boutonSecher.removeClassName("actif");
-				boutonNettoyer.removeClassName("actif");
-				boutonSecouer.addClassName("actif");
-				outilActuel = new OutilSecouer();
+				if (clicEnCours)
+				{
+					int x = event.getRelativeX(event.getRelativeElement());
+					int y = event.getRelativeY(event.getRelativeElement());
+					if ((x - xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y - ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
+						scrollEnCours = true;
+					xVue = xVueInitial - ((x - xSourisInitial) * largeurVue) / largeurFenetre;
+					if (xVue < 0)
+						xVue = 0;
+					if (xVue > monde.getCarte().getLongueurTotale() - largeurVue)
+						xVue = monde.getCarte().getLongueurTotale() - largeurVue;
+				}
 			}
 		});
 	}
@@ -218,7 +225,7 @@ public class Creatura implements EntryPoint
 			canvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
 			//Mise à l'échelle
 			contexte.scale(largeurFenetre / (double) largeurVue, -hauteurFenetre / (double) hauteurVue);
-			contexte.translate(0, -hauteurVue);
+			contexte.translate(-xVue, -hauteurVue);
 			
 			//Dessin du monde
 			double progressionTic = (dateActuelle - metronome.getDateDernierTic()) / (double) Constantes.PERIODE_TIC;
@@ -247,7 +254,14 @@ public class Creatura implements EntryPoint
 		htmlInfos.append("<hr/>");
 		htmlInfos.append("<p>Sante : ").append(creature.getSante()).append("</p>");
 		htmlInfos.append("<hr/>");
-		htmlInfos.append("<p><b>Cliquez sur la carte pour déposer de la nourriture. Soyez sympa !</b></p>");
+		htmlInfos.append("<p><b>Cliquez sur le distributeur pour déposer de la nourriture. Soyez sympa !</b></p>");
+		htmlInfos.append("<p>Patch note (v0.5) : </p>");
+		htmlInfos.append("<ul>");
+		htmlInfos.append("<li>Vous pouvez scroller la carte.</li>");
+		htmlInfos.append("<li>Plus d'outils : cliquez directement sur les éléments pour agir avec !</li>");
+		htmlInfos.append("<li>De petits nusibles viennent dévorer la nourriture s'il y en a trop au sol.</li>");
+		htmlInfos.append("<li>Le régime alimentaire de votre créature n'accepte plus les fruits (pour le moment). Mais vous avez un distributeur de granule (le truc vertical gris).</li>");
+		htmlInfos.append("</ul>");
 		htmlInfos.append("<hr>");
 		htmlInfos.append("<p>Moodles : </p>");
 		htmlInfos.append("<ul>");
@@ -264,74 +278,5 @@ public class Creatura implements EntryPoint
 		
 		//On affiche les informations
 		uiInformations.setHTML(htmlInfos.toString());
-	}
-	
-	private interface Outil
-	{
-		public void onClick(ClickEvent event);
-	}
-	
-	private class OutilPlacerNourriture implements Outil
-	{
-		@Override
-		public void onClick(ClickEvent event)
-		{
-			int x = (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
-			int y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
-			TypeNourriture[] types = TypeNourriture.values();
-			TypeNourriture type = types[Random.nextInt(types.length)];
-			monde.nouvelleEntite(new EntiteNourriture(monde, type, new Position(x, y)));
-		}
-	}
-	
-	private class OutilSecher implements Outil
-	{
-		@Override
-		public void onClick(ClickEvent event)
-		{
-			double x = (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
-			double y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
-			double xc = creature.position.x;
-			double yc = creature.position.z;
-			double l = creature.getTaille().l;
-			double h = creature.getTaille().h;
-			
-			if (x >= xc - l / 2 && x <= xc + l / 2 && y >= yc && y <= yc + h)
-				creature.getMoodle(TypeMoodle.MOUILLE).desactive();
-		}
-	}
-	
-	private class OutilNettoyer implements Outil
-	{
-		@Override
-		public void onClick(ClickEvent event)
-		{
-			int x = (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
-			int y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
-			
-			for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
-			{
-				if (entite.getType() == TypeEntite.NOURRITURE || entite.getType() == TypeEntite.POPO)
-					entite.detruit();
-				else if (entite.getType() == TypeEntite.LITIERE)
-					((EntiteLitiere) entite).vide();
-			}
-		}
-	}
-	
-	private class OutilSecouer implements Outil
-	{
-		@Override
-		public void onClick(ClickEvent event)
-		{
-			int x = (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
-			int y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
-			
-			for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
-			{
-				if (entite.getType() == TypeEntite.ARBRE)
-					((EntiteArbre) entite).secoue();
-			}
-		}
 	}
 }

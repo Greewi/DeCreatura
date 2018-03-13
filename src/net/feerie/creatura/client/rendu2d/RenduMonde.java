@@ -7,6 +7,7 @@ import java.util.List;
 import com.google.gwt.canvas.dom.client.Context2d;
 
 import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.CreatureNuisible;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.EntiteArbre;
 import net.feerie.creatura.shared.entites.TypeEntite;
@@ -46,7 +47,21 @@ public class RenduMonde
 			{
 				if (entite.getType() == TypeEntite.CREATURE)
 					rendusEntites.put(entite.getID(), new RenduCreature((Creature) entite, contexte));
-				else if (entite.getType() == TypeEntite.ARBRE)
+				else if (entite.getType() == TypeEntite.CREATURE_NUISIBLE)
+					rendusEntites.put(entite.getID(), new RenduNuisible((CreatureNuisible) entite, contexte));
+				else if (entite.getType() == TypeEntite.NOURRITURE_GRANULE)
+					rendusEntites.put(entite.getID(), new RenduNourriture(entite, contexte));
+				else if (entite.getType() == TypeEntite.NOURRITURE_FRUIT)
+					rendusEntites.put(entite.getID(), new RenduNourriture(entite, contexte));
+				else if (entite.getType() == TypeEntite.NOURRITURE_FIBRE)
+					rendusEntites.put(entite.getID(), new RenduNourriture(entite, contexte));
+				else if (entite.getType() == TypeEntite.NOURRITURE_GRAINE)
+					rendusEntites.put(entite.getID(), new RenduNourriture(entite, contexte));
+				else if (entite.getType() == TypeEntite.NOURRITURE_INSECTE)
+					rendusEntites.put(entite.getID(), new RenduNourriture(entite, contexte));
+				else if (entite.getType() == TypeEntite.NOURRITURE_POISSON)
+					rendusEntites.put(entite.getID(), new RenduNourriture(entite, contexte));
+				else if (entite.getType() == TypeEntite.ARBRE_FRUITIER || entite.getType() == TypeEntite.ARBRE_COQUE)
 					rendusEntites.put(entite.getID(), new RenduArbre((EntiteArbre) entite, contexte));
 				else
 					rendusEntites.put(entite.getID(), new RenduEntite(entite, contexte));

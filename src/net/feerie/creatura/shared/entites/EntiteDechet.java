@@ -22,6 +22,14 @@ public class EntiteDechet extends Entite
 	}
 	
 	@Override
+	public String active(boolean activeParJoueur)
+	{
+		if (activeParJoueur)
+			this.detruit();
+		return super.active(activeParJoueur);
+	}
+	
+	@Override
 	public TypeEntite getType()
 	{
 		return TypeEntite.POPO;

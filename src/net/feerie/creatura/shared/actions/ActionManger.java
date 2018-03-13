@@ -13,6 +13,7 @@ import net.feerie.creatura.shared.entites.TypeEntite;
  */
 public class ActionManger extends AbstractActionAvecDuree
 {
+	private final Creature creature;
 	private final Entite cible;
 	
 	/**
@@ -22,7 +23,7 @@ public class ActionManger extends AbstractActionAvecDuree
 	 */
 	public ActionManger(Creature creature, Entite cible)
 	{
-		super(creature);
+		this.creature = creature;
 		this.cible = cible;
 		setDuree(Constantes.ACTION_MANGER_DUREE);
 	}
@@ -37,11 +38,11 @@ public class ActionManger extends AbstractActionAvecDuree
 	public boolean termine()
 	{
 		//Si c'est de la nourriture on applique les effets
-		if (cible.getType() == TypeEntite.NOURRITURE)
+		if (cible.getType() == TypeEntite.NOURRITURE_GRANULE)
 		{
 			cible.detruit();
-			getCreature().getMoodle(TypeMoodle.FAIM).decharge(50);
-			getCreature().getMoodle(TypeMoodle.POPO).charge(30);
+			creature.getMoodle(TypeMoodle.FAIM).decharge(50);
+			creature.getMoodle(TypeMoodle.POPO).charge(30);
 		}
 		return false;
 	}

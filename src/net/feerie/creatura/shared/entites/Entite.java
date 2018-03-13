@@ -94,6 +94,20 @@ public abstract class Entite
 	}
 	
 	/**
+	 * Active l'entité (clic sur l'entité, ou utilisation par la créature)
+	 * 
+	 * @param activeParJoueur si <tt>true</tt> l'entité est activée par le
+	 *        joueur
+	 * @return le nom de l'interface à ouvrir si l'entité permet l'accès à un
+	 *         une interface particulière (la gestion de la créature par
+	 *         exemple) ou <tt>null</tt> si aucune interface n'est à ouvrir
+	 */
+	public String active(boolean activeParJoueur)
+	{
+		return null;
+	}
+	
+	/**
 	 * Met à jour l'entité
 	 */
 	public void effectueTic()

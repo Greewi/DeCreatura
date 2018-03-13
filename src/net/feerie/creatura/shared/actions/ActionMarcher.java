@@ -2,7 +2,7 @@ package net.feerie.creatura.shared.actions;
 
 import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.commons.Position;
-import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.EntiteCreature;
 
 /**
  * Représente une action de déplacement
@@ -11,7 +11,7 @@ import net.feerie.creatura.shared.entites.Creature;
  */
 public class ActionMarcher extends AbstractAction
 {
-	private IAction actionAEnchainer;
+	private Action actionAEnchainer;
 	private Position depart;
 	private Position destination;
 	private int vitesseHorizontale;
@@ -19,7 +19,7 @@ public class ActionMarcher extends AbstractAction
 	/**
 	 * @param creature la créature se déplaçant
 	 */
-	public ActionMarcher(Creature creature)
+	public ActionMarcher(EntiteCreature creature)
 	{
 		super(creature);
 		this.depart = new Position(creature.position);
@@ -31,7 +31,7 @@ public class ActionMarcher extends AbstractAction
 	 * @param creature la créature se déplaçant
 	 * @param destination la position vers laquelle se déplace la créature
 	 */
-	public ActionMarcher(Creature creature, Position destination)
+	public ActionMarcher(EntiteCreature creature, Position destination)
 	{
 		super(creature);
 		this.depart = new Position(creature.position);
@@ -46,7 +46,7 @@ public class ActionMarcher extends AbstractAction
 	 * @param actionAEnchainer l'action à effetuer une fois arrivée sur place.
 	 *        <tt>null</tt> si aucune action n'est à faire.
 	 */
-	public ActionMarcher(Creature creature, Position destination, IAction actionAEnchainer)
+	public ActionMarcher(EntiteCreature creature, Position destination, Action actionAEnchainer)
 	{
 		super(creature);
 		this.depart = new Position(creature.position);
@@ -91,7 +91,7 @@ public class ActionMarcher extends AbstractAction
 	 * 
 	 * @param actionAEnchainer
 	 */
-	public void setActionAEnchainer(IAction actionAEnchainer)
+	public void setActionAEnchainer(Action actionAEnchainer)
 	{
 		this.actionAEnchainer = actionAEnchainer;
 	}

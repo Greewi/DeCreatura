@@ -8,11 +8,12 @@ import net.feerie.creatura.shared.entites.TypeEntite;
 
 public class ActionBoire extends AbstractActionAvecDuree
 {
+	private final Creature creature;
 	private final Entite cible;
 	
 	public ActionBoire(Creature creature, Entite cible)
 	{
-		super(creature);
+		this.creature = creature;
 		this.cible = cible;
 		setDuree(Constantes.ACTION_BOIRE_DUREE);
 	}
@@ -29,9 +30,9 @@ public class ActionBoire extends AbstractActionAvecDuree
 		//Si c'est de l'eau on applique les effets
 		if (cible.getType() == TypeEntite.EAU)
 		{
-			getCreature().getMoodle(TypeMoodle.SOIF).desactive();
-			getCreature().getMoodle(TypeMoodle.POPO).charge(10);
-			getCreature().getMoodle(TypeMoodle.MOUILLE).active();
+			creature.getMoodle(TypeMoodle.SOIF).desactive();
+			creature.getMoodle(TypeMoodle.POPO).charge(10);
+			creature.getMoodle(TypeMoodle.MOUILLE).active();
 		}
 		return false;
 	}

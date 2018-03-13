@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.gwt.user.client.Random;
+
 import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.entites.CreatureNuisible;
 import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.TypeEntite;
 import net.feerie.creatura.shared.events.ObservateurEntiteAjoutee;
 import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
 
@@ -20,6 +24,7 @@ public class Monde
 	//Entités
 	private final HashMap<Integer, Entite> entites = new HashMap<>();
 	private int IDEntiteSuivante = 1;
+	
 	//Observateurs d'événements
 	private final ArrayList<ObservateurEntiteAjoutee> observateursEntiteAjoutee = new ArrayList<>();
 	private final ArrayList<ObservateurEntiteSupprimee> observateursEntiteSuprimee = new ArrayList<>();
@@ -72,7 +77,7 @@ public class Monde
 			double le = e.getTaille().l;
 			double he = e.getTaille().h;
 			
-			if (xc>=xe-le/2 && xc<=xe+le/2 && yc>=ye && yc<ye+he)
+			if (xc >= xe - le / 2 && xc <= xe + le / 2 && yc >= ye && yc < ye + he)
 				entites.add(e);
 		}
 		
@@ -160,8 +165,27 @@ public class Monde
 			for (Entite entite : entitesTic)
 				entite.effectueCycleIA();
 		if (cycleMetabolique)
+		{
+			boolean nuisibleExiste = false;
+			int quantiteNourriture = 0;
 			for (Entite entite : entitesTic)
+			{
+				if (entite.getType() == TypeEntite.CREATURE_NUISIBLE)
+					nuisibleExiste = true;
+				if (entite.getType().peutEtreMange())
+					quantiteNourriture++;
 				entite.effectueCycleMetabolique();
+			}
+			
+			//Génération des nuisibles
+			if (quantiteNourriture > Constantes.QUANTITE_ELEMENT_POUR_NUISIBLE && !nuisibleExiste)
+			{
+				int x = Random.nextInt(carte.getLongueurTotale());
+				Position position = new Position(x, 0);
+				position.z = carte.getHauteurSol(position);
+				nouvelleEntite(new CreatureNuisible(this, position));
+			}
+		}
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 package net.feerie.creatura.shared.creature.ia;
 
-import net.feerie.creatura.shared.actions.IAction;
+import net.feerie.creatura.shared.actions.Action;
 
 /**
  * Représente l'IA d'une créature
@@ -15,5 +15,5 @@ public interface IA
 	 * 
 	 * @return la prochaine action à effectuer
 	 */
-	IAction decideProchaineAction();
+	Action decideProchaineAction();
 }

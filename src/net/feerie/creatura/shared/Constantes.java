@@ -17,12 +17,14 @@ public class Constantes
 	public final static int ACTION_BOIRE_DUREE = 10; //Durée de l'action Boire en tic 
 	public final static int ACTION_MANGER_DUREE = 10; //Durée de l'action Boire en tic 
 	public final static int ACTION_POPO_DUREE = 10; //Durée de l'action Boire en tic 
+	public final static int ACTION_NUISIBLE_MANGER_DUREE = 20; //Durée de l'action manger en tic pour un nuisible
 	
 	/*
 	 * Métabolismes
 	 */
 	public static final int TEMPERATURE_FROID = 12; //Température (en °C) en dessous de laquelle il fait froid 
 	public static final int TEMPERATURE_CHAUD = 25; //Température (en °C) en dessus de laquelle il fait chaud
+	public static final int QUANTITE_ELEMENT_POUR_NUISIBLE = 20; //Nombre d'élément commestible sur la carte avant l'apparition d'un nuisible.
 	
 	// Arbres
 	public static final int ARBRE_CYCLE_NOUVEAU_FRUIT = 80; // Arbre : nombre de cycle métabolique pour générer un nouveau fruit

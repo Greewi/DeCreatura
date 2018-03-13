@@ -1,34 +1,20 @@
 package net.feerie.creatura.shared.actions;
 
-import net.feerie.creatura.shared.entites.Creature;
-
 /**
  * Représente une action entreprise par une créature.
  * 
  * @author greewi
  */
-public abstract class AbstractActionAvecDuree implements IAction
+public abstract class AbstractActionAvecDuree implements Action
 {
-	private final Creature creature;
 	protected int dureeTotale;
 	protected int dureeEcoulee;
 	
 	/**
 	 * @param creature la créature réalisant l'action
 	 */
-	public AbstractActionAvecDuree(Creature creature)
+	public AbstractActionAvecDuree()
 	{
-		this.creature = creature;
-	}
-	
-	/**
-	 * Renvoie la créature qui effectue l'action
-	 * 
-	 * @return la créature qui effectue l'action
-	 */
-	public Creature getCreature()
-	{
-		return creature;
 	}
 	
 	/**
@@ -51,7 +37,9 @@ public abstract class AbstractActionAvecDuree implements IAction
 		return dureeTotale;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.feerie.creatura.shared.actions.IAction#getProgression()
 	 */
 	@Override
@@ -60,13 +48,17 @@ public abstract class AbstractActionAvecDuree implements IAction
 		return dureeEcoulee;
 	}
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.feerie.creatura.shared.actions.IAction#getType()
 	 */
 	@Override
 	public abstract TypeAction getType();
 	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.feerie.creatura.shared.actions.IAction#effectueTic()
 	 */
 	@Override

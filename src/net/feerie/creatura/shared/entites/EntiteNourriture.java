@@ -11,31 +11,31 @@ import net.feerie.creatura.shared.monde.Monde;
  */
 public class EntiteNourriture extends Entite
 {
-	private final TypeNourriture type;
+	private final TypeEntite type;
 	
 	/**
 	 * @param monde le monde de l'entité
-	 * @param type le type de nourriture
-	 * @param position la position de l'entit�
+	 * @param position la position de l'entité
+	 * @param type le type de cette nourriture
 	 */
-	public EntiteNourriture(Monde monde, TypeNourriture type, Position position)
+	public EntiteNourriture(Monde monde, Position position, TypeEntite type)
 	{
 		super(monde, position, new Dimension(20, 20));
 		this.type = type;
 	}
 	
-	/**
-	 * @return la couleur de cette nourriture
-	 */
-	public String getCouleur()
+	@Override
+	public String active(boolean activeParJoueur)
 	{
-		return type.getCouleur();
+		if (activeParJoueur)
+			detruit();
+		return null;
 	}
 	
 	@Override
 	public TypeEntite getType()
 	{
-		return TypeEntite.NOURRITURE;
+		return type;
 	}
 	
 	@Override

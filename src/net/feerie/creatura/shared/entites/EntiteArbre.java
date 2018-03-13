@@ -3,8 +3,6 @@ package net.feerie.creatura.shared.entites;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.Random;
-
 import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
@@ -27,7 +25,7 @@ public class EntiteArbre extends Entite
 	@Override
 	public TypeEntite getType()
 	{
-		return TypeEntite.ARBRE;
+		return TypeEntite.ARBRE_FRUITIER;
 	}
 	
 	/**
@@ -43,10 +41,12 @@ public class EntiteArbre extends Entite
 	/**
 	 * Secoue l'arbre et fait tomber ses fruits murs
 	 */
-	public void secoue()
+	@Override
+	public String active(boolean activeParJoueur)
 	{
 		while (fruits.size() > 0 && fruits.get(0).estMur())
 			faitTomberPremierFruit();
+		return null;
 	}
 	
 	/**
@@ -55,9 +55,7 @@ public class EntiteArbre extends Entite
 	private void faitTomberPremierFruit()
 	{
 		Fruit fruit = fruits.remove(0);
-		TypeNourriture[] types = TypeNourriture.values();
-		TypeNourriture type = types[Random.nextInt(types.length)];
-		monde.nouvelleEntite(new EntiteNourriture(monde, type, fruit.getPosition()));
+		monde.nouvelleEntite(new EntiteNourriture(monde, fruit.getPosition(), TypeEntite.NOURRITURE_FRUIT));
 	}
 	
 	@Override

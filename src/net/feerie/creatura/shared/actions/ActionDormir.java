@@ -3,15 +3,16 @@ package net.feerie.creatura.shared.actions;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 
-public class ActionDormir extends AbstractAction
+public class ActionDormir implements Action
 {
+	private final Creature creature;
 	
 	/**
 	 * @param creature la créature qui dort
 	 */
 	public ActionDormir(Creature creature)
 	{
-		super(creature);
+		this.creature = creature;
 	}
 	
 	@Override
@@ -23,6 +24,12 @@ public class ActionDormir extends AbstractAction
 	@Override
 	public boolean effectueTic()
 	{
-		return getCreature().estAffectePar(TypeMoodle.FATIGUE);
+		return creature.estAffectePar(TypeMoodle.FATIGUE);
+	}
+	
+	@Override
+	public int getProgression()
+	{
+		return 0;
 	}
 }

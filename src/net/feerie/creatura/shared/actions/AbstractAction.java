@@ -1,16 +1,16 @@
 package net.feerie.creatura.shared.actions;
 
-import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.EntiteCreature;
 
-public abstract class AbstractAction implements IAction
+public abstract class AbstractAction implements Action
 {
-	private final Creature creature;
+	private final EntiteCreature creature;
 	protected int dureeEcoulee;
 	
 	/**
 	 * @param creature la créature réalisant l'action
 	 */
-	public AbstractAction(Creature creature)
+	public AbstractAction(EntiteCreature creature)
 	{
 		this.creature = creature;
 	}
@@ -20,7 +20,7 @@ public abstract class AbstractAction implements IAction
 	 * 
 	 * @return la créature qui effectue l'action
 	 */
-	public Creature getCreature()
+	public EntiteCreature getCreature()
 	{
 		return creature;
 	}

@@ -29,6 +29,14 @@ public class EntiteLitiere extends Entite
 		this.contenu = 0;
 	}
 	
+	@Override
+	public String active(boolean activeParJoueur)
+	{
+		if (activeParJoueur)
+			vide();
+		return null;
+	}
+	
 	/**
 	 * @return la capacité de cette litiere
 	 */

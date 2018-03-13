@@ -34,11 +34,6 @@ html, html body {
 	color : #AAAAAA;
 }
 
-#outils button.actif {
-	color : #FFFFFF;
-	background : #999999;
-}
-
 #canvas canvas {
 	position:absolute;
 	bottom : 0;

@@ -53,7 +53,7 @@ public class RenduZone implements RenduElement
 		if (zone.getHauteurEau() > 0)
 		{
 			contexte.setFillStyle(couleurEau);
-			contexte.fillRect(zone.getX(), 0, zone.getX() + zone.getLongueur(), zone.getHauteurEau());
+			contexte.fillRect(zone.getX(), 0, zone.getX() + zone.getLongueur()+1, zone.getHauteurEau());
 		}
 		//Sol
 		contexte.setFillStyle(couleurSol);

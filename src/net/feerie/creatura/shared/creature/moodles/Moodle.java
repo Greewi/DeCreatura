@@ -71,6 +71,8 @@ public abstract class Moodle
 	 */
 	public final void active()
 	{
+		if (!estActif())
+			getCreature().onGagneMoodle(getType());
 		charge = 100;
 		actif = true;
 	}
@@ -80,6 +82,8 @@ public abstract class Moodle
 	 */
 	public final void desactive()
 	{
+		if (estActif())
+			getCreature().onPerdMoodle(getType());
 		charge = 0;
 		actif = false;
 	}

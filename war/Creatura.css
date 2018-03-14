@@ -3,38 +3,143 @@ html, html body {
 	margin: 0;
 }
 
-#informations {
+body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+#canvas canvas {
+	position: absolute;
+	bottom: 0;
+}
+
+/**
+ * Fenêtre d'information de debug
+ */
+#infosDebug {
 	width: 200px;
 	position: absolute;
 	top: 0px;
 	padding: 10px;
-	background-color: rgba(255, 255, 255, 0.65);
+	background-color: rgba(255, 255, 255, 0.8);
 	border-bottom-right-radius: 10px;
-	z-index:20;
+	z-index: 20;
+	will-change: transform;
+	transform: translate(-240px, 0);
+	transition: transform;
+	transition-duration: 500ms;
 }
 
-#outils {
+#infosDebug.infosDebug--ouvert {
+	transform: translate(0, 0);
+}
+
+/**
+ * Fenêtre d'information de version
+ */
+#infosVersion {
 	width: 200px;
 	position: absolute;
-	bottom: 0px;
-	right:0px;
+	top: 0px;
+	right: 0px;
 	padding: 10px;
-	background-color: rgba(255, 255, 255, 0.65);
+	background-color: rgba(255, 255, 255, 0.8);
+	border-bottom-left-radius: 10px;
+	z-index: 20;
+	will-change: transform;
+	transform: translate(240px, 0);
+	transition: transform;
+	transition-duration: 500ms;
+}
+
+#infosVersion.infosVersion--ouvert {
+	transform: translate(0, 0);
+}
+
+/**
+ * Fenêtre d'information physique d'une créature
+ */
+#infosCreaturePhysique {
+	position: absolute;
+	bottom: 0px;
+	padding: 10px 20px 20px 10px;
+	left: 0px;
+	width: 200px;
+	background-color: rgba(255, 255, 255, 0.8);
+	border-top-right-radius: 10px;
+	will-change: transform;
+	transform: translate(-240px, 0);
+	transition: transform;
+	transition-duration: 500ms;
+}
+
+#infosCreaturePhysique.infosCreaturePhysique--ouvert {
+	transform: translate(0, 0);
+}
+
+/**
+ * Fenêtre d'information mentales d'une créature
+ */
+#infosCreatureMentales {
+	position: absolute;
+	bottom: 0px;
+	padding: 10px 10px 20px 20px;
+	right: 0px;
+	width: 200px;
+	background-color: rgba(255, 255, 255, 0.8);
 	border-top-left-radius: 10px;
-	z-index:20;
+	will-change: transform;
+	transform: translate(240px, 0);
+	transition: transform;
+	transition-duration: 500ms;
 }
 
-#outils button {
-	width : 200px;
-	margin : 5px 0 0 0;
-	padding : 5px 0 5px 0;
-	background : #555555;
-	border : none;
-	border-radius : 5px;
-	color : #AAAAAA;
+#infosCreatureMentales.infosCreatureMentales--ouvert {
+	transform: translate(0, 0);
 }
 
-#canvas canvas {
-	position:absolute;
-	bottom : 0;
+.infosCreature-label {
+	font-weight: bold;
+}
+
+.infosCreature-infos {
+	padding-left: 20px;
+}
+
+/**
+ * Barre d'outil d'une créature
+ */
+#toolbarCreature {
+	position: absolute;
+	bottom: 0px;
+	left: 240px;
+	padding: 10px 10px 20px 10px;
+	height: 40px;
+	width: 400px;
+	background-color: rgba(255, 255, 255, 0.8);
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	will-change: transform;
+	transform: translate(0, 70px);
+	transition: transform;
+	transition-duration: 500ms;
+}
+
+#toolbarCreature.toolbarCreature--ouvert {
+	transform: translate(0, 0);
+}
+
+.toolbarCreature-bouton {
+	display: none;
+	border: none;
+	border-radius: 5px;
+	background: #000000;
+	color: #FFFFFF;
+	height: 50px;
+	padding: 5px;
+}
+
+.toolbarCreature-bouton.toolbarCreature-bouton--actif {
+	display: inline-block;
 }

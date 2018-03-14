@@ -13,23 +13,26 @@ import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 
 import net.feerie.creatura.client.rendu2d.RenduMonde;
+import net.feerie.creatura.client.ui.PanneauInfosCreatureMentales;
+import net.feerie.creatura.client.ui.PanneauInfosCreaturePhysique;
+import net.feerie.creatura.client.ui.PanneauInfosDebug;
+import net.feerie.creatura.client.ui.PanneauToolbarCreature;
+import net.feerie.creatura.client.ui.PanneauVersion;
 import net.feerie.creatura.shared.Console;
 import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.Metronome;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
-import net.feerie.creatura.shared.creature.moodles.Moodle;
-import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.EntiteArbre;
 import net.feerie.creatura.shared.entites.EntiteDistributeurGranule;
 import net.feerie.creatura.shared.entites.EntiteEau;
 import net.feerie.creatura.shared.entites.EntiteLitiere;
+import net.feerie.creatura.shared.entites.TypeEntite;
 import net.feerie.creatura.shared.monde.Carte;
 import net.feerie.creatura.shared.monde.Environnement;
 import net.feerie.creatura.shared.monde.Monde;
@@ -54,7 +57,11 @@ public class Creatura implements EntryPoint
 	private int hauteurVue;
 	private int xVue;
 	//UI
-	private HTML uiInformations;
+	private PanneauInfosDebug panneauInfosDebug;
+	private PanneauVersion panneauVersion;
+	private PanneauInfosCreaturePhysique panneauInfosCreaturePhysique;
+	private PanneauInfosCreatureMentales panneauInfosCreatureMentales;
+	private PanneauToolbarCreature panneauToolbarCreature;
 	
 	public void onModuleLoad()
 	{
@@ -75,8 +82,11 @@ public class Creatura implements EntryPoint
 		this.contexte = canvas.getContext2d();
 		
 		//Initialisation de l'UI
-		uiInformations = new HTML();
-		RootPanel.get("informations").add(uiInformations);
+		panneauInfosDebug = new PanneauInfosDebug();
+		panneauVersion = new PanneauVersion();
+		panneauInfosCreaturePhysique = new PanneauInfosCreaturePhysique();
+		panneauInfosCreatureMentales = new PanneauInfosCreatureMentales();
+		panneauToolbarCreature = new PanneauToolbarCreature();
 		
 		//Construction du monde
 		Environnement eChaud = new Environnement(31, 1, "#FCFFA6");
@@ -136,6 +146,7 @@ public class Creatura implements EntryPoint
 		AnimationScheduler.get().requestAnimationFrame(boucleRendu);
 		
 		initialiseEvenement();
+		ouvreInterfaceGenerale();
 	}
 	
 	private int xVueInitial;
@@ -160,36 +171,6 @@ public class Creatura implements EntryPoint
 			}
 		});
 		
-		canvas.addMouseUpHandler(new MouseUpHandler()
-		{
-			@Override
-			public void onMouseUp(MouseUpEvent event)
-			{
-				clicEnCours = false;
-				if (scrollEnCours)
-				{
-					scrollEnCours = false;
-				}
-				else
-				{
-					int x = xVue + (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
-					int y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
-					
-					Entite entiteASelectionner = null;
-					for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
-					{
-						if (entiteASelectionner == null || entite.getType().getPrioriteSelection() > entiteASelectionner.getType().getPrioriteSelection())
-							entiteASelectionner = entite;
-					}
-					if (entiteASelectionner != null)
-					{
-						String outilAOuvrir = entiteASelectionner.active(true);
-						Console.log("Outil à ouvrir : " + outilAOuvrir);
-					}
-				}
-			}
-		});
-		
 		canvas.addMouseMoveHandler(new MouseMoveHandler()
 		{
 			@Override
@@ -209,6 +190,64 @@ public class Creatura implements EntryPoint
 				}
 			}
 		});
+		
+		canvas.addMouseUpHandler(new MouseUpHandler()
+		{
+			@Override
+			public void onMouseUp(MouseUpEvent event)
+			{
+				clicEnCours = false;
+				if (scrollEnCours)
+				{
+					scrollEnCours = false;
+				}
+				else
+				{
+					int x = xVue + (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
+					int y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
+					
+					Entite entiteSelectionnee = null;
+					for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
+					{
+						if (entiteSelectionnee == null || entite.getType().getPrioriteSelection() > entiteSelectionnee.getType().getPrioriteSelection())
+							entiteSelectionnee = entite;
+					}
+					
+					ouvreInterfaceGenerale();
+					
+					if (entiteSelectionnee != null)
+					{
+						String outilAOuvrir = entiteSelectionnee.active(true);
+						Console.log("Outil à ouvrir : " + outilAOuvrir);
+						if (outilAOuvrir != null && outilAOuvrir.equalsIgnoreCase("Creature") && entiteSelectionnee.getType() == TypeEntite.CREATURE)
+						{
+							ouvreInterfaceCreature((Creature) entiteSelectionnee);
+						}
+					}
+				}
+			}
+		});
+	}
+	
+	private void ouvreInterfaceGenerale()
+	{
+		panneauInfosCreaturePhysique.ferme();
+		panneauInfosCreatureMentales.ferme();
+		panneauToolbarCreature.ferme();
+		panneauInfosDebug.ouvre(creature);
+		panneauVersion.ouvre();
+	}
+	
+	private void ouvreInterfaceCreature(Creature creature)
+	{
+		if (creature.estVivante())
+		{
+			panneauInfosCreaturePhysique.ouvre(creature);
+			panneauInfosCreatureMentales.ouvre(creature);
+			panneauToolbarCreature.ouvre(creature);
+			panneauInfosDebug.ferme();
+			panneauVersion.ferme();
+		}
 	}
 	
 	private class BoucleRendu implements AnimationScheduler.AnimationCallback
@@ -236,47 +275,11 @@ public class Creatura implements EntryPoint
 			vueMonde.dessine(dateActuelle, progressionTic);
 			
 			//Mise à jour de l'UI
-			metAJourUI();
+			panneauInfosDebug.metAJourUI();
 			
 			//Appel de la frame suivante
 			AnimationScheduler.get().requestAnimationFrame(this);
 		}
 	}
 	
-	private void metAJourUI()
-	{
-		//Action et besoins
-		StringBuilder htmlInfos = new StringBuilder();
-		if (creature.getActionActuelle() != null)
-			htmlInfos.append("<p>Action : ").append(creature.getActionActuelle().getType().getNom()).append("</p>");
-		else
-			htmlInfos.append("<p>Action : aucune</p>");
-		htmlInfos.append("<hr/>");
-		htmlInfos.append("<p>Sante : ").append(creature.getSante()).append("</p>");
-		htmlInfos.append("<hr/>");
-		htmlInfos.append("<p><b>Cliquez sur le distributeur pour déposer de la nourriture. Soyez sympa !</b></p>");
-		htmlInfos.append("<p>Patch note (v0.5) : </p>");
-		htmlInfos.append("<ul>");
-		htmlInfos.append("<li>Vous pouvez scroller la carte.</li>");
-		htmlInfos.append("<li>Plus d'outils : cliquez directement sur les éléments pour agir avec !</li>");
-		htmlInfos.append("<li>De petits nusibles viennent dévorer la nourriture s'il y en a trop au sol.</li>");
-		htmlInfos.append("<li>Le régime alimentaire de votre créature n'accepte plus les fruits (pour le moment). Mais vous avez un distributeur de granule (le truc vertical gris).</li>");
-		htmlInfos.append("</ul>");
-		htmlInfos.append("<hr>");
-		htmlInfos.append("<p>Moodles : </p>");
-		htmlInfos.append("<ul>");
-		for (TypeMoodle typeMoodle : TypeMoodle.values())
-		{
-			Moodle moodle = creature.getMoodle(typeMoodle);
-			int charge = moodle.getCharge();
-			if (moodle.estActif())
-				htmlInfos.append("<li><b>").append(typeMoodle.getNom()).append(" : ").append(charge).append("%</li></b>");
-			else
-				htmlInfos.append("<li>").append(typeMoodle.getNom()).append(" : ").append(charge).append("%</li>");
-		}
-		htmlInfos.append("</ul>");
-		
-		//On affiche les informations
-		uiInformations.setHTML(htmlInfos.toString());
-	}
 }

@@ -65,11 +65,11 @@ public abstract class EntiteCreature extends Entite
 		{
 			if (action != null)
 				if (!action.effectueTic())
-					this.action = null;
+					setActionActuelle(null);
 		}
 		//Sinon rien...
 		else
-			action = null;
+			setActionActuelle(null);
 		
 		//On applique la gravité
 		appliqueGravite();
@@ -79,7 +79,7 @@ public abstract class EntiteCreature extends Entite
 	public void effectueCycleIA()
 	{
 		if (estVivante())
-			action = ia.decideProchaineAction();
+			setActionActuelle(ia.decideProchaineAction());
 	}
 	
 	/**

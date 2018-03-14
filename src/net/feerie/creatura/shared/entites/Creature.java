@@ -1,12 +1,16 @@
 package net.feerie.creatura.shared.entites;
 
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import net.feerie.creatura.shared.actions.Action;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.creature.ia.IABasique;
 import net.feerie.creatura.shared.creature.moodles.Moodle;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+import net.feerie.creatura.shared.events.ObservateurCreature;
 import net.feerie.creatura.shared.monde.Monde;
 
 /**
@@ -18,6 +22,7 @@ public class Creature extends EntiteCreature
 {
 	private int sante;
 	private final EnumMap<TypeMoodle, Moodle> moodles;
+	private Set<ObservateurCreature> observateurs = new HashSet<>();
 	
 	public Creature(Monde monde, Position position)
 	{
@@ -35,6 +40,26 @@ public class Creature extends EntiteCreature
 			return "Creature";
 		else
 			return null;
+	}
+	
+	/**
+	 * Ajoute un observateur à cette créature
+	 * 
+	 * @param observateur l'observateur à ajouter
+	 */
+	public void ajouteObservateur(ObservateurCreature observateur)
+	{
+		observateurs.add(observateur);
+	}
+	
+	/**
+	 * Retire un observateur de cette créature
+	 * 
+	 * @param observateur l'observateur à ajouter
+	 */
+	public void retireObservateur(ObservateurCreature observateur)
+	{
+		observateurs.remove(observateur);
 	}
 	
 	/**
@@ -56,7 +81,13 @@ public class Creature extends EntiteCreature
 	{
 		sante -= montant;
 		if (sante <= 0)
+		{
 			sante = 0;
+			for (ObservateurCreature observateur : observateurs)
+				observateur.onMeurt();
+		}
+		for (ObservateurCreature observateur : observateurs)
+			observateur.onChangeSante(sante);
 	}
 	
 	/**
@@ -94,10 +125,40 @@ public class Creature extends EntiteCreature
 		return getMoodle(moodle).estActif();
 	}
 	
+	/**
+	 * Appelée à chaque fois qu'un moodle apparait
+	 * 
+	 * @param moodle le moodle activé
+	 */
+	public void onGagneMoodle(TypeMoodle moodle)
+	{
+		for (ObservateurCreature observateur : observateurs)
+			observateur.onGagneMoodle(moodle);
+	}
+	
+	/**
+	 * Appelé à chaque fois qu'un moodle disparait
+	 * 
+	 * @param moodle le moodle désactivé
+	 */
+	public void onPerdMoodle(TypeMoodle moodle)
+	{
+		for (ObservateurCreature observateur : observateurs)
+			observateur.onPerdMoodle(moodle);
+	}
+	
 	@Override
 	public TypeEntite getType()
 	{
 		return TypeEntite.CREATURE;
+	}
+	
+	@Override
+	public void setActionActuelle(Action action)
+	{
+		super.setActionActuelle(action);
+		for (ObservateurCreature observateur : observateurs)
+			observateur.onChangeAction(action);
 	}
 	
 	@Override

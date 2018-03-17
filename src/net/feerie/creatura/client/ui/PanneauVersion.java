@@ -14,7 +14,7 @@ public class PanneauVersion
 	public PanneauVersion()
 	{
 		panneau = DivElement.as(Document.get().getElementById("infosVersion"));
-		List<PatchNote> patchnotes = Arrays.asList(version0_5(), version0_6());
+		List<PatchNote> patchnotes = Arrays.asList(version0_6(), version0_7());
 		
 		StringBuilder html = new StringBuilder();
 		for (PatchNote patchnote : patchnotes)
@@ -33,6 +33,7 @@ public class PanneauVersion
 		panneau.removeClassName("infosVersion--ouvert");
 	}
 	
+	@SuppressWarnings("unused")
 	private PatchNote version0_5()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.5) : ");
@@ -48,6 +49,17 @@ public class PanneauVersion
 		PatchNote patchNote = new PatchNote("Patch note (v0.6) : ");
 		patchNote.ajoute("Nouvelle UI lorsqu'on clique sur la créature");
 		patchNote.ajoute("Vous pouvez à nouveau sécher votre créature (ou la mouiller !)");
+		return patchNote;
+	}
+	
+	private PatchNote version0_7()
+	{
+		PatchNote patchNote = new PatchNote("Patch note (v0.7) : ");
+		patchNote.ajoute("Nouvelle IA (qui fait nawak XD)");
+		patchNote.ajoute("Votre créature a désormais des croyances");
+		patchNote.ajoute("La créature peut activer des choses");
+		patchNote.ajoute("Vous pouvez maintenant gronder ou encourager votre créature");
+		patchNote.ajoute("Les touches + et - accélèrent et ralentissent le temps");
 		return patchNote;
 	}
 	

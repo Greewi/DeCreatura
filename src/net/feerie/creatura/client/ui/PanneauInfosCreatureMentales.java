@@ -4,6 +4,8 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 
 import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.creature.ia.Croyance;
+import net.feerie.creatura.shared.creature.ia.IAEvolutive;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.events.ObservateurCreature;
@@ -14,13 +16,13 @@ public class PanneauInfosCreatureMentales implements ObservateurCreature
 	private boolean ouvert;
 	private final DivElement panneau;
 	private final DivElement actionCreature;
-	private final DivElement conceptsCreature;
+	private final DivElement croyancesCreature;
 	
 	public PanneauInfosCreatureMentales()
 	{
 		panneau = DivElement.as(Document.get().getElementById("infosCreatureMentales"));
 		actionCreature = DivElement.as(Document.get().getElementById("actionCreature"));
-		conceptsCreature = DivElement.as(Document.get().getElementById("conceptsCreature"));
+		croyancesCreature = DivElement.as(Document.get().getElementById("croyancesCreature"));
 		creature = null;
 		ouvert = false;
 	}
@@ -37,8 +39,8 @@ public class PanneauInfosCreatureMentales implements ObservateurCreature
 		creature.ajouteObservateur(this);
 		//Action
 		onChangeAction(creature.getActionActuelle());
-		//Concepts
-		conceptsCreature.setInnerText("Pas encore implémenté");//TODO
+		//Croyances
+		metAJourCroyances();
 		
 		panneau.addClassName("infosCreatureMentales--ouvert");
 	}
@@ -55,6 +57,24 @@ public class PanneauInfosCreatureMentales implements ObservateurCreature
 		creature.retireObservateur(this);
 		creature = null;
 		panneau.removeClassName("infosCreatureMentales--ouvert");
+	}
+	
+	/**
+	 * Met à jour les concepts
+	 */
+	private void metAJourCroyances()
+	{
+		if (creature.getIA() instanceof IAEvolutive)
+		{
+			IAEvolutive ia = (IAEvolutive) creature.getIA();
+			StringBuilder builder = new StringBuilder();
+			for (Croyance croyance : ia.getCroyances())
+				builder.append("<div>").append(croyance).append("</div>");
+			croyancesCreature.setInnerHTML(builder.toString());
+		}
+		else
+			croyancesCreature.setInnerText("IA Non Compatible");
+		
 	}
 	
 	@Override
@@ -78,10 +98,20 @@ public class PanneauInfosCreatureMentales implements ObservateurCreature
 	@Override
 	public void onChangeAction(Action action)
 	{
+		metAJourCroyances();
 		if (action == null)
 			actionCreature.setInnerText("Attend");
 		else
-			actionCreature.setInnerText(action.getType().getNom());
+		{
+			if (creature.getIA() instanceof IAEvolutive)
+			{
+				IAEvolutive ia = (IAEvolutive) creature.getIA();
+				actionCreature.setInnerText(ia.getAction().getNom() + " + " + ia.getCibleAction());
+			}
+			else
+				actionCreature.setInnerText(action.getType().getNom());
+		}
+		
 	}
 	
 	@Override

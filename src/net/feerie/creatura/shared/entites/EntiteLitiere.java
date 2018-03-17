@@ -30,9 +30,9 @@ public class EntiteLitiere extends Entite
 	}
 	
 	@Override
-	public String active(boolean activeParJoueur)
+	public String active(EntiteCreature activateur)
 	{
-		if (activeParJoueur)
+		if (activateur == null)
 			vide();
 		return null;
 	}

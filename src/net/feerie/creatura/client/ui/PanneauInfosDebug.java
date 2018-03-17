@@ -3,6 +3,7 @@ package net.feerie.creatura.client.ui;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Document;
 
+import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.creature.moodles.Moodle;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.entites.Creature;
@@ -42,6 +43,8 @@ public class PanneauInfosDebug
 		htmlInfos.append("<p>Sante : ").append(creature.getSante()).append("</p>");
 		htmlInfos.append("<hr/>");
 		htmlInfos.append("<p><b>Cliquez sur le distributeur pour déposer de la nourriture. Soyez sympa !</b></p>");
+		htmlInfos.append("<hr>");
+		htmlInfos.append("<p>Temps d'un tic : ").append(Constantes.PERIODE_TIC).append("ms</p>");
 		htmlInfos.append("<hr>");
 		htmlInfos.append("<p>Moodles : </p>");
 		htmlInfos.append("<ul>");

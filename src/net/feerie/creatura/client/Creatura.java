@@ -6,12 +6,18 @@ import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -152,51 +158,48 @@ public class Creatura implements EntryPoint
 	private int xVueInitial;
 	private int xSourisInitial;
 	private int ySourisInitial;
-	private boolean clicEnCours;
 	private boolean scrollEnCours;
+	private HandlerRegistration mouseMoveRegistration;
 	
 	private final void initialiseEvenement()
 	{
-		clicEnCours = false;
-		scrollEnCours = false;
-		canvas.addMouseDownHandler(new MouseDownHandler()
-		{
-			@Override
-			public void onMouseDown(MouseDownEvent event)
-			{
-				xSourisInitial = event.getRelativeX(event.getRelativeElement());
-				ySourisInitial = event.getRelativeY(event.getRelativeElement());
-				clicEnCours = true;
-				xVueInitial = xVue;
-			}
-		});
-		
-		canvas.addMouseMoveHandler(new MouseMoveHandler()
+		final MouseMoveHandler mouseMoveHandler = new MouseMoveHandler()
 		{
 			@Override
 			public void onMouseMove(MouseMoveEvent event)
 			{
-				if (clicEnCours)
-				{
-					int x = event.getRelativeX(event.getRelativeElement());
-					int y = event.getRelativeY(event.getRelativeElement());
-					if ((x - xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y - ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
-						scrollEnCours = true;
-					xVue = xVueInitial - ((x - xSourisInitial) * largeurVue) / largeurFenetre;
-					if (xVue < 0)
-						xVue = 0;
-					if (xVue > monde.getCarte().getLongueurTotale() - largeurVue)
-						xVue = monde.getCarte().getLongueurTotale() - largeurVue;
-				}
+				int x = event.getRelativeX(event.getRelativeElement());
+				int y = event.getRelativeY(event.getRelativeElement());
+				if ((x - xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y - ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
+					scrollEnCours = true;
+				xVue = xVueInitial - ((x - xSourisInitial) * largeurVue) / largeurFenetre;
+				if (xVue < 0)
+					xVue = 0;
+				if (xVue > monde.getCarte().getLongueurTotale() - largeurVue)
+					xVue = monde.getCarte().getLongueurTotale() - largeurVue;
 			}
-		});
+		};
 		
-		canvas.addMouseUpHandler(new MouseUpHandler()
+		final MouseDownHandler mouseDownHandler = new MouseDownHandler()
+		{
+			@Override
+			public void onMouseDown(MouseDownEvent event)
+			{
+				scrollEnCours = false;
+				xSourisInitial = event.getRelativeX(event.getRelativeElement());
+				ySourisInitial = event.getRelativeY(event.getRelativeElement());
+				xVueInitial = xVue;
+				mouseMoveRegistration = canvas.addMouseMoveHandler(mouseMoveHandler);
+			}
+		};
+		
+		final MouseUpHandler mouseUpHandler = new MouseUpHandler()
 		{
 			@Override
 			public void onMouseUp(MouseUpEvent event)
 			{
-				clicEnCours = false;
+				if (mouseMoveRegistration != null)
+					mouseMoveRegistration.removeHandler();
 				if (scrollEnCours)
 				{
 					scrollEnCours = false;
@@ -217,16 +220,46 @@ public class Creatura implements EntryPoint
 					
 					if (entiteSelectionnee != null)
 					{
-						String outilAOuvrir = entiteSelectionnee.active(true);
+						String outilAOuvrir = entiteSelectionnee.active(null);
 						Console.log("Outil à ouvrir : " + outilAOuvrir);
 						if (outilAOuvrir != null && outilAOuvrir.equalsIgnoreCase("Creature") && entiteSelectionnee.getType() == TypeEntite.CREATURE)
-						{
 							ouvreInterfaceCreature((Creature) entiteSelectionnee);
-						}
 					}
 				}
 			}
-		});
+		};
+		
+		final BlurHandler blurHandler = new BlurHandler()
+		{
+			@Override
+			public void onBlur(BlurEvent event)
+			{
+				if (mouseMoveRegistration != null)
+					mouseMoveRegistration.removeHandler();
+				scrollEnCours = false;
+			}
+		};
+		
+		canvas.addMouseDownHandler(mouseDownHandler);
+		canvas.addMouseUpHandler(mouseUpHandler);
+		canvas.addBlurHandler(blurHandler);
+		
+		RootPanel.get().addDomHandler(new KeyDownHandler()
+		{
+			@Override
+			public void onKeyDown(KeyDownEvent event)
+			{
+				if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_PLUS)
+				{
+					Constantes.PERIODE_TIC /= 1.20;
+				}
+				else if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_MINUS)
+				{
+					Constantes.PERIODE_TIC *= 1.20;
+				}
+			}
+		}, KeyDownEvent.getType());
+		
 	}
 	
 	private void ouvreInterfaceGenerale()

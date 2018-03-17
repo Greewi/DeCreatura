@@ -6,7 +6,7 @@ public class Constantes
 	 * Général
 	 */
 	// Gestion du temps
-	public final static long PERIODE_TIC = 250l; // Durée d'un tic en millisecondes
+	public static long PERIODE_TIC = 250l; // Durée d'un tic en millisecondes
 	public final static long PERIODE_CYCLE_IA = 1; // Nombre de tic pour un cycle d'IA
 	public final static long PERIODE_CYCLE_METABOLIQUE = 10; // Nombre de tic pour un cycle métabolique
 	
@@ -18,6 +18,7 @@ public class Constantes
 	public final static int ACTION_MANGER_DUREE = 10; //Durée de l'action Boire en tic 
 	public final static int ACTION_POPO_DUREE = 10; //Durée de l'action Boire en tic 
 	public final static int ACTION_NUISIBLE_MANGER_DUREE = 20; //Durée de l'action manger en tic pour un nuisible
+	public final static int ACTION_ACTIVER_DUREE = 5; //Durée de l'action Activer en tic 
 	
 	/*
 	 * Métabolismes

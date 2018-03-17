@@ -22,9 +22,11 @@ public class EntiteDistributeurGranule extends Entite
 	}
 	
 	@Override
-	public String active(boolean activeParJoueur)
+	public String active(EntiteCreature activateur)
 	{
 		monde.nouvelleEntite(new EntiteNourriture(monde, rectangleGeneration.getPositionAleatoire(), TypeEntite.NOURRITURE_GRANULE));
+		if (activateur != null)
+			activateur.getIA().constateNouvelleEntite(TypeEntite.NOURRITURE_GRANULE);
 		return null;
 	}
 }

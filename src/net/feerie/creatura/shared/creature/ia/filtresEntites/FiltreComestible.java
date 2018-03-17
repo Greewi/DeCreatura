@@ -1,5 +1,6 @@
 package net.feerie.creatura.shared.creature.ia.filtresEntites;
 
+import net.feerie.creatura.shared.actions.TypeAction;
 import net.feerie.creatura.shared.entites.Entite;
 
 /**
@@ -12,6 +13,6 @@ public class FiltreComestible implements FiltreEntite
 	@Override
 	public boolean teste(Entite entite)
 	{
-		return entite.getType().peutEtreMange();
+		return entite.getType().estActionPossible(TypeAction.MANGER);
 	}
 }

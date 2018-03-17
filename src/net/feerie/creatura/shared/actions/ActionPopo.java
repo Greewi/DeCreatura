@@ -40,19 +40,23 @@ public class ActionPopo extends AbstractActionAvecDuree
 	@Override
 	public boolean termine()
 	{
-		//On collecte les déchets de la créature
-		creature.getMoodle(TypeMoodle.POPO).desactive();
-		
-		//On créé des déchets dans le monde
-		if (cible.getType() == TypeEntite.LITIERE)
+		if (creature.estAffectePar(TypeMoodle.POPO))
 		{
-			EntiteLitiere litiere = (EntiteLitiere) cible;
-			litiere.ajouteDechets();
-		}
-		else
-		{
-			Monde monde = creature.getMonde();
-			monde.nouvelleEntite(new EntiteDechet(monde, new Position(cible.position)));
+			//On collecte les déchets de la créature
+			creature.getMoodle(TypeMoodle.POPO).desactive();
+			
+			//On créé des déchets dans le monde
+			if (cible.getType() == TypeEntite.LITIERE)
+			{
+				EntiteLitiere litiere = (EntiteLitiere) cible;
+				litiere.ajouteDechets();
+			}
+			else
+			{
+				Monde monde = creature.getMonde();
+				monde.nouvelleEntite(new EntiteDechet(monde, new Position(cible.position)));
+				creature.getIA().constateNouvelleEntite(TypeEntite.POPO);
+			}
 		}
 		
 		return false;

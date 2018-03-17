@@ -6,6 +6,7 @@ public enum TypeAction
 	MANGER("Mange"),
 	BOIRE("Boit"),
 	FAIRE_POPO("Fait Popo"),
+	ACTIVER("Active"),
 	DORMIR("Dort");
 	
 	/**
@@ -21,5 +22,11 @@ public enum TypeAction
 	private TypeAction(String nom)
 	{
 		this.nom = nom;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return nom;
 	}
 }

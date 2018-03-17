@@ -4,13 +4,13 @@ import java.util.List;
 
 import com.google.gwt.user.client.Random;
 
+import net.feerie.creatura.shared.actions.Action;
 import net.feerie.creatura.shared.actions.ActionBoire;
 import net.feerie.creatura.shared.actions.ActionDormir;
 import net.feerie.creatura.shared.actions.ActionManger;
 import net.feerie.creatura.shared.actions.ActionMarcher;
 import net.feerie.creatura.shared.actions.ActionMarcherVersEntite;
 import net.feerie.creatura.shared.actions.ActionPopo;
-import net.feerie.creatura.shared.actions.Action;
 import net.feerie.creatura.shared.actions.TypeAction;
 import net.feerie.creatura.shared.creature.ia.filtresEntites.FiltreTypeEntite;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
@@ -75,5 +75,35 @@ public class IABasique implements IA
 		}
 		
 		return null;
+	}
+	
+	@Override
+	public void encourage()
+	{
+		// Sans effet sur l'IA basique
+	}
+	
+	@Override
+	public void gronde()
+	{
+		// Sans effet sur l'IA basique
+	}
+	
+	@Override
+	public void constateNouvelleEntite(TypeEntite entite)
+	{
+		// Sans effet sur l'IA basique
+	}
+	
+	@Override
+	public void constateApparitionMoodle(TypeMoodle moodle)
+	{
+		// Sans effet sur l'IA basique
+	}
+	
+	@Override
+	public void constateDisparitionMoodle(TypeMoodle moodle)
+	{
+		// Sans effet sur l'IA basique
 	}
 }

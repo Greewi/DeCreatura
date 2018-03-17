@@ -7,6 +7,7 @@ import java.util.List;
 import com.google.gwt.user.client.Random;
 
 import net.feerie.creatura.shared.Constantes;
+import net.feerie.creatura.shared.actions.TypeAction;
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.entites.CreatureNuisible;
 import net.feerie.creatura.shared.entites.Entite;
@@ -172,7 +173,7 @@ public class Monde
 			{
 				if (entite.getType() == TypeEntite.CREATURE_NUISIBLE)
 					nuisibleExiste = true;
-				if (entite.getType().peutEtreMange())
+				if (entite.getType().estActionPossible(TypeAction.MANGER))
 					quantiteNourriture++;
 				entite.effectueCycleMetabolique();
 			}

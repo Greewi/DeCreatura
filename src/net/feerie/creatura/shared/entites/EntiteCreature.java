@@ -1,5 +1,8 @@
 package net.feerie.creatura.shared.entites;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import net.feerie.creatura.shared.actions.Action;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
@@ -18,6 +21,16 @@ public abstract class EntiteCreature extends Entite
 		super(monde, position, taille);
 		this.action = null;
 		this.ia = null;
+	}
+	
+	/**
+	 * Renvoie l'IA de la créature
+	 * 
+	 * @return l'IA de la créature
+	 */
+	public IA getIA()
+	{
+		return ia;
 	}
 	
 	/**
@@ -119,5 +132,18 @@ public abstract class EntiteCreature extends Entite
 				distance = getDistanceCarre(e);
 			}
 		return entite;
+	}
+	
+	/**
+	 * Recherche toutes les types d'entités à portée de la créature
+	 * 
+	 * @return l'ensemble des types d'entités à portée de la créature
+	 */
+	public Set<TypeEntite> chercheEntiteDisponibles()
+	{
+		EnumSet<TypeEntite> entitesDisponibles = EnumSet.noneOf(TypeEntite.class);
+		for (Entite entite : monde.getListeEntites())
+			entitesDisponibles.add(entite.getType());
+		return entitesDisponibles;
 	}
 }

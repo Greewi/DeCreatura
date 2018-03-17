@@ -1,5 +1,6 @@
 package net.feerie.creatura.shared.entites;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -7,7 +8,7 @@ import java.util.Set;
 import net.feerie.creatura.shared.actions.Action;
 import net.feerie.creatura.shared.commons.Dimension;
 import net.feerie.creatura.shared.commons.Position;
-import net.feerie.creatura.shared.creature.ia.IABasique;
+import net.feerie.creatura.shared.creature.ia.IAEvolutive;
 import net.feerie.creatura.shared.creature.moodles.Moodle;
 import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
 import net.feerie.creatura.shared.events.ObservateurCreature;
@@ -29,17 +30,14 @@ public class Creature extends EntiteCreature
 		super(monde, position, new Dimension(50, 50));
 		this.sante = 100;
 		this.moodles = new EnumMap<>(TypeMoodle.class);
+		setIA(new IAEvolutive(this, 20));
 		getMoodle(TypeMoodle.ENNUI).active();
-		setIA(new IABasique(this));
 	}
 	
 	@Override
-	public String active(boolean activeParJoueur)
+	public String active(EntiteCreature activateur)
 	{
-		if (activeParJoueur)
-			return "Creature";
-		else
-			return null;
+		return "Creature";
 	}
 	
 	/**
@@ -83,7 +81,7 @@ public class Creature extends EntiteCreature
 		if (sante <= 0)
 		{
 			sante = 0;
-			for (ObservateurCreature observateur : observateurs)
+			for (ObservateurCreature observateur : new ArrayList<>(observateurs))
 				observateur.onMeurt();
 		}
 		for (ObservateurCreature observateur : observateurs)

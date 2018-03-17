@@ -19,12 +19,16 @@ public class PanneauToolbarCreature implements ObservateurCreature
 	private final DivElement panneau;
 	private final ButtonElement boutonSecherCreature;
 	private final ButtonElement boutonMouillerCreature;
+	private final ButtonElement boutonEncouragerCreature;
+	private final ButtonElement boutonGronderCreature;
 	
 	public PanneauToolbarCreature()
 	{
 		panneau = DivElement.as(Document.get().getElementById("toolbarCreature"));
 		boutonSecherCreature = ButtonElement.as(Document.get().getElementById("boutonSecherCreature"));
 		boutonMouillerCreature = ButtonElement.as(Document.get().getElementById("boutonMouillerCreature"));
+		boutonEncouragerCreature = ButtonElement.as(Document.get().getElementById("boutonEncouragerCreature"));
+		boutonGronderCreature = ButtonElement.as(Document.get().getElementById("boutonGronderCreature"));
 		creature = null;
 		ouvert = false;
 		
@@ -45,6 +49,26 @@ public class PanneauToolbarCreature implements ObservateurCreature
 			{
 				if (ouvert)
 					creature.getMoodle(TypeMoodle.MOUILLE).active();
+			}
+		});
+		
+		Button.wrap(boutonEncouragerCreature).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				if (ouvert)
+					creature.getIA().encourage();
+			}
+		});
+		
+		Button.wrap(boutonGronderCreature).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				if (ouvert)
+					creature.getIA().gronde();
 			}
 		});
 	}
@@ -70,6 +94,9 @@ public class PanneauToolbarCreature implements ObservateurCreature
 			boutonMouillerCreature.addClassName("toolbarCreature-bouton--actif");
 			boutonSecherCreature.removeClassName("toolbarCreature-bouton--actif");
 		}
+		
+		boutonGronderCreature.addClassName("toolbarCreature-bouton--actif");
+		boutonEncouragerCreature.addClassName("toolbarCreature-bouton--actif");
 		
 		panneau.addClassName("toolbarCreature--ouvert");
 	}

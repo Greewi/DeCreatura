@@ -42,10 +42,14 @@ public class EntiteArbre extends Entite
 	 * Secoue l'arbre et fait tomber ses fruits murs
 	 */
 	@Override
-	public String active(boolean activeParJoueur)
+	public String active(EntiteCreature activateur)
 	{
 		while (fruits.size() > 0 && fruits.get(0).estMur())
+		{
 			faitTomberPremierFruit();
+			if (activateur != null)
+				activateur.getIA().constateNouvelleEntite(TypeEntite.NOURRITURE_FRUIT);
+		}
 		return null;
 	}
 	

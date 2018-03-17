@@ -32,9 +32,10 @@ public class CreatureNuisible extends EntiteCreature
 	}
 	
 	@Override
-	public String active(boolean activeParJoueur)
+	public String active(EntiteCreature activateur)
 	{
 		detruit();
+		//TODO IA disparition entite
 		return null;
 	}
 }

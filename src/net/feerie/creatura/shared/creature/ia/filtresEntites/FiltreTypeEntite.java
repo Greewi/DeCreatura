@@ -10,9 +10,14 @@ import net.feerie.creatura.shared.entites.TypeEntite;
  */
 public class FiltreTypeEntite implements FiltreEntite
 {
-	private final TypeEntite type;
+	private TypeEntite type;
 	
 	public FiltreTypeEntite(TypeEntite typeAConserver)
+	{
+		this.type = typeAConserver;
+	}
+	
+	public void setTypeEntite(TypeEntite typeAConserver)
 	{
 		this.type = typeAConserver;
 	}

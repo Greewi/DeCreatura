@@ -1,6 +1,5 @@
 package net.feerie.creatura.shared.actions;
 
-import net.feerie.creatura.shared.Console;
 import net.feerie.creatura.shared.Constantes;
 import net.feerie.creatura.shared.entites.Entite;
 
@@ -29,9 +28,8 @@ public class ActionNuisibleManger extends AbstractActionAvecDuree
 	public boolean termine()
 	{
 		//Si c'est de la nourriture on applique les effets
-		if (cible.getType().peutEtreMange())
+		if (cible.getType().estActionPossible(TypeAction.MANGER))
 		{
-			Console.log("C'etait bien a manger.");
 			cible.detruit();
 		}
 		return false;

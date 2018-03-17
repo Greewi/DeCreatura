@@ -22,11 +22,11 @@ public class EntiteDechet extends Entite
 	}
 	
 	@Override
-	public String active(boolean activeParJoueur)
+	public String active(EntiteCreature activateur)
 	{
-		if (activeParJoueur)
+		if (activateur == null)
 			this.detruit();
-		return super.active(activeParJoueur);
+		return null;
 	}
 	
 	@Override

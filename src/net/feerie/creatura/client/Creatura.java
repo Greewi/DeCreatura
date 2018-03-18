@@ -23,7 +23,9 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 
+import net.feerie.creatura.client.pixi.Utils;
 import net.feerie.creatura.client.rendu2d.RenduMonde;
+import net.feerie.creatura.client.renduPixi.Vue;
 import net.feerie.creatura.client.ui.PanneauInfosCreatureMentales;
 import net.feerie.creatura.client.ui.PanneauInfosCreaturePhysique;
 import net.feerie.creatura.client.ui.PanneauInfosDebug;
@@ -56,14 +58,7 @@ public class Creatura implements EntryPoint
 	private Metronome metronome;
 	private Creature creature;
 	//Vue
-	private Canvas canvas;
-	private Context2d contexte;
-	private RenduMonde vueMonde;
-	private int largeurFenetre;
-	private int hauteurFenetre;
-	private int largeurVue;
-	private int hauteurVue;
-	private int xVue;
+	private Vue vue;
 	//UI
 	private PanneauInfosDebug panneauInfosDebug;
 	private PanneauVersion panneauVersion;
@@ -73,28 +68,7 @@ public class Creatura implements EntryPoint
 	
 	public void onModuleLoad()
 	{
-		largeurVue = Window.getClientWidth();//2000;
-		hauteurVue = Window.getClientHeight();//1000;
-		largeurFenetre = Window.getClientWidth();
-		hauteurFenetre = Window.getClientHeight();
-		if (largeurFenetre / (double) largeurVue > hauteurFenetre / (double) hauteurVue)
-			largeurFenetre = (int) (largeurVue * hauteurFenetre / (double) hauteurVue);
-		else
-			hauteurFenetre = (int) (hauteurVue * largeurFenetre / (double) largeurVue);
-		
-		//Initialisation du contexte
-		this.canvas = Canvas.createIfSupported();
-		canvas.setCoordinateSpaceWidth(largeurFenetre);
-		canvas.setCoordinateSpaceHeight(hauteurFenetre);
-		RootPanel.get("canvas").add(canvas);
-		this.contexte = canvas.getContext2d();
-		
-		//Initialisation de l'UI
-		panneauInfosDebug = new PanneauInfosDebug();
-		panneauVersion = new PanneauVersion();
-		panneauInfosCreaturePhysique = new PanneauInfosCreaturePhysique();
-		panneauInfosCreatureMentales = new PanneauInfosCreatureMentales();
-		panneauToolbarCreature = new PanneauToolbarCreature();
+		Utils.sayHello();
 		
 		//Construction du monde
 		Environnement eChaud = new Environnement(31, 1, "#FCFFA6");
@@ -126,7 +100,6 @@ public class Creatura implements EntryPoint
 		Carte carte = new Carte(zones.toArray(new Zone[1]));
 		this.monde = new Monde(carte);
 		this.metronome = new Metronome(monde);
-		this.vueMonde = new RenduMonde(monde, contexte);
 		
 		//Ajout d'une litierre
 		monde.nouvelleEntite(new EntiteLitiere(monde, 10, new Position(850 + longeurOceanGauche, 150)));
@@ -146,15 +119,24 @@ public class Creatura implements EntryPoint
 		this.creature = new Creature(monde, new Position(400 + longeurOceanGauche, 170));
 		monde.nouvelleEntite(creature);
 		
+		// Interface et vue
+		//Initialisation de l'UI
+		panneauInfosDebug = new PanneauInfosDebug();
+		panneauVersion = new PanneauVersion();
+		panneauInfosCreaturePhysique = new PanneauInfosCreaturePhysique();
+		panneauInfosCreatureMentales = new PanneauInfosCreatureMentales();
+		panneauToolbarCreature = new PanneauToolbarCreature();
+		this.vue = new Vue(monde);
+		
 		//Placement de la camera
-		xVue = longeurOceanGauche;
+		vue.setXVue(longeurOceanGauche);
+		
+		initialiseEvenement();
+		ouvreInterfaceGenerale();
 		
 		//Boucle de rendu
 		BoucleRendu boucleRendu = new BoucleRendu();
 		AnimationScheduler.get().requestAnimationFrame(boucleRendu);
-		
-		initialiseEvenement();
-		ouvreInterfaceGenerale();
 	}
 	
 	private int xVueInitial;
@@ -176,116 +158,82 @@ public class Creatura implements EntryPoint
 	}
 	
 	private final void initialiseEvenement()
-	{
-		final MouseMoveHandler mouseMoveHandler = new MouseMoveHandler()
-		{
-			@Override
-			public void onMouseMove(MouseMoveEvent event)
-			{
-				int x = event.getRelativeX(event.getRelativeElement());
-				int y = event.getRelativeY(event.getRelativeElement());
-				if ((x - xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y - ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
-					scrollEnCours = true;
-				xVue = xVueInitial - ((x - xSourisInitial) * largeurVue) / largeurFenetre;
-				if (xVue < 0)
-					xVue = 0;
-				if (xVue > monde.getCarte().getLongueurTotale() - largeurVue)
-					xVue = monde.getCarte().getLongueurTotale() - largeurVue;
-			}
-		};
-		
-		final MouseUpHandler mouseUpHandler = new MouseUpHandler()
-		{
-			@Override
-			public void onMouseUp(MouseUpEvent event)
-			{
-				reinitialiseHandlers();
-				
-				if (scrollEnCours)
-				{
-					scrollEnCours = false;
-				}
-				else
-				{
-					int x = xVue + (event.getRelativeX(event.getRelativeElement()) * largeurVue) / largeurFenetre;
-					int y = hauteurVue - (event.getRelativeY(event.getRelativeElement()) * hauteurVue) / hauteurFenetre;
-					
-					Entite entiteSelectionnee = null;
-					for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
-					{
-						if (entiteSelectionnee == null || entite.getType().getPrioriteSelection() > entiteSelectionnee.getType().getPrioriteSelection())
-							entiteSelectionnee = entite;
-					}
-					
-					ouvreInterfaceGenerale();
-					
-					if (entiteSelectionnee != null)
-					{
-						String outilAOuvrir = entiteSelectionnee.active(null);
-						Console.log("Outil à ouvrir : " + outilAOuvrir);
-						if (outilAOuvrir != null && outilAOuvrir.equalsIgnoreCase("Creature") && entiteSelectionnee.getType() == TypeEntite.CREATURE)
-							ouvreInterfaceCreature((Creature) entiteSelectionnee);
-					}
-				}
-			}
-		};
-		
-		final MouseDownHandler mouseDownHandler = new MouseDownHandler()
-		{
-			@Override
-			public void onMouseDown(MouseDownEvent event)
-			{
-				scrollEnCours = false;
-				xSourisInitial = event.getRelativeX(event.getRelativeElement());
-				ySourisInitial = event.getRelativeY(event.getRelativeElement());
-				xVueInitial = xVue;
-				mouseMoveRegistration = RootPanel.get().addDomHandler(mouseMoveHandler, MouseMoveEvent.getType());
-				mouseUpRegistration = RootPanel.get().addDomHandler(mouseUpHandler, MouseUpEvent.getType());
-			}
-		};
-		
-		final BlurHandler blurHandler = new BlurHandler()
-		{
-			@Override
-			public void onBlur(BlurEvent event)
-			{
-				reinitialiseHandlers();
-				scrollEnCours = false;
-			}
-		};
-		
-		final MouseOutHandler mouseOutHandler = new MouseOutHandler()
-		{
-			@Override
-			public void onMouseOut(MouseOutEvent event)
-			{
-				reinitialiseHandlers();
-				scrollEnCours = false;
-			}
-		};
-		
-		canvas.addMouseDownHandler(mouseDownHandler);
-		RootPanel.get().addDomHandler(blurHandler, BlurEvent.getType());
-		RootPanel.get().addDomHandler(mouseOutHandler, MouseOutEvent.getType());
-		
-		RootPanel.get().addDomHandler(new KeyDownHandler()
-		{
-			@Override
-			public void onKeyDown(KeyDownEvent event)
-			{
-				if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_PLUS)
-				{
-					Constantes.PERIODE_TIC /= 1.20;
-					if (Constantes.PERIODE_TIC < 5)
-						Constantes.PERIODE_TIC = 5;
-				}
-				else if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_MINUS)
-				{
-					Constantes.PERIODE_TIC *= 1.20;
-				}
-			}
-		}, KeyDownEvent.getType());
-		
+	{/*
+		 * final MouseMoveHandler mouseMoveHandler = new MouseMoveHandler() {
+		 * 
+		 * @Override public void onMouseMove(MouseMoveEvent event) { int x =
+		 * event.getRelativeX(event.getRelativeElement()); int y =
+		 * event.getRelativeY(event.getRelativeElement()); if ((x -
+		 * xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y -
+		 * ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
+		 * scrollEnCours = true; xVue = xVueInitial - ((x - xSourisInitial) *
+		 * largeurVue) / largeurFenetre; if (xVue < 0) xVue = 0; if (xVue >
+		 * monde.getCarte().getLongueurTotale() - largeurVue) xVue =
+		 * monde.getCarte().getLongueurTotale() - largeurVue; } };
+		 * 
+		 * final MouseUpHandler mouseUpHandler = new MouseUpHandler() {
+		 * 
+		 * @Override public void onMouseUp(MouseUpEvent event) {
+		 * reinitialiseHandlers();
+		 * 
+		 * if (scrollEnCours) { scrollEnCours = false; } else { int x = xVue +
+		 * (event.getRelativeX(event.getRelativeElement()) * largeurVue) /
+		 * largeurFenetre; int y = hauteurVue -
+		 * (event.getRelativeY(event.getRelativeElement()) * hauteurVue) /
+		 * hauteurFenetre;
+		 * 
+		 * Entite entiteSelectionnee = null; for (Entite entite :
+		 * monde.getEntiteAPosition(new Position(x, y))) { if
+		 * (entiteSelectionnee == null ||
+		 * entite.getType().getPrioriteSelection() >
+		 * entiteSelectionnee.getType().getPrioriteSelection())
+		 * entiteSelectionnee = entite; }
+		 * 
+		 * ouvreInterfaceGenerale();
+		 * 
+		 * if (entiteSelectionnee != null) { String outilAOuvrir =
+		 * entiteSelectionnee.active(null); Console.log("Outil à ouvrir : " +
+		 * outilAOuvrir); if (outilAOuvrir != null &&
+		 * outilAOuvrir.equalsIgnoreCase("Creature") &&
+		 * entiteSelectionnee.getType() == TypeEntite.CREATURE)
+		 * ouvreInterfaceCreature((Creature) entiteSelectionnee); } } } };
+		 * 
+		 * final MouseDownHandler mouseDownHandler = new MouseDownHandler() {
+		 * 
+		 * @Override public void onMouseDown(MouseDownEvent event) {
+		 * scrollEnCours = false; xSourisInitial =
+		 * event.getRelativeX(event.getRelativeElement()); ySourisInitial =
+		 * event.getRelativeY(event.getRelativeElement()); xVueInitial = xVue;
+		 * mouseMoveRegistration =
+		 * RootPanel.get().addDomHandler(mouseMoveHandler,
+		 * MouseMoveEvent.getType()); mouseUpRegistration =
+		 * RootPanel.get().addDomHandler(mouseUpHandler,
+		 * MouseUpEvent.getType()); } };
+		 * 
+		 * final BlurHandler blurHandler = new BlurHandler() {
+		 * 
+		 * @Override public void onBlur(BlurEvent event) {
+		 * reinitialiseHandlers(); scrollEnCours = false; } };
+		 * 
+		 * final MouseOutHandler mouseOutHandler = new MouseOutHandler() {
+		 * 
+		 * @Override public void onMouseOut(MouseOutEvent event) {
+		 * reinitialiseHandlers(); scrollEnCours = false; } };
+		 * 
+		 * canvas.addMouseDownHandler(mouseDownHandler);
+		 * RootPanel.get().addDomHandler(blurHandler, BlurEvent.getType());
+		 * RootPanel.get().addDomHandler(mouseOutHandler,
+		 * MouseOutEvent.getType());
+		 * 
+		 * RootPanel.get().addDomHandler(new KeyDownHandler() {
+		 * 
+		 * @Override public void onKeyDown(KeyDownEvent event) { if
+		 * (event.getNativeKeyCode() == KeyCodes.KEY_NUM_PLUS) {
+		 * Constantes.PERIODE_TIC /= 1.20; if (Constantes.PERIODE_TIC < 5)
+		 * Constantes.PERIODE_TIC = 5; } else if (event.getNativeKeyCode() ==
+		 * KeyCodes.KEY_NUM_MINUS) { Constantes.PERIODE_TIC *= 1.20; } } },
+		 * KeyDownEvent.getType());
+		 */
 	}
 	
 	private void ouvreInterfaceGenerale()
@@ -319,20 +267,20 @@ public class Creatura implements EntryPoint
 			//Mise à jour du monde
 			metronome.nouvelleFrame();
 			
-			//Affichage du canvas
-			canvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
-			//Mise à l'échelle
-			contexte.scale(largeurFenetre / (double) largeurVue, -hauteurFenetre / (double) hauteurVue);
-			contexte.translate(-xVue, -hauteurVue);
-			
-			//Dessin du monde
-			double progressionTic = (dateActuelle - metronome.getDateDernierTic()) / (double) Constantes.PERIODE_TIC;
-			if (progressionTic < 0)
-				progressionTic = 0;
-			if (progressionTic > 1)
-				progressionTic = 1;
-			vueMonde.dessine(dateActuelle, progressionTic);
-			
+			vue.dessine();
+			/*
+			 * //Affichage du canvas
+			 * canvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
+			 * //Mise à l'échelle contexte.scale(largeurFenetre / (double)
+			 * largeurVue, -hauteurFenetre / (double) hauteurVue);
+			 * contexte.translate(-xVue, -hauteurVue);
+			 * 
+			 * //Dessin du monde double progressionTic = (dateActuelle -
+			 * metronome.getDateDernierTic()) / (double) Constantes.PERIODE_TIC;
+			 * if (progressionTic < 0) progressionTic = 0; if (progressionTic >
+			 * 1) progressionTic = 1; vueMonde.dessine(dateActuelle,
+			 * progressionTic);
+			 */
 			//Mise à jour de l'UI
 			panneauInfosDebug.metAJourUI();
 			

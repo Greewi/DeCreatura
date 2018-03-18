@@ -38,11 +38,19 @@ public class ActionManger extends AbstractActionAvecDuree
 	public boolean termine()
 	{
 		//Si c'est de la nourriture on applique les effets
-		if (cible.getType() == TypeEntite.NOURRITURE_GRANULE)
+		if (cible.getType().estActionPossible(TypeAction.MANGER))
 		{
+			if (cible.getType() == TypeEntite.NOURRITURE_GRANULE)
+			{
+				creature.getMoodle(TypeMoodle.FAIM).decharge(50);
+				creature.getMoodle(TypeMoodle.POPO).charge(30);
+			}
+			else
+			{
+				creature.getMoodle(TypeMoodle.POISON).active();				
+				creature.getMoodle(TypeMoodle.POPO).charge(30);
+			}
 			cible.detruit();
-			creature.getMoodle(TypeMoodle.FAIM).decharge(50);
-			creature.getMoodle(TypeMoodle.POPO).charge(30);
 		}
 		return false;
 	}

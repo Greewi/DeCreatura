@@ -174,7 +174,7 @@ public class Croyance
 	 */
 	public int getPoids()
 	{
-		return poids / (1 + tempsDepuisDerniereActivation / 80);
+		return poids*1000 / (1000 + (tempsDepuisDerniereActivation*1000) / 80);
 	}
 	
 	private Croyance(TypeAction action, TypeEntite cibleAction, TypeCroyance type, TypeEntite resultatEntite, TypeMoodle resultatMoodle)

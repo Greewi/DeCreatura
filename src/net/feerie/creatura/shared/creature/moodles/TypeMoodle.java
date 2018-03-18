@@ -88,6 +88,14 @@ public enum TypeMoodle
 		{
 			return new MoodlePopo(creature);
 		}
+	},
+	POISON("Est empoisonné")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodlePoison(creature);
+		}
 	};
 	
 	private final String nom;

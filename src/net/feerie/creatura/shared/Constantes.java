@@ -72,4 +72,7 @@ public class Constantes
 	public static final int FROID_DECHARGEMENT_TEMPERE_MOUILLE = 10;
 	public static final int FROID_CHARGEMENT_FROID = 10;
 	public static final int FROID_CHARGEMENT_FROID_MOUILLE = 15;
+	//Poison
+	public static final int POISON_DECHARGEMENT_PASSIF = 5;	
+	public static final int POISON_REDUCTION_SANTE = 3;	
 }

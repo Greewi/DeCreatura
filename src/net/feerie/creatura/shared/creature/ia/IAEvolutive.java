@@ -201,6 +201,7 @@ public class IAEvolutive implements IA
 		case MANGER:
 		case DORMIR:
 		case FAIRE_POPO:
+		case ACTIVER:
 			return true;
 		default:
 			return false;

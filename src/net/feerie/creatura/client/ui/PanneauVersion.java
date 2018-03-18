@@ -14,7 +14,7 @@ public class PanneauVersion
 	public PanneauVersion()
 	{
 		panneau = DivElement.as(Document.get().getElementById("infosVersion"));
-		List<PatchNote> patchnotes = Arrays.asList(version0_6(), version0_7());
+		List<PatchNote> patchnotes = Arrays.asList(version0_7(), version0_7b());
 		
 		StringBuilder html = new StringBuilder();
 		for (PatchNote patchnote : patchnotes)
@@ -43,7 +43,8 @@ public class PanneauVersion
 		patchNote.ajoute("Le régime alimentaire de votre créature n'accepte plus les fruits (pour le moment). Mais vous avez un distributeur de granule (le truc vertical gris).");
 		return patchNote;
 	}
-	
+
+	@SuppressWarnings("unused")
 	private PatchNote version0_6()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.6) : ");
@@ -60,6 +61,16 @@ public class PanneauVersion
 		patchNote.ajoute("La créature peut activer des choses");
 		patchNote.ajoute("Vous pouvez maintenant gronder ou encourager votre créature");
 		patchNote.ajoute("Les touches + et - accélèrent et ralentissent le temps");
+		return patchNote;
+	}
+	
+	private PatchNote version0_7b()
+	{
+		PatchNote patchNote = new PatchNote("Patch note (v0.7b) : ");
+		patchNote.ajoute("La créature tiens compte des actions Activer dans son apprentissage");
+		patchNote.ajoute("La créature s'empoisonne si elle manger des choses pas bonnes pour elle");
+		patchNote.ajoute("Quelques corrections d'interactions lors de la perte de focus de la fenêtre");
+		patchNote.ajoute("La décrémentation des croyances est plus continue");
 		return patchNote;
 	}
 	

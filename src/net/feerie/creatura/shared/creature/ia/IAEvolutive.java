@@ -119,7 +119,8 @@ public class IAEvolutive implements IA
 				if (croyanceMal.getPoids() < 20)
 					croyances.remove(croyanceMal);
 			}
-			ajouteCroyance(Croyance.creeBien(derniereActionEffectuee, cibleDerniereActionEffectuee));
+			else
+				ajouteCroyance(Croyance.creeBien(derniereActionEffectuee, cibleDerniereActionEffectuee));
 		}
 	}
 	
@@ -142,7 +143,8 @@ public class IAEvolutive implements IA
 				if (croyanceBien.getPoids() < 20)
 					croyances.remove(croyanceBien);
 			}
-			ajouteCroyance(Croyance.creeMal(derniereActionEffectuee, cibleDerniereActionEffectuee));
+			else
+				ajouteCroyance(Croyance.creeMal(derniereActionEffectuee, cibleDerniereActionEffectuee));
 		}
 	}
 	

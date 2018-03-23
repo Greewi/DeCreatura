@@ -1,15 +1,23 @@
 package net.feerie.creatura.client.pixi;
 
-import com.google.gwt.core.client.JavaScriptObject;
+import jsinterop.annotations.JsConstructor;
+import jsinterop.annotations.JsOverlay;
+import jsinterop.annotations.JsProperty;
+import jsinterop.annotations.JsType;
 
-public final class Sprite extends JavaScriptObject
+@JsType(isNative=true, namespace="PIXI")
+public class Sprite extends Container
 {
-	protected Sprite()
+	@JsProperty
+	public ObservablePoint anchor;
+	
+	@JsConstructor
+	public Sprite(Texture texture)
 	{
 	}
 	
-	public static native Sprite newSprite(String textureName)/*-{
-		var PIXI = $wnd.PIXI;
-		return new PIXI.Sprite(PIXI.loader.resources[textureName].texture);
-	}-*/;
+	@JsOverlay
+	public final static Sprite newSprite(String textureName){
+		return new Sprite(Loader.getTexture(textureName));
+	};
 }

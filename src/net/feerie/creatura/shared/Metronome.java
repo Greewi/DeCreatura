@@ -40,10 +40,8 @@ public class Metronome
 	/**
 	 * Exécute une nouvelle frame.
 	 */
-	public void nouvelleFrame()
-	{
-		long dateActuelle = System.currentTimeMillis();
-		
+	public void nouvelleFrame(long dateActuelle)
+	{	
 		while (dateDernierTic + Constantes.PERIODE_TIC <= dateActuelle)
 		{
 			dateDernierTic += Constantes.PERIODE_TIC;

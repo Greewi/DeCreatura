@@ -17,6 +17,14 @@ public class Loader
 		$wnd.PIXI.loader.load(callbackJS);
 	}-*/;
 	
+	public static native Texture getTexture(String textureName)/*-{
+		return $wnd.PIXI.loader.resources[textureName].texture
+	}-*/;
+	
+	public static native BaseTexture getBaseTexture(String textureName)/*-{
+		return $wnd.PIXI.loader.resources[textureName].texture
+	}-*/;
+	
 	public static interface OnLoadCallback
 	{
 		public void onLoad();

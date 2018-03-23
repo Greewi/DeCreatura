@@ -21,4 +21,14 @@ public class Console
 		GWT.log(message);
 		//logger.log(Level.SEVERE, message);
 	}
+	
+	public static void log(double message)
+	{
+		log("" + message);
+	}
+	
+	public static void log(Object object)
+	{
+		log("" + object);
+	}
 }

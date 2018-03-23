@@ -175,6 +175,7 @@ public class Creature extends EntiteCreature
 		if (estVivante())
 		{
 			//Gain sante
+			int ancienneSante = sante;
 			sante++;
 			
 			//MAJ Moodle
@@ -192,6 +193,9 @@ public class Creature extends EntiteCreature
 				sante = 100;
 			if (sante < 0)
 				sante = 0;
+			if(sante!=ancienneSante)
+				for (ObservateurCreature observateur : observateurs)
+					observateur.onChangeSante(sante);
 		}
 	}
 	

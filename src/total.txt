@@ -1,0 +1,2878 @@
+package net.feerie.creatura.shared;
+
+/**
+ * Cette classe sert à cadenser le rythme de la simulation
+ * 
+ * @author greewi
+ */
+public class Metronome
+{
+	public final static long PERIODE_TIC = 300l;
+	public final static long PERIODE_CYCLE_IA = 1;
+	public final static long PERIODE_CYCLE_METABOLIQUE = 10;
+	private long dateDernierTic;
+	private long ticDernierCycleIA;
+	private long ticDernierCycleMetabolique;
+	private final Monde monde;
+	private long ticActuel;
+	
+	/**
+	 * @param monde le monde à cadenser
+	 */
+	public Metronome(Monde monde)
+	{
+		this.monde = monde;
+		this.dateDernierTic = System.currentTimeMillis();
+		ticDernierCycleIA = 0;
+		ticDernierCycleMetabolique = 0;
+		ticActuel = 0;
+	}
+	
+	/**
+	 * Exécute une nouvelle frame.
+	 */
+	public void nouvelleFrame()
+	{
+		long dateActuelle = System.currentTimeMillis();
+		
+		while (dateDernierTic + PERIODE_TIC <= dateActuelle)
+		{
+			dateDernierTic += PERIODE_TIC;
+			ticActuel++;
+			
+			boolean effectuerCycleIA = false;
+			if (ticDernierCycleIA + PERIODE_CYCLE_IA <= ticActuel)
+			{
+				ticDernierCycleIA += PERIODE_CYCLE_IA;
+				effectuerCycleIA = true;
+			}
+			
+			boolean effectuerCycleMetabolique = false;
+			if (ticDernierCycleMetabolique + PERIODE_CYCLE_METABOLIQUE <= ticActuel)
+			{
+				ticDernierCycleMetabolique += PERIODE_CYCLE_METABOLIQUE;
+				effectuerCycleMetabolique = true;
+			}
+			
+			monde.effectueTic(effectuerCycleIA, effectuerCycleMetabolique);
+		}
+	}
+	
+}
+package net.feerie.creatura.shared.events;
+
+import net.feerie.creatura.shared.entites.Entite;
+
+public interface ObservateurEntiteSupprimee
+{
+	public void onEntiteSuprimee(Entite entite);
+}
+package net.feerie.creatura.shared.events;
+
+import net.feerie.creatura.shared.entites.Entite;
+
+public interface ObservateurEntiteAjoutee
+{
+	public void onEntiteAjoutee(Entite entite);
+}
+package net.feerie.creatura.shared;
+
+/**
+ * Représente les données envrionnementales d'une zone ou celles affectant une
+ * créature
+ */
+public class Environnement
+{
+	private int temperature;
+	private double luminosite;
+	private String couleur;
+	
+	/**
+	 * Constructeur
+	 * 
+	 * @param temperature la température (en degrés celsius)
+	 * @param luminosite la luminosité (de 0.0f à 1.0f)
+	 * @param couleur le code couleur de l'environnement
+	 */
+	public Environnement(int temperature, double luminosite, String couleur)
+	{
+		super();
+		this.temperature = temperature;
+		this.luminosite = luminosite;
+		this.couleur = couleur;
+	}
+	
+	/**
+	 * @return la température de l'environnement
+	 */
+	public int getTemperature()
+	{
+		return temperature;
+	}
+	
+	/**
+	 * @return la luminosité de l'environnement
+	 */
+	public double getLuminosite()
+	{
+		return luminosite;
+	}
+	
+	/**
+	 * @return la couleur de l'environnement
+	 */
+	public String getCouleur()
+	{
+		return couleur;
+	}
+}
+package net.feerie.creatura.shared;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.TypeEntite;
+import net.feerie.creatura.shared.entites.Zone;
+import net.feerie.creatura.shared.events.ObservateurEntiteAjoutee;
+import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
+
+/**
+ * Représente le monde. Il contiendra les entités.
+ */
+public class Monde
+{
+	private final HashMap<Integer, Entite> entites = new HashMap<>();
+	private int IDEntiteSuivante = 1;
+	private ArrayList<Zone> zones = new ArrayList<>();
+	private Environnement environnementParDefaut;
+	//Observateurs d'événements
+	private final ArrayList<ObservateurEntiteAjoutee> observateursEntiteAjoutee = new ArrayList<>();
+	private final ArrayList<ObservateurEntiteSupprimee> observateursEntiteSuprimee = new ArrayList<>();
+	
+	/**
+	 * Contructeur
+	 */
+	public Monde(Environnement environnementParDefaut)
+	{
+		this.environnementParDefaut = environnementParDefaut;
+	}
+	
+	/**
+	 * Génére et renvoie un nouvel ID d'entité
+	 * 
+	 * @return l'ID généré
+	 */
+	public int genereIDEntite()
+	{
+		return IDEntiteSuivante++;
+	}
+	
+	/**
+	 * Renvoie une entité
+	 * 
+	 * @param ID l'ID de l'entité qu'on veut avoir
+	 * @return l'entité correspondant à l'ID ou <tt>null</tt> sinon.
+	 */
+	public Entite getEntite(int ID)
+	{
+		return entites.get(ID);
+	}
+	
+	/**
+	 * Récupère la liste des entités à une position
+	 * 
+	 * @param position
+	 * @return
+	 */
+	public List<Entite> getEntiteAPosition(Position position)
+	{
+		double xc = position.x;
+		double yc = position.y;
+		
+		List<Entite> entites = new ArrayList<>();
+		for (Entite e : getListeEntites())
+		{
+			if (e.getType() == TypeEntite.ZONE)
+				continue;
+			
+			double xe = e.getPosition().x;
+			double ye = e.getPosition().y;
+			double rayon = e.getTaille().l / 2;
+			
+			if ((xc - xe) * (xc - xe) + (yc - ye) * (yc - ye) <= rayon * rayon)
+				entites.add(e);
+		}
+		
+		return entites;
+	}
+	
+	/**
+	 * Ajoute une entité
+	 * 
+	 * @param entite l'entité à ajouter
+	 */
+	void ajouteEntite(Entite entite)
+	{
+		entites.put(entite.getID(), entite);
+		for (ObservateurEntiteAjoutee observateur : observateursEntiteAjoutee)
+			observateur.onEntiteAjoutee(entite);
+	}
+	
+	public void nouvelleEntite(Entite entite)
+	{
+		ajouteEntite(entite);
+	}
+	
+	/**
+	 * Supprime une entité (ne supprimera pas une Zone !)
+	 * 
+	 * @param ID l'ID de l'entité à supprimer
+	 */
+	public void supprimeEntite(int ID)
+	{
+		if (entites.containsKey(ID))
+		{
+			Entite entite = entites.get(ID);
+			if (entite.getType() == TypeEntite.ZONE) // On ne supprime pas les zones
+				return;
+			entites.remove(ID);
+			for (ObservateurEntiteSupprimee observateur : observateursEntiteSuprimee)
+				observateur.onEntiteSuprimee(entite);
+		}
+	}
+	
+	/**
+	 * Renvoie la liste des entités contenues dans le monde
+	 * 
+	 * @return la liste des entités contenues dans le monde
+	 */
+	public ArrayList<Entite> getListeEntites()
+	{
+		return new ArrayList<>(entites.values());
+	}
+	
+	/**
+	 * Renvoie la zone contenant les coordonnées passées en paramètre
+	 * 
+	 * @param position la position évaluée
+	 * @return la zone contenant les coordonnées ou <tt>null</tt>
+	 */
+	public Zone getZone(Position position)
+	{
+		for (Zone zone : zones)
+			if (zone.contient(position))
+				return zone;
+		return null;
+	}
+	
+	/**
+	 * Ajoute une zone dans le monde
+	 * 
+	 * @param zone la zone à ajouter
+	 */
+	public void ajouteZone(Zone zone)
+	{
+		ajouteEntite(zone);
+		zones.add(zone);
+	}
+	
+	/**
+	 * Détermine l'environnement à la position donnée
+	 * 
+	 * @param position la position où on souhaite connaitre l'environnement
+	 * @return l'environnement de la position
+	 */
+	public Environnement getEnvironnement(Position position)
+	{
+		Zone zone = getZone(position);
+		if (zone == null)
+			return environnementParDefaut;
+		else
+			return zone.getEnvironnement();
+	}
+	
+	private final List<Entite> entitesTic = new ArrayList<>();
+	
+	public void effectueTic(boolean cycleIA, boolean cycleMetabolique)
+	{
+		entitesTic.clear();
+		entitesTic.addAll(this.entites.values());
+		for (Entite entite : entitesTic)
+			entite.effectueTic();
+		if (cycleIA)
+			for (Entite entite : entitesTic)
+				entite.effectueCycleIA();
+		if (cycleMetabolique)
+			for (Entite entite : entitesTic)
+				entite.effectueCycleMetabolique();
+	}
+	
+	/**
+	 * Ajoute un observateur sur les événements d'ajout d'entite
+	 * 
+	 * @param observateur un observateur qui écoutera les ajouts d'entites
+	 */
+	public void onEntiteAjoutee(ObservateurEntiteAjoutee observateur)
+	{
+		observateursEntiteAjoutee.add(observateur);
+	}
+	
+	/**
+	 * Ajoute un observateur sur les événements de suppressions d'entite
+	 * 
+	 * @param observateur un observateur qui écoutera les supressions d'entites
+	 */
+	public void onEntiteSupprimee(ObservateurEntiteSupprimee observateur)
+	{
+		observateursEntiteSuprimee.add(observateur);
+	}
+}
+package net.feerie.creatura.shared;
+
+import com.google.gwt.core.client.GWT;
+
+/**
+ * Effectue des sorties dans la console du navigateur
+ * 
+ * @author greewi
+ */
+public class Console
+{
+	//private static Logger logger = java.util.logging.Logger.getLogger("Console");
+	
+	/**
+	 * Écrit un message dans la console du navigateur
+	 * 
+	 * @param message le message à écrire
+	 */
+	public static void log(String message)
+	{
+		GWT.log(message);
+		//logger.log(Level.SEVERE, message);
+	}
+}
+package net.feerie.creatura.shared.entites;
+
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+
+/**
+ * Représente un déchet (une crotte)
+ * 
+ * @author greewi
+ */
+public class EntiteDechet extends Entite
+{
+	
+	/**
+	 * @param monde le monde de cette entité
+	 * @param position la position de cette entité
+	 */
+	public EntiteDechet(Monde monde, Position position)
+	{
+		super(monde, position, new Dimension(2, 2));
+	}
+	
+	@Override
+	public TypeEntite getType()
+	{
+		return TypeEntite.POPO;
+	}
+}
+package net.feerie.creatura.shared.entites;
+
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.commons.Rectangle;
+
+/**
+ * Représente une litière (là ou on espère que la créature fera ses besoins)
+ * 
+ * @author greewi
+ */
+public class EntiteLitiere extends Entite
+{
+	private final Monde monde;
+	private double capacite;
+	private double contenu;
+	
+	/**
+	 * @param monde le monde ce cette entité
+	 * @param capacite la capacité de cette litière
+	 * @param position la potion de l'entité
+	 */
+	public EntiteLitiere(Monde monde, int capacite, Position position)
+	{
+		super(monde, position, new Dimension(10.0, 10.0));
+		this.monde = monde;
+		this.capacite = capacite;
+		this.contenu = 0;
+	}
+	
+	/**
+	 * @return la capacité de cette litiere
+	 */
+	public double getCapacite()
+	{
+		return capacite;
+	}
+	
+	/**
+	 * @return le contenu de cette litiere
+	 */
+	public double getContenu()
+	{
+		return contenu;
+	}
+	
+	/**
+	 * Ajoute un déchet dans la litière. Si la litière est pleine, crée un
+	 * déchet dans le monde.
+	 * 
+	 * @param quantite la quantité de déchet à créer
+	 */
+	public void ajouteDechets()
+	{
+		//Si la litière n'est pas pleine on stock le déchet
+		if (contenu + 1 <= capacite)
+			contenu++;
+		//Si la litiere est pleine on créé un déchet dans le monde
+		else
+		{
+			Position positionDechet = Rectangle.creeDepuisCentre(getPosition(), getTaille()).getPositionAleatoire();
+			monde.nouvelleEntite(new EntiteDechet(monde, positionDechet));
+		}
+	}
+	
+	/**
+	 * Vide la litière
+	 */
+	public void vide()
+	{
+		contenu = 0;
+	}
+	
+	@Override
+	public TypeEntite getType()
+	{
+		return TypeEntite.LITIERE;
+	}
+}
+package net.feerie.creatura.shared.entites;
+
+public enum TypeEntite
+{
+	CREATURE,
+	NOURRITURE,
+	EAU,
+	POPO,
+	LITIERE,
+	ZONE;
+}
+package net.feerie.creatura.shared.entites;
+
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+
+/**
+ * Représente de la nourriture
+ * 
+ * @author greewi
+ */
+public class EntiteNourriture extends Entite
+{
+	TypeNourriture type;
+	
+	/**
+	 * @param monde le monde de l'entité
+	 * @param type le type de nourriture
+	 * @param position la position de l'entit�
+	 */
+	public EntiteNourriture(Monde monde, TypeNourriture type, Position position)
+	{
+		super(monde, position, new Dimension(2.0, 2.0));
+		this.type = type;
+	}
+	
+	/**
+	 * @return la couleur de cette nourriture
+	 */
+	public String getCouleur()
+	{
+		return type.getCouleur();
+	}
+	
+	@Override
+	public TypeEntite getType()
+	{
+		return TypeEntite.NOURRITURE;
+	}
+}
+package net.feerie.creatura.shared.entites;
+
+import java.util.EnumMap;
+
+import net.feerie.creatura.shared.Environnement;
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.creature.ia.IA;
+import net.feerie.creatura.shared.creature.ia.IABasique;
+import net.feerie.creatura.shared.creature.moodles.Moodle;
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+
+/**
+ * Représente une créature
+ * 
+ * @author greewi
+ */
+public class Creature extends Entite
+{
+	
+	private Action action;
+	private Environnement environnementActuel;
+	private final IA ia;
+	
+	private int sante;
+	private final EnumMap<TypeMoodle, Moodle> moodles;
+	
+	public Creature(Monde monde, Position position)
+	{
+		super(monde, position, new Dimension(5.0, 5.0));
+		
+		//Action et environnement
+		this.action = null;
+		this.environnementActuel = monde.getEnvironnement(position);
+		this.ia = new IABasique(this);
+		
+		//Santé
+		this.sante = 100;
+		this.moodles = new EnumMap<>(TypeMoodle.class);
+		
+		getMoodle(TypeMoodle.ENNUI).active();
+	}
+	
+	/**
+	 * Renvoie le niveau de santé de la créature
+	 * 
+	 * @return le niveau de santé de la créature
+	 */
+	public int getSante()
+	{
+		return sante;
+	}
+	
+	/**
+	 * Réduit la santé de la créature
+	 * 
+	 * @param montant le montant de santé à réduire
+	 */
+	public void reduitSante(int montant)
+	{
+		sante -= montant;
+		if (sante <= 0)
+			sante = 0;
+	}
+	
+	/**
+	 * Détermine si la créature est vivante.
+	 * 
+	 * @return <tt>true</tt> si la créature est vivante
+	 */
+	public boolean estVivante()
+	{
+		return sante > 0;
+	}
+	
+	/**
+	 * Récupére un moodle
+	 * 
+	 * @param moodle le type du moodle à récupérer
+	 * @return le moodle
+	 */
+	public Moodle getMoodle(TypeMoodle moodle)
+	{
+		if (!moodles.containsKey(moodle))
+			moodles.put(moodle, moodle.instancie(this));
+		return moodles.get(moodle);
+	}
+	
+	/**
+	 * Détermine si la créature est affecté par un moodle.
+	 * 
+	 * @param moodle le type du moodle dont on cherche à savoir si la créature
+	 *        est affectée par.
+	 * @return <tt>true</tt> si la créature est affectée par le moodle
+	 */
+	public boolean estAffectePar(TypeMoodle moodle)
+	{
+		return getMoodle(moodle).estActif();
+	}
+	
+	/**
+	 * Défini l'action actuelle que doit entreprendre cette créature
+	 * 
+	 * @param action l'action que doit entreprendre cette créature
+	 */
+	public void setActionActuelle(Action action)
+	{
+		this.action = action;
+	}
+	
+	/**
+	 * @return l'action actuellement entreprise par la créature
+	 */
+	public Action getActionActuelle()
+	{
+		return action;
+	}
+	
+	@Override
+	public TypeEntite getType()
+	{
+		return TypeEntite.CREATURE;
+	}
+	
+	@Override
+	public void effectueTic()
+	{
+		if (estVivante())
+		{
+			Entite eauProche = cherche(TypeEntite.EAU);
+			if (eauProche != null && getDistanceCarre(eauProche) < eauProche.getTaille().l * eauProche.getTaille().l / 4.0 + 4)
+				getMoodle(TypeMoodle.MOUILLE).active();
+			
+			if (action != null)
+				if (!action.effectueTic())
+					this.action = null;
+		}
+		else
+			action = null;
+	}
+	
+	@Override
+	public void effectueCycleIA()
+	{
+		if (estVivante())
+			action = ia.decideProchaineAction();
+	}
+	
+	@Override
+	public void effectueCycleMetabolique()
+	{
+		if (estVivante())
+		{
+			//Gain sante
+			sante++;
+			
+			//MAJ Moodle
+			for (TypeMoodle typeMoodle : TypeMoodle.values())
+			{
+				Moodle moodle = getMoodle(typeMoodle);
+				moodle.nouveauCycle();
+			}
+			
+			//Cap de santé
+			if (sante > 100)
+				sante = 100;
+			if (sante < 0)
+				sante = 0;
+		}
+	}
+	
+	/**
+	 * Renvoie le monde dans lequel �volue la cr�ature
+	 * 
+	 * @return le monde dans lequel �volue la cr�ature
+	 */
+	public Monde getMonde()
+	{
+		return monde;
+	}
+	
+	/**
+	 * R�cup�re l'environnement actuel
+	 * 
+	 * @return l'environnement actuel
+	 */
+	public Environnement getEnvironnement()
+	{
+		return environnementActuel;
+	}
+	
+	/**
+	 * Recherche l'entite d'un type donn� le plus proche
+	 * 
+	 * @param typeEntite le type de l'entit�
+	 * @return l'entit� trouv�e ou <tt>null</tt>
+	 */
+	public Entite cherche(TypeEntite typeEntite)
+	{
+		Entite entite = null;
+		double distance = 100000000000.0;
+		for (Entite e : monde.getListeEntites())
+			if (e.getType() == typeEntite && getDistanceCarre(e) < distance)
+			{
+				entite = e;
+				distance = getDistanceCarre(e);
+			}
+		return entite;
+	}
+}
+package net.feerie.creatura.shared.entites;
+
+/**
+ * Représente un type de nourriture
+ * 
+ * @author greewi
+ */
+public enum TypeNourriture
+{
+	
+	TOMATE("Tomate", "#EB4B4B", 200, 200, 100, 0),
+	CERISE("Cerise", "#BA3442", 300, 100, 100, 0),
+	PRUNE("Prune", "#832B8F", 300, 100, 100, 0),
+	FRAMBOISE("Framboise", "#ED268A", 400, 50, 50, 0),
+	FRAISE("Fraise", "#F0401D", 200, 200, 100, 0),
+	NOIX("Noix", "#A3754D", 100, 300, 100, 0),
+	CACAHUETE("Cacahuete", "#C9BB7F", 100, 200, 200, 0),
+	NOISETTE("Noisette", "#D18834", 100, 100, 300, 0),
+	MAIS("Mais", "#D7DE12", 300, 100, 100, 0);
+	
+	/**
+	 * @return le nom du type de nourriture
+	 */
+	public String getNom()
+	{
+		return nom;
+	}
+	
+	/**
+	 * @return la quantité d'eau contenue dans ce type de nourriture
+	 */
+	public int getEau()
+	{
+		return eau;
+	}
+	
+	/**
+	 * @return la quantité de sucres contenue dans ce type de nourriture
+	 */
+	public int getSucres()
+	{
+		return sucres;
+	}
+	
+	/**
+	 * @return la quantité de proteines contenue dans ce type de nourriture
+	 */
+	public int getProteines()
+	{
+		return proteines;
+	}
+	
+	/**
+	 * @return la quantité de gras contenue dans ce type de nourriture
+	 */
+	public int getGras()
+	{
+		return gras;
+	}
+	
+	/**
+	 * @return le code couleur de ce type de nourriture
+	 */
+	public String getCouleur()
+	{
+		return couleur;
+	}
+	
+	private final String nom;
+	private final String couleur;
+	private final int sucres;
+	private final int proteines;
+	private final int gras;
+	private final int eau;
+	
+	private TypeNourriture(String nom, String couleur, int sucres, int proteines, int gras, int eau)
+	{
+		this.nom = nom;
+		this.couleur = couleur;
+		this.sucres = sucres;
+		this.proteines = proteines;
+		this.gras = gras;
+		this.eau = eau;
+	}
+	
+}
+package net.feerie.creatura.shared.entites;
+
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+
+public abstract class Entite
+{
+	protected final Monde monde;
+	private final int ID;
+	private Position position;
+	private Dimension taille;
+	private boolean estDetruit = false;
+	
+	/**
+	 * Constructeur
+	 * 
+	 * @param monde le monde auquel appartient l'entité
+	 * @param x la position x de l'entité
+	 * @param y la position y de l'entité
+	 * @param l la longueur de l'entité
+	 * @param h la hauteur de l'entité
+	 */
+	public Entite(Monde monde, Position position, Dimension taille)
+	{
+		this.monde = monde;
+		this.ID = monde.genereIDEntite();
+		this.position = position;
+		this.taille = taille;
+		this.estDetruit = false;
+	}
+	
+	/**
+	 * @return l'ID de cette entité
+	 */
+	public int getID()
+	{
+		return ID;
+	}
+	
+	/**
+	 * @return la position de cette entité
+	 */
+	public Position getPosition()
+	{
+		return new Position(position);
+	}
+	
+	/**
+	 * modifie la position de cette entité
+	 * 
+	 * @param position la nouvelle position
+	 */
+	public void setPosition(Position position)
+	{
+		this.position = position;
+	}
+	
+	/**
+	 * @return la taille de cette entité
+	 */
+	public Dimension getTaille()
+	{
+		return new Dimension(taille);
+	}
+	
+	/**
+	 * Calcule la distance carrée avec une autre entité
+	 * 
+	 * @param entite l'entité avec laquelle calculer la distance carrée
+	 * @return la distance au carrée entre les deux entité
+	 */
+	public double getDistanceCarre(Entite entite)
+	{
+		Position p1 = entite.getPosition();
+		Position p2 = getPosition();
+		return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
+	}
+	
+	/**
+	 * @return le type de cette entité (voir {@link TypeEntite})
+	 */
+	public abstract TypeEntite getType();
+	
+	/**
+	 * Détruit l'entité. Appellée par {@link Monde} !
+	 */
+	public void detruit()
+	{
+		monde.supprimeEntite(ID);
+		estDetruit = true;
+	}
+	
+	/**
+	 * Détermie si cette entité existe encore
+	 * 
+	 * @return <tt>true</tt> si et seulement si cette entité existe encore
+	 */
+	public boolean existe()
+	{
+		return !estDetruit;
+	}
+	
+	/**
+	 * Met à jour l'entité
+	 */
+	public void effectueTic()
+	{
+		//Rien à faire par défaut
+	}
+	
+	/**
+	 * Met à jour l'entité
+	 */
+	public void effectueCycleIA()
+	{
+		//Rien à faire par défaut		
+	}
+	
+	/**
+	 * Met à jour l'entité
+	 */
+	public void effectueCycleMetabolique()
+	{
+		//Rien à faire par défaut
+	}
+}
+package net.feerie.creatura.shared.entites;
+
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+
+/**
+ * Représente une source d'eau où la créature peut boire
+ * 
+ * @author greewi
+ */
+public class EntiteEau extends Entite
+{
+	public EntiteEau(Monde monde, Position position)
+	{
+		super(monde, position, new Dimension(30, 30));
+	}
+	
+	@Override
+	public TypeEntite getType()
+	{
+		return TypeEntite.EAU;
+	}
+}
+package net.feerie.creatura.shared.entites;
+
+import net.feerie.creatura.shared.Environnement;
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.commons.Rectangle;
+
+/**
+ * Représente une zone (un endroit, une salle) dans le monde (étend
+ * creatura.Entite)
+ * 
+ * @author greewi
+ */
+public class Zone extends Entite
+{
+	private Rectangle geometrie;
+	private Environnement environnement;
+	
+	/**
+	 * @param monde le monde de l'entité
+	 * @param position la position de la zone (centre de la zone)
+	 * @param taille la taille de la zone
+	 * @param environnement l'environnement de la zone
+	 */
+	public Zone(Monde monde, Position position, Dimension taille, Environnement environnement)
+	{
+		super(monde, position, taille);
+		this.geometrie = Rectangle.creeDepuisCentre(position, taille);
+		this.environnement = environnement;
+	}
+	
+	/**
+	 * Détermine si la zone contient la position donnée
+	 * 
+	 * @param position la position dont on veut savoir si elle est contenue dans
+	 *        la zone
+	 * @return <tt>true</tt> si et seulement si la zone contient la position
+	 *         demand�e
+	 */
+	public boolean contient(Position position)
+	{
+		return geometrie.contient(position);
+	}
+	
+	/**
+	 * @return l'environnement de la zone
+	 */
+	public Environnement getEnvironnement()
+	{
+		return environnement;
+	}
+	
+	/**
+	 * @return la couleur de la zone
+	 */
+	public String getCouleur()
+	{
+		return environnement.getCouleur();
+	}
+	
+	@Override
+	public TypeEntite getType()
+	{
+		return TypeEntite.ZONE;
+	}
+}
+package net.feerie.creatura.shared.creature.ia;
+
+import net.feerie.creatura.shared.actions.Action;
+
+/**
+ * Représente l'IA d'une créature
+ * 
+ * @author greewi
+ */
+public interface IA
+{
+	
+	/**
+	 * Décide de la prochaine action de la créature
+	 * 
+	 * @return la prochaine action à effectuer
+	 */
+	Action decideProchaineAction();
+}package net.feerie.creatura.shared.creature.ia;
+
+import com.google.gwt.user.client.Random;
+
+import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.actions.ActionBoire;
+import net.feerie.creatura.shared.actions.ActionDormir;
+import net.feerie.creatura.shared.actions.ActionManger;
+import net.feerie.creatura.shared.actions.ActionPopo;
+import net.feerie.creatura.shared.actions.ActionSeDeplacer;
+import net.feerie.creatura.shared.actions.ActionSeDeplacerVersEntite;
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.commons.Vecteur;
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.TypeEntite;
+
+/**
+ * L'IABasique de base/debug d'une créature
+ * 
+ * @author greewi
+ */
+public class IABasique implements IA
+{
+	private final Creature creature;
+	
+	public IABasique(Creature creature)
+	{
+		this.creature = creature;
+	}
+	
+	@Override
+	public Action decideProchaineAction()
+	{
+		if (creature.getActionActuelle() != null)
+			return creature.getActionActuelle();
+		
+		if (creature.estAffectePar(TypeMoodle.FAIM))
+		{
+			Entite nourriture = creature.cherche(TypeEntite.NOURRITURE);
+			if (nourriture != null)
+				return new ActionSeDeplacerVersEntite(creature, nourriture, new ActionManger(creature, nourriture));
+		}
+		if (creature.estAffectePar(TypeMoodle.SOIF))
+		{
+			Entite eau = creature.cherche(TypeEntite.EAU);
+			if (eau != null)
+				return new ActionSeDeplacerVersEntite(creature, eau, new ActionBoire(creature, eau));
+		}
+		if (creature.estAffectePar(TypeMoodle.POPO))
+		{
+			Entite litiere = creature.cherche(TypeEntite.LITIERE);
+			if (litiere != null)
+				return new ActionSeDeplacer(creature, litiere.getPosition(), new ActionPopo(creature, litiere));
+		}
+		if (creature.estAffectePar(TypeMoodle.FATIGUE))
+		{
+			return new ActionDormir(creature);
+		}
+		if (creature.estAffectePar(TypeMoodle.ENNUI))
+		{
+			Position destination = new Position(Random.nextInt(100), Random.nextInt(100));
+			Vecteur vecteur = new Vecteur(creature.getPosition(), destination);
+			double norme = vecteur.getNorme();
+			if (norme > 25)
+				destination = creature.getPosition().translate(vecteur.multiplie(25 / norme));
+			return new ActionSeDeplacer(creature, destination);
+		}
+		
+		return null;
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la creature a faim
+ * 
+ * @author greewi
+ */
+public class MoodleFroid extends Moodle
+{
+	
+	/* package */ MoodleFroid(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.FROID;
+	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		if (estActif())
+			getCreature().getMoodle(TypeMoodle.FAIM).charge(5);
+		
+		if (getCreature().getEnvironnement().getTemperature() < 10)
+			charge(10);
+		else
+			decharge(20);
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la créature a trop chaud
+ * 
+ * @author greewi
+ */
+public class MoodleChaud extends Moodle
+{
+	
+	/* package */ MoodleChaud(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.CHAUD;
+	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		if (estActif())
+			getCreature().getMoodle(TypeMoodle.SOIF).charge(5);
+		
+		if (getCreature().getEnvironnement().getTemperature() > 25)
+			charge(10);
+		else
+			decharge(20);
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la créature est mouillée
+ * 
+ * @author greewi
+ */
+public class MoodleMouille extends Moodle
+{
+	
+	/* package */ MoodleMouille(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.MOUILLE;
+	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		if (estActif())
+		{
+			getCreature().getMoodle(TypeMoodle.FROID).charge(5);
+			getCreature().getMoodle(TypeMoodle.CHAUD).decharge(10);
+		}
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la créature a soif.
+ * 
+ * @author greewi
+ */
+public class MoodleSoif extends Moodle
+{
+	
+	/* package */ MoodleSoif(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.SOIF;
+	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		if (estActif())
+			getCreature().reduitSante(1);
+		
+		charge(3);
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la créature a envie de faire ses besoins
+ * 
+ * @author greewi
+ */
+public class MoodlePopo extends Moodle
+{
+	
+	/* package */ MoodlePopo(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.POPO;
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la créature a faim
+ * 
+ * @author greewi
+ */
+public class MoodleFaim extends Moodle
+{
+	
+	/* package */ MoodleFaim(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.FAIM;
+	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		if (estActif())
+			getCreature().reduitSante(1);
+		
+		charge(2);
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.actions.TypeAction;
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la créature est fatiguée
+ * 
+ * @author greewi
+ */
+public class MoodleFatigue extends Moodle
+{
+	
+	/* package */ MoodleFatigue(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.FATIGUE;
+	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		Action actionActuelle = getCreature().getActionActuelle();
+		if (actionActuelle != null && actionActuelle.getType() == TypeAction.DORMIR)
+			decharge(5);
+		else
+		{
+			if (estActif())
+				getCreature().reduitSante(1);
+			charge(1);
+		}
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Regroupe les différents moodles.
+ * 
+ * @author greewi
+ */
+public enum TypeMoodle
+{
+	FAIM("A faim")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleFaim(creature);
+		}
+	},
+	SOIF("A soif")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleSoif(creature);
+		}
+	},
+	FATIGUE("Est fatigué")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleFatigue(creature);
+		}
+	},
+	ENNUI("S'ennuie")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleEnnui(creature);
+		}
+	},
+	FROID("A froid")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleFroid(creature);
+		}
+	},
+	CHAUD("A chaud")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleChaud(creature);
+		}
+	},
+	MOUILLE("Est mouillé(e)")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodleMouille(creature);
+		}
+	},
+	POPO("A besoin de faire")
+	{
+		@Override
+		public Moodle instancie(Creature creature)
+		{
+			return new MoodlePopo(creature);
+		}
+	};
+	
+	private final String nom;
+	
+	private TypeMoodle(String nom)
+	{
+		this.nom = nom;
+	}
+	
+	/**
+	 * Renvoie le nom (une chaine lisible) du moodle
+	 * 
+	 * @return le nom (une chaine lisible) du moodle
+	 */
+	public String getNom()
+	{
+		return nom;
+	}
+	
+	/**
+	 * Instancie le moodle
+	 * 
+	 * @param creature la cérature potentiellement affectée par le moodle
+	 * @return le moodle créé.
+	 */
+	public abstract Moodle instancie(Creature creature);
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Moodle : la créature s'ennuie
+ * 
+ * @author greewi
+ */
+public class MoodleEnnui extends Moodle
+{
+	
+	/* package */ MoodleEnnui(Creature creature)
+	{
+		super(creature);
+	}
+	
+	@Override
+	public TypeMoodle getType()
+	{
+		return TypeMoodle.ENNUI;
+	}
+	
+	@Override
+	public void nouveauCycle()
+	{
+		if (getCreature().getActionActuelle() == null)
+			charge(10);
+		else
+			decharge(24);
+	}
+}
+package net.feerie.creatura.shared.creature.moodles;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Un moodle est un état de la créature
+ * 
+ * @author greewi
+ */
+public abstract class Moodle
+{
+	private int charge;
+	private boolean actif;
+	private final Creature creature;
+	
+	/* package */ Moodle(Creature creature)
+	{
+		this.creature = creature;
+		this.charge = 0;
+		this.actif = false;
+	}
+	
+	/**
+	 * Renvoie le type du Moodle
+	 * 
+	 * @return le type du Moodle
+	 */
+	public abstract TypeMoodle getType();
+	
+	/**
+	 * Effectue un nouveau cycle métabolique Note : il est préférable
+	 * d'appliquer les effets avant de charger le moodle de sorte à laisser le
+	 * temps à la créature de réagir.
+	 */
+	public void nouveauCycle()
+	{
+		//Ne fait rien par défaut 
+	}
+	
+	/**
+	 * Renvoie la créature potentiellement affectée par ce moodle
+	 * 
+	 * @return la créature potentiellement affectée par ce moodle
+	 */
+	protected Creature getCreature()
+	{
+		return creature;
+	}
+	
+	/**
+	 * Détermine si le moodle est actif et a un effet
+	 * 
+	 * @return <tt>true</tt> si le moodle est actif et a un effet
+	 */
+	public final boolean estActif()
+	{
+		return actif;
+	}
+	
+	/**
+	 * Active le moodle et fixe sa charge au maximum
+	 */
+	public final void active()
+	{
+		charge = 100;
+		actif = true;
+	}
+	
+	/**
+	 * Désactive le moodle et fixe sa charge au minimum
+	 */
+	public final void desactive()
+	{
+		charge = 0;
+		actif = false;
+	}
+	
+	/**
+	 * Charge le moodle et l'active si la charge atteint le maximum
+	 * 
+	 * @param increment la quantité à charger (sur 100)
+	 */
+	public final void charge(int increment)
+	{
+		charge += increment;
+		if (charge >= 100)
+			active();
+	}
+	
+	/**
+	 * Décharge le moodle et le séactive si la charge atteint le minimum
+	 * 
+	 * @param decrement la quantité à décharger (sur 100)
+	 */
+	public final void decharge(int decrement)
+	{
+		charge -= decrement;
+		if (charge <= 0)
+			desactive();
+	}
+	
+	/**
+	 * Renvoie la charge du moodle sur 100. Note une charge entre 0 et 100 ne
+	 * veux pas dire que le moodle est actif (ou inactif). utilisez est actif
+	 * pour le déterminer.
+	 * 
+	 * @return la charge du moodle sur 100
+	 */
+	public int getCharge()
+	{
+		return charge;
+	}
+}
+package net.feerie.creatura.shared.creature.adn;
+
+/**
+ * Représente l'ADN d'un organisme. L'ADN d'un organisme code directement ses organes.
+ * 
+ * @author greewi
+ */
+public class ADN
+{
+	
+	public ADN()
+	{
+		// TODO Auto-generated constructor stub
+	}
+	
+}
+package net.feerie.creatura.shared.creature.adn;
+
+public enum Gene
+{
+	CERVEAU_SIMPLE("ACTGAG"),
+	ESTOMAC_SIMPLE("CTTAAG"),
+	YEUX_SIMPLE("AAATTA"),
+	PEAU_SIMPLE("CCTGTG");
+	
+	private final String codons;
+	
+	private Gene(String codons)
+	{
+		this.codons=codons;
+	}
+	
+	public String getCodons()
+	{
+		return codons;
+	}
+}
+package net.feerie.creatura.shared.actions;
+
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.EntiteDechet;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.EntiteLitiere;
+import net.feerie.creatura.shared.entites.TypeEntite;
+
+/**
+ * Repràsente l'action de faire popo (oui. Chier...)
+ * 
+ * @author greewi
+ */
+public class ActionPopo extends Action
+{
+	private final Entite cible;
+	
+	/**
+	 * @param creature a créature qui fait popo
+	 * @param cible le pauvre truc sur lequel la créature fait popo
+	 */
+	public ActionPopo(Creature creature, Entite cible)
+	{
+		super(creature);
+		this.cible = cible;
+		setDuree(6);
+	}
+	
+	@Override
+	public TypeAction getType()
+	{
+		return TypeAction.FAIRE_POPO;
+	}
+	
+	@Override
+	public boolean termine()
+	{
+		//On collecte les déchets de la créature
+		getCreature().getMoodle(TypeMoodle.POPO).desactive();
+		
+		//On créé des déchets dans le monde
+		if (cible.getType() == TypeEntite.LITIERE)
+		{
+			EntiteLitiere litiere = (EntiteLitiere) cible;
+			litiere.ajouteDechets();
+		}
+		else
+			getCreature().getMonde().nouvelleEntite(new EntiteDechet(getCreature().getMonde(), new Position(cible.getPosition())));
+		
+		return false;
+	}	
+}
+package net.feerie.creatura.shared.actions;
+
+import net.feerie.creatura.shared.entites.Creature;
+
+public class ActionDormir extends Action
+{
+	
+	/**
+	 * @param creature la créature qui dort
+	 */
+	public ActionDormir(Creature creature)
+	{
+		super(creature);
+		setDuree(30);
+	}
+	
+	@Override
+	public TypeAction getType()
+	{
+		return TypeAction.DORMIR;
+	}
+	
+	@Override
+	public boolean termine()
+	{
+		return false;
+	}
+}
+package net.feerie.creatura.shared.actions;
+
+public enum TypeAction
+{
+	SE_DEPLACER("Se Deplace"),
+	MANGER("Mange"),
+	BOIRE("Boit"),
+	FAIRE_POPO("Fait Popo"),
+	DORMIR("Dort");
+	
+	/**
+	 * @return le nom de l'action
+	 */
+	public String getNom()
+	{
+		return nom;
+	}
+	
+	private final String nom;
+	
+	private TypeAction(String nom)
+	{
+		this.nom = nom;
+	}
+}
+package net.feerie.creatura.shared.actions;
+
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.TypeEntite;
+
+public class ActionBoire extends Action
+{
+	private final Entite cible;
+	
+	public ActionBoire(Creature creature, Entite cible)
+	{
+		super(creature);
+		this.cible = cible;
+		setDuree(6);
+	}
+	
+	@Override
+	public TypeAction getType()
+	{
+		return TypeAction.BOIRE;
+	}
+	
+	@Override
+	public boolean termine()
+	{
+		//Si c'est de l'eau on applique les effets
+		if (cible.getType() == TypeEntite.EAU)
+		{
+			getCreature().getMoodle(TypeMoodle.SOIF).desactive();
+			getCreature().getMoodle(TypeMoodle.POPO).charge(10);
+		}
+		return false;
+	}
+}
+package net.feerie.creatura.shared.actions;
+
+import net.feerie.creatura.shared.Metronome;
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Représente une action entreprise par une créature.
+ * 
+ * @author greewi
+ */
+public abstract class Action
+{
+	private final Creature creature;
+	private long dateDebut;
+	protected int dureeTotale;
+	protected int dureeEcoulee;
+	
+	/**
+	 * @param creature la créature réalisant l'action
+	 */
+	public Action(Creature creature)
+	{
+		this.creature = creature;
+		debute();
+	}
+	
+	/**
+	 * Renvoie la créature qui effectue l'action
+	 * 
+	 * @return la créature qui effectue l'action
+	 */
+	protected Creature getCreature()
+	{
+		return creature;
+	}
+	
+	/**
+	 * Défini la durée de l'action
+	 * 
+	 * @param duree la durée de l'action en tic
+	 */
+	protected void setDuree(int duree)
+	{
+		this.dureeTotale = duree;
+	}
+	
+	/**
+	 * Renvoie la progression de l'action
+	 * 
+	 * @return la progression de l'action (0 = début, 1 = fin)
+	 */
+	public double getProgression()
+	{
+		return dureeEcoulee / (double) dureeTotale;
+	}
+	
+	/**
+	 * Renvoie la progression de l'action pour l'affichage client. Cette
+	 * progression n'est pas fiable et ne devrait jamais servir dans la
+	 * simulation.
+	 * 
+	 * @param date la date actuelle en milliseconde
+	 * @return la progression de l'action (0 = début, 1 = fin)
+	 */
+	public double getProgressionAffichage(long date)
+	{
+		return (date - dateDebut) / (double) (dureeTotale * Metronome.PERIODE_TIC);
+	}
+	
+	/**
+	 * @return le type de l'action
+	 */
+	public abstract TypeAction getType();
+	
+	/**
+	 * Met à jour l'action, pouvant potentiellement la terminer.
+	 * 
+	 * @return <tt>true</tt> si et seulement si l'action n'est pas terminée.
+	 */
+	public boolean effectueTic()
+	{
+		dureeEcoulee++;
+		if (dureeEcoulee >= dureeTotale)
+			return termine();
+		return true;
+	}
+	
+	/**
+	 * Débute l'action
+	 */
+	public void debute()
+	{
+		dateDebut = System.currentTimeMillis();
+	}
+	
+	/**
+	 * Termine l'action (la durée est écoulée)
+	 * 
+	 * @return <tt>true</tt> si l'action enchaine sur une autre action.
+	 */
+	public abstract boolean termine();
+}
+package net.feerie.creatura.shared.actions;
+
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.commons.Vecteur;
+import net.feerie.creatura.shared.entites.Creature;
+
+/**
+ * Représente une action de déplacement
+ * 
+ * @author greewi
+ */
+public class ActionSeDeplacer extends Action
+{
+	private Action actionAEnchainer;
+	private Position depart;
+	private Position destination;
+	private final int vitesse = 10; //Pixels par tics
+	
+	/**
+	 * @param creature la créature se déplaçant
+	 */
+	public ActionSeDeplacer(Creature creature)
+	{
+		super(creature);
+		this.depart = creature.getPosition();
+		this.destination = null;
+		this.actionAEnchainer = null;
+	}
+	
+	/**
+	 * @param creature la créature se déplaçant
+	 * @param destination la position vers laquelle se déplace la créature
+	 */
+	public ActionSeDeplacer(Creature creature, Position destination)
+	{
+		super(creature);
+		this.depart = creature.getPosition();
+		this.destination = destination;
+		this.actionAEnchainer = null;
+		calculeTrajet();
+	}
+	
+	/**
+	 * @param creature la créature se déplaçant
+	 * @param destination la position vers laquelle se déplace la créature
+	 * @param actionAEnchainer l'action à effetuer une fois arrivée sur place.
+	 *        <tt>null</tt> si aucune action n'est à faire.
+	 */
+	public ActionSeDeplacer(Creature creature, Position destination, Action actionAEnchainer)
+	{
+		super(creature);
+		this.depart = creature.getPosition();
+		this.destination = destination;
+		this.actionAEnchainer = actionAEnchainer;
+		calculeTrajet();
+	}
+	
+	/**
+	 * Définis la destination
+	 * 
+	 * @param destination
+	 */
+	public void setDestination(Position destination)
+	{
+		this.destination = destination;
+		calculeTrajet();
+	}
+	
+	/**
+	 * Renvoie la position de départ de la créature
+	 * 
+	 * @return la position de départ de la créature
+	 */
+	public Position getDepart()
+	{
+		return depart;
+	}
+	
+	/**
+	 * Renvoie la position d'arrivée de la créature
+	 * 
+	 * @return la position d'arrivée de la créature
+	 */
+	public Position getDestination()
+	{
+		return destination;
+	}
+	
+	/**
+	 * Défini l'action à enchainer une fois le déplacement terminé
+	 * 
+	 * @param actionAEnchainer
+	 */
+	public void setActionAEnchainer(Action actionAEnchainer)
+	{
+		this.actionAEnchainer = actionAEnchainer;
+	}
+	
+	private void calculeTrajet()
+	{
+		Vecteur direction = new Vecteur(depart, destination);
+		double distance = direction.getNorme();
+		setDuree((int) Math.ceil(distance / vitesse));
+	}
+	
+	@Override
+	public TypeAction getType()
+	{
+		return TypeAction.SE_DEPLACER;
+	}
+	
+	@Override
+	public boolean effectueTic()
+	{
+		dureeEcoulee++;
+		double progression = getProgression();
+		Position positionActuelle = new Position((1 - progression) * depart.x + progression * destination.x, (1 - progression) * depart.y + progression * destination.y);
+		getCreature().setPosition(positionActuelle);
+		if (dureeEcoulee >= dureeTotale)
+			return termine();
+		return true;
+	}
+	
+	@Override
+	public boolean termine()
+	{
+		getCreature().setPosition(new Position(destination));
+		if (actionAEnchainer != null)
+		{
+			getCreature().setActionActuelle(actionAEnchainer);
+			actionAEnchainer.debute();
+			return true;
+		}
+		else
+			return false;
+	}
+}
+package net.feerie.creatura.shared.actions;
+
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.commons.Vecteur;
+import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.Entite;
+
+/**
+ * Se déplace vers une entité et s'arrête au bord
+ * 
+ * @author greewi
+ */
+public class ActionSeDeplacerVersEntite extends ActionSeDeplacer
+{
+	private Entite cible;
+	
+	/**
+	 * @param creature la créature qui va se déplacer
+	 * @param cible l'entite vers laquelle aller
+	 */
+	public ActionSeDeplacerVersEntite(Creature creature, Entite cible)
+	{
+		super(creature);
+		this.cible = cible;
+		calculeDestination();
+	}
+	
+	/**
+	 * @param creature la créature qui va se déplacer
+	 * @param cible l'entite vers laquelle aller
+	 * @param actionAEnchainer l'action à effetuer une fois arrivée sur place.
+	 *        <tt>null</tt> si aucune action n'est à faire.
+	 */
+	public ActionSeDeplacerVersEntite(Creature creature, Entite cible, Action actionAEnchainer)
+	{
+		super(creature);
+		this.cible = cible;
+		setActionAEnchainer(actionAEnchainer);
+		calculeDestination();
+	}
+	
+	private void calculeDestination()
+	{
+		Position depart = getCreature().getPosition();
+		Position destination = new Position(cible.getPosition());
+		Vecteur vecteur = new Vecteur(depart, destination);
+		double norme = vecteur.getNorme();
+		destination = depart.translate(vecteur.multiplie((norme - (cible.getTaille().h + cible.getTaille().l) / 4) / norme));
+		setDestination(destination);
+	}
+	
+}
+package net.feerie.creatura.shared.actions;
+
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.TypeEntite;
+
+/**
+ * Représente l'action de manger
+ * 
+ * @author greewi
+ */
+public class ActionManger extends Action
+{
+	private final Entite cible;
+	
+	/**
+	 * @param creature la creature qui mange
+	 * @param cible la chose qui sera mangée (enfin que la créature va tenter de
+	 *        manger)
+	 */
+	public ActionManger(Creature creature, Entite cible)
+	{
+		super(creature);
+		this.cible = cible;
+		setDuree(4);
+	}
+	
+	@Override
+	public TypeAction getType()
+	{
+		return TypeAction.MANGER;
+	}
+	
+	@Override
+	public boolean termine()
+	{
+		//Si c'est de la nourriture on applique les effets
+		if (cible.getType() == TypeEntite.NOURRITURE)
+		{
+			cible.detruit();
+			getCreature().getMoodle(TypeMoodle.FAIM).decharge(50);
+			getCreature().getMoodle(TypeMoodle.POPO).charge(30);
+		}
+		return false;
+	}
+	
+}
+package net.feerie.creatura.shared.commons;
+
+import com.google.gwt.user.client.Random;
+
+/**
+ * Représente un rectangle (ou une zone rectangulaire)
+ * 
+ * @author greewi
+ */
+public class Rectangle
+{
+	public Position position;
+	public Dimension dimension;
+	
+	/**
+	 * Créé un rectangle depuis les coordonnées de son coin haut-gauche et de
+	 * ses dimensions
+	 * 
+	 * @param position la position du coin haut-gauche
+	 * @param dimension les dimentions du rectangle
+	 * @return le rectangle créé
+	 */
+	public static Rectangle creeDepuisCoinHautGauche(Position position, Dimension dimension)
+	{
+		return new Rectangle(new Position(position), new Dimension(dimension));
+	}
+	
+	/**
+	 * Créé un rectangle centré sur un point avec des dimensions pr�cis�es
+	 * 
+	 * @param centre le centre du rectangle
+	 * @param dimension les dimensions du rectangle
+	 * @return le rectangle créé
+	 */
+	public static Rectangle creeDepuisCentre(Position centre, Dimension dimension)
+	{
+		return new Rectangle(new Position(centre.x - dimension.l / 2, centre.y - dimension.h / 2), new Dimension(dimension));
+	}
+	
+	/**
+	 * Détermine si le rectangle contient le point donné
+	 * 
+	 * @param position la position dont on veut savoir si elle est contenue dans
+	 *        le rectangle
+	 * @return <tt>true</tt> si et seulement la position est contenue dans le
+	 *         rectagle (bords compris)
+	 */
+	public boolean contient(Position position)
+	{
+		return position.x >= this.position.x && position.y >= this.position.y && position.x <= this.position.x + this.dimension.l && position.y <= this.position.y + this.dimension.h;
+	}
+	
+	/**
+	 * Génère une position aléatoire contenue dans le rectangle
+	 * 
+	 * @return la position générée
+	 */
+	public Position getPositionAleatoire()
+	{
+		return new Position(position.x + Random.nextDouble() * dimension.l, position.y + Random.nextDouble() * dimension.h);
+	}
+	
+	private Rectangle(Position position, Dimension dimension)
+	{
+		this.position = position;
+		this.dimension = dimension;
+	}
+	
+}
+package net.feerie.creatura.shared.commons;
+
+/**
+ * Représente des dimensions
+ * 
+ * @author greewi
+ */
+public class Dimension
+{
+	public double l;
+	public double h;
+	
+	public Dimension()
+	{
+		
+	}
+	
+	/**
+	 * @param l la largeur
+	 * @param h la hauteur
+	 */
+	public Dimension(double l, double h)
+	{
+		this.l = l;
+		this.h = h;
+	}
+	
+	/**
+	 * Constructeur par copie
+	 * 
+	 * @param dimension la Dimention à copier
+	 */
+	public Dimension(Dimension dimension)
+	{
+		this.l = dimension.l;
+		this.h = dimension.h;
+	}
+}
+package net.feerie.creatura.shared.commons;
+
+/**
+ * Représente un vecteur
+ * 
+ * @author greewi
+ */
+public class Vecteur
+{
+	public double x;
+	public double y;
+	
+	public Vecteur()
+	{
+	}
+	
+	/**
+	 * @param x la coordonnée x du vecteur
+	 * @param y la coordonnée y du vecteur
+	 */
+	public Vecteur(double x, double y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+	
+	/**
+	 * Construit le vecteur à partir d'une position de départ et une position de
+	 * fin
+	 * 
+	 * @param debut la position de départ du vecteur
+	 * @param fin la position de fin du vecteur
+	 */
+	public Vecteur(Position debut, Position fin)
+	{
+		this.x = fin.x - debut.x;
+		this.y = fin.y - debut.y;
+	}
+	
+	/**
+	 * @return la norme du vecteur
+	 */
+	public double getNorme()
+	{
+		return Math.sqrt(x * x + y * y);
+	}
+	
+	/**
+	 * Multiplie ce vecteur par un nombre et le renvoie. Ne modifie pas ce
+	 * vecteur.
+	 * 
+	 * @param facteur le nombre à déplacer
+	 * @return le vecteur multiplié par le fecteur.
+	 */
+	public Vecteur multiplie(double facteur)
+	{
+		return new Vecteur(x * facteur, y * facteur);
+	}
+}
+package net.feerie.creatura.shared.commons;
+
+/**
+ * Repr�sente une position
+ * 
+ * @author greewi
+ */
+public class Position
+{
+	public double x;
+	public double y;
+	
+	public Position()
+	{
+	}
+	
+	/**
+	 * Constructeur par copie
+	 * 
+	 * @param position la position à copier
+	 */
+	public Position(Position position)
+	{
+		this.x = position.x;
+		this.y = position.y;
+	}
+	
+	/**
+	 * @param x la coordonnée x de la position
+	 * @param y la coordonnée y de la position
+	 */
+	public Position(double x, double y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+	
+	/**
+	 * Effectue une translation (ne modifie pas cette position)
+	 * 
+	 * @param v le vecteur de translation
+	 * @return la position translatée
+	 */
+	public Position translate(Vecteur v)
+	{
+		return new Position(x + v.x, y + v.y);
+	}
+}
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  When updating your version of GWT, you should also update this DTD reference,
+  so that your app can take advantage of the latest GWT module capabilities.
+-->
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.6.0//EN"
+  "http://google-web-toolkit.googlecode.com/svn/tags/2.6.0/distro-source/core/src/gwt-module.dtd">
+<module rename-to='creatura'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+  <!-- inherits name="com.google.gwt.logging.Logging"/-->
+
+  <!-- Inherit the default GWT style sheet.  You can change       -->
+  <!-- the theme of your GWT application by uncommenting          -->
+  <!-- any one of the following lines.                            -->
+  <inherits name='com.google.gwt.user.theme.clean.Clean'/>
+  <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
+
+  <!-- Other module inherits                                      -->
+
+  <!-- Specify the app entry point class.                         -->
+  <entry-point class='net.feerie.creatura.client.Creatura'/>
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path='client'/>
+  <source path='shared'/>
+
+  <!-- allow Super Dev Mode -->
+  <add-linker name="xsiframe"/>
+</module>
+package net.feerie.creatura.client.rendu2d;
+
+import com.google.gwt.canvas.dom.client.Context2d;
+
+import net.feerie.creatura.shared.actions.Action;
+import net.feerie.creatura.shared.actions.ActionSeDeplacer;
+import net.feerie.creatura.shared.actions.TypeAction;
+import net.feerie.creatura.shared.entites.Creature;
+
+public class RenduCreature implements RenduElement
+{
+	private final Context2d contexte;
+	private final String couleur;
+	private final Creature creature;
+	
+	public RenduCreature(Creature creature, Context2d contexte)
+	{
+		this.creature = creature;
+		this.contexte = contexte;
+		this.couleur = "#FF7300";
+	}
+	
+	/**
+	 * détruit ce rendu
+	 */
+	@Override
+	public void detruit()
+	{
+		//rien à faire pour le moment
+	}
+	
+	/**
+	 * Dessine l'creature
+	 * 
+	 * @param timestamp
+	 */
+	@Override
+	public void dessine(long dateActuelle)
+	{
+		Action actionActuelle = creature.getActionActuelle();
+		
+		double x = creature.getPosition().x;
+		double y = creature.getPosition().y;
+		
+		if (actionActuelle != null && actionActuelle.getType() == TypeAction.SE_DEPLACER)
+		{
+			ActionSeDeplacer deplacement = (ActionSeDeplacer) actionActuelle;
+			double t = deplacement.getProgressionAffichage(dateActuelle);
+			double x0 = deplacement.getDepart().x;
+			double y0 = deplacement.getDepart().y;
+			double x1 = deplacement.getDestination().x;
+			double y1 = deplacement.getDestination().y;
+			x = (1 - t) * x0 + t * x1;
+			y = (1 - t) * y0 + t * y1;
+		}
+		
+		contexte.setFillStyle(couleur);
+		contexte.beginPath();
+		contexte.arc(x, y, creature.getTaille().l / 2, 0, 20);
+		contexte.closePath();
+		contexte.fill();
+	}
+}
+package net.feerie.creatura.client.rendu2d;
+
+import java.util.HashMap;
+
+import com.google.gwt.canvas.dom.client.Context2d;
+
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.TypeEntite;
+import net.feerie.creatura.shared.events.ObservateurEntiteAjoutee;
+import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
+
+/**
+ * Représente le rendu d'un monde. Se charger de dessiner le monde.
+ * 
+ * @author greewi
+ */
+public class RenduMonde
+{
+	@SuppressWarnings("unused")
+	private final Monde monde;
+	@SuppressWarnings("unused")
+	private final Context2d contexte;
+	private final HashMap<Integer, RenduElement> rendusEntites;
+	
+	/**
+	 * @param monde le monde à dessiner
+	 * @param contexte le contexte dans lequel dessiner
+	 */
+	public RenduMonde(Monde monde, final Context2d contexte)
+	{
+		this.monde = monde;
+		this.contexte = contexte;
+		rendusEntites = new HashMap<>();
+		//On attache les observateurs sur les événements du monde pour mettre à jour la vue 
+		monde.onEntiteAjoutee(new ObservateurEntiteAjoutee()
+		{
+			@Override
+			public void onEntiteAjoutee(Entite entite)
+			{
+				if (entite.getType() == TypeEntite.CREATURE)
+					rendusEntites.put(entite.getID(), new RenduCreature((Creature) entite, contexte));
+				else
+					rendusEntites.put(entite.getID(), new RenduEntite(entite, contexte));
+			}
+		});
+		monde.onEntiteSupprimee(new ObservateurEntiteSupprimee()
+		{
+			@Override
+			public void onEntiteSuprimee(Entite entite)
+			{
+				RenduElement renduADetruire = rendusEntites.remove(entite.getID());
+				if (renduADetruire != null)
+					renduADetruire.detruit();
+			}
+		});
+	}
+	
+	/**
+	 * Détruit ce moteur de rendu
+	 */
+	public void detruit()
+	{
+		for (RenduElement rendu : rendusEntites.values())
+			rendu.detruit();
+		rendusEntites.clear();
+	}
+	
+	/**
+	 * Dessine le monde.
+	 * 
+	 * @param timestamp la date du rendu
+	 */
+	public void dessine(long dateActuelle)
+	{
+		for (RenduElement rendu : rendusEntites.values())
+			rendu.dessine(dateActuelle);
+	}
+}
+package net.feerie.creatura.client.rendu2d;
+
+public interface RenduElement
+{
+	/**
+	 * détruit ce rendu
+	 */
+	public void detruit();
+	
+	/**
+	 * Dessine l'entite
+	 * 
+	 * @param dateActuelle la date actuelle en millisecondes
+	 */
+	public void dessine(long dateActuelle);
+}
+package net.feerie.creatura.client.rendu2d;
+
+import com.google.gwt.canvas.dom.client.Context2d;
+
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.EntiteLitiere;
+import net.feerie.creatura.shared.entites.EntiteNourriture;
+import net.feerie.creatura.shared.entites.TypeEntite;
+import net.feerie.creatura.shared.entites.Zone;
+
+/**
+ * Représente un rendu d'entité. Cette classe s'occupe de dessiner les entités
+ * 
+ * @author greewi
+ */
+public class RenduEntite implements RenduElement
+{
+	private final Entite entite;
+	private final Context2d contexte;
+	private final String couleur;
+	
+	/**
+	 * @param entite l'entite à dessiner
+	 * @param contexte le contexte dans lequel dessiner
+	 */
+	public RenduEntite(Entite entite, Context2d contexte)
+	{
+		this.entite = entite;
+		this.contexte = contexte;
+		
+		if (entite.getType() == TypeEntite.CREATURE)
+			this.couleur = "#FF7300";
+		else if (entite.getType() == TypeEntite.NOURRITURE)
+			this.couleur = ((EntiteNourriture) entite).getCouleur();
+		else if (entite.getType() == TypeEntite.EAU)
+			this.couleur = "#11AAFF";
+		else if (entite.getType() == TypeEntite.ZONE)
+			this.couleur = ((Zone) entite).getCouleur();
+		else if (entite.getType() == TypeEntite.POPO)
+			this.couleur = "#303010";
+		else
+			this.couleur = "#737373";
+	}
+	
+	/**
+	 * détruit ce rendu
+	 */
+	@Override
+	public void detruit()
+	{
+		//rien à faire pour le moment
+	}
+	
+	/**
+	 * Dessine l'entite
+	 * 
+	 * @param timestamp
+	 */
+	@Override
+	public void dessine(long dateActuelle)
+	{
+		contexte.setFillStyle(couleur);
+		if (entite.getType() == TypeEntite.LITIERE)
+		{
+			contexte.fillRect(entite.getPosition().x - entite.getTaille().l / 2, entite.getPosition().y - entite.getTaille().h / 2, entite.getTaille().l, entite.getTaille().h);
+			double taux = ((EntiteLitiere) entite).getContenu() / ((EntiteLitiere) entite).getCapacite();
+			double l = entite.getTaille().l * taux;
+			double h = entite.getTaille().h * taux;
+			contexte.setFillStyle("#505013");
+			contexte.fillRect(entite.getPosition().x - l / 2, entite.getPosition().y - h / 2, l, h);
+		}
+		else if (entite.getType() == TypeEntite.ZONE)
+			contexte.fillRect(entite.getPosition().x - entite.getTaille().l / 2, entite.getPosition().y - entite.getTaille().h / 2, entite.getTaille().l, entite.getTaille().h);
+		else
+		{
+			contexte.beginPath();
+			contexte.arc(entite.getPosition().x, entite.getPosition().y, entite.getTaille().l / 2, 0, 20);
+			contexte.closePath();
+			contexte.fill();
+		}
+	}
+}
+package net.feerie.creatura.client;
+
+import com.google.gwt.animation.client.AnimationScheduler;
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.ButtonElement;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootPanel;
+
+import net.feerie.creatura.client.rendu2d.RenduMonde;
+import net.feerie.creatura.shared.Console;
+import net.feerie.creatura.shared.Environnement;
+import net.feerie.creatura.shared.Metronome;
+import net.feerie.creatura.shared.Monde;
+import net.feerie.creatura.shared.commons.Dimension;
+import net.feerie.creatura.shared.commons.Position;
+import net.feerie.creatura.shared.creature.moodles.Moodle;
+import net.feerie.creatura.shared.creature.moodles.TypeMoodle;
+import net.feerie.creatura.shared.entites.Creature;
+import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.EntiteEau;
+import net.feerie.creatura.shared.entites.EntiteLitiere;
+import net.feerie.creatura.shared.entites.EntiteNourriture;
+import net.feerie.creatura.shared.entites.TypeEntite;
+import net.feerie.creatura.shared.entites.TypeNourriture;
+import net.feerie.creatura.shared.entites.Zone;
+
+/**
+ * Entry point classes define <code>onModuleLoad()</code>.
+ */
+public class Creatura implements EntryPoint
+{
+	//Modele
+	private Monde monde;
+	private Metronome metronome;
+	private Creature creature;
+	//Vue
+	private Canvas canvas;
+	private Context2d contexte;
+	private RenduMonde vueMonde;
+	private int taille;
+	//UI
+	private Outil outilActuel;
+	private HTML uiInformations;
+	private ButtonElement boutonPlacerNourriture;
+	private ButtonElement boutonSecher;
+	private ButtonElement boutonNettoyer;
+	
+	public void onModuleLoad()
+	{
+		//Initialisation du contexte
+		this.canvas = Canvas.createIfSupported();
+		taille = Window.getClientWidth() > Window.getClientHeight() ? Window.getClientHeight() : Window.getClientWidth();
+		canvas.setCoordinateSpaceWidth(taille);
+		canvas.setCoordinateSpaceHeight(taille);
+		RootPanel.get("canvas").add(canvas);
+		this.contexte = canvas.getContext2d();
+		
+		//Initialisation de l'UI
+		uiInformations = new HTML();
+		RootPanel.get("informations").add(uiInformations);
+		boutonPlacerNourriture = (ButtonElement) Document.get().getElementById("boutonPlacerNourriture");
+		boutonSecher = (ButtonElement) Document.get().getElementById("boutonSecher");
+		boutonNettoyer = (ButtonElement) Document.get().getElementById("boutonNettoyer");
+		
+		//Construction du monde
+		this.monde = new Monde(new Environnement(0, 0, "#000000"));
+		this.metronome = new Metronome(monde);
+		this.vueMonde = new RenduMonde(monde, contexte);
+		
+		//Ajout des zones
+		monde.ajouteZone(new Zone(monde, new Position(25, 50), new Dimension(50, 100), new Environnement(22, 1, "#A6FFAD")));
+		monde.ajouteZone(new Zone(monde, new Position(75, 25), new Dimension(50, 50), new Environnement(31, 1, "#FCFFA6")));
+		monde.ajouteZone(new Zone(monde, new Position(75, 75), new Dimension(50, 50), new Environnement(7, 1, "#A6FFEF")));
+		
+		//Ajout d'une litierre
+		monde.nouvelleEntite(new EntiteLitiere(monde, 10, new Position(90, 10)));
+		
+		//Ajout d'un point d'eau
+		monde.nouvelleEntite(new EntiteEau(monde, new Position(15, 85)));
+		
+		//Ajout de la nourriture
+		for (int i = 0; i < 0; i++)
+		{
+			TypeNourriture[] types = TypeNourriture.values();
+			TypeNourriture type = types[Random.nextInt(types.length)];
+			monde.nouvelleEntite(new EntiteNourriture(monde, type, new Position(Random.nextInt(100), Random.nextInt(100))));
+		}
+		
+		//Ajout d'une créature
+		this.creature = new Creature(monde, new Position(25, 50));
+		monde.nouvelleEntite(creature);
+		
+		//Boucle de rendu
+		BoucleRendu boucleRendu = new BoucleRendu();
+		AnimationScheduler.get().requestAnimationFrame(boucleRendu);
+		
+		initialiseEvenement();
+	}
+	
+	private final void initialiseEvenement()
+	{
+		outilActuel = new OutilPlacerNourriture();
+		boutonPlacerNourriture.addClassName("actif");
+		canvas.addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				if (outilActuel != null)
+					outilActuel.onClick(event);
+			}
+		});
+		
+		Button.wrap(boutonPlacerNourriture).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				Console.log("Click sur boutonPlacerNourriture");
+				boutonPlacerNourriture.addClassName("actif");
+				boutonSecher.removeClassName("actif");
+				boutonNettoyer.removeClassName("actif");
+				outilActuel = new OutilPlacerNourriture();
+			}
+		});
+		
+		Button.wrap(boutonSecher).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				Console.log("Click sur boutonSecher");
+				boutonPlacerNourriture.removeClassName("actif");
+				boutonSecher.addClassName("actif");
+				boutonNettoyer.removeClassName("actif");
+				outilActuel = new OutilSecher();
+			}
+		});
+		
+		Button.wrap(boutonNettoyer).addClickHandler(new ClickHandler()
+		{
+			@Override
+			public void onClick(ClickEvent event)
+			{
+				Console.log("Click sur boutonNettoyer");
+				boutonPlacerNourriture.removeClassName("actif");
+				boutonSecher.removeClassName("actif");
+				boutonNettoyer.addClassName("actif");
+				outilActuel = new OutilNettoyer();
+			}
+		});
+	}
+	
+	private class BoucleRendu implements AnimationScheduler.AnimationCallback
+	{
+		@Override
+		public void execute(double timestamp)
+		{
+			long dateActuelle = System.currentTimeMillis();
+			
+			//Mise à jour du monde
+			metronome.nouvelleFrame();
+			
+			//Affichage du canvas
+			canvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
+			//Mise à l'échelle
+			if (canvas.getCoordinateSpaceWidth() < canvas.getCoordinateSpaceHeight())
+				contexte.scale(canvas.getCoordinateSpaceWidth() / 100.0, canvas.getCoordinateSpaceWidth() / 100.0);
+			else
+				contexte.scale(canvas.getCoordinateSpaceHeight() / 100.0, canvas.getCoordinateSpaceHeight() / 100.0);
+			
+			//Dessin du monde
+			vueMonde.dessine(dateActuelle);
+			
+			//Mise à jour de l'UI
+			metAJourUI();
+			
+			//Appel de la frame suivante
+			AnimationScheduler.get().requestAnimationFrame(this);
+		}
+	}
+	
+	private void metAJourUI()
+	{
+		//Action et besoins
+		StringBuilder htmlInfos = new StringBuilder();
+		if (creature.getActionActuelle() != null)
+			htmlInfos.append("<p>Action : ").append(creature.getActionActuelle().getType().getNom()).append("</p>");
+		else
+			htmlInfos.append("<p>Action : aucune</p>");
+		htmlInfos.append("<hr/>");
+		htmlInfos.append("<p>Sante : ").append(creature.getSante()).append("</p>");
+		htmlInfos.append("<hr/>");
+		htmlInfos.append("<p><b>Cliquez sur la carte pour déposer de la nourriture. Soyez sympa !</b></p>");
+		htmlInfos.append("<hr>");
+		htmlInfos.append("<p>Moodles : </p>");
+		htmlInfos.append("<ul>");
+		for (TypeMoodle typeMoodle : TypeMoodle.values())
+		{
+			Moodle moodle = creature.getMoodle(typeMoodle);
+			int charge = moodle.getCharge();
+			if (moodle.estActif())
+				htmlInfos.append("<li><b>").append(typeMoodle.getNom()).append(" : ").append(charge).append("%</li></b>");
+			else
+				htmlInfos.append("<li>").append(typeMoodle.getNom()).append(" : ").append(charge).append("%</li>");
+		}
+		htmlInfos.append("</ul>");
+		
+		//On affiche les informations
+		uiInformations.setHTML(htmlInfos.toString());
+	}
+	
+	private interface Outil
+	{
+		public void onClick(ClickEvent event);
+	}
+	
+	private class OutilPlacerNourriture implements Outil
+	{
+		@Override
+		public void onClick(ClickEvent event)
+		{
+			double x = event.getRelativeX(event.getRelativeElement()) * 100.0 / taille;
+			double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
+			TypeNourriture[] types = TypeNourriture.values();
+			TypeNourriture type = types[Random.nextInt(types.length)];
+			monde.nouvelleEntite(new EntiteNourriture(monde, type, new Position(x, y)));
+		}
+	}
+	
+	private class OutilSecher implements Outil
+	{
+		@Override
+		public void onClick(ClickEvent event)
+		{
+			double x = event.getRelativeX(event.getRelativeElement()) * 100.0 / taille;
+			double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
+			double xc = creature.getPosition().x;
+			double yc = creature.getPosition().y;
+			double rayon = creature.getTaille().l / 2;
+			
+			if ((x - xc) * (x - xc) + (y - yc) * (y - yc) <= rayon * rayon)
+			{
+				creature.getMoodle(TypeMoodle.MOUILLE).desactive();
+			}
+		}
+	}
+	
+	private class OutilNettoyer implements Outil
+	{
+		@Override
+		public void onClick(ClickEvent event)
+		{
+			double x = event.getRelativeX(event.getRelativeElement()) * 100.0 / taille;
+			double y = event.getRelativeY(event.getRelativeElement()) * 100.0 / taille;
+			
+			for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
+			{
+				if (entite.getType() == TypeEntite.NOURRITURE || entite.getType() == TypeEntite.POPO)
+					entite.detruit();
+				else if (entite.getType() == TypeEntite.LITIERE)
+					((EntiteLitiere) entite).vide();
+			}
+		}
+	}
+}

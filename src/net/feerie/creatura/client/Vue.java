@@ -11,12 +11,13 @@ import net.feerie.creatura.client.pixi.Application;
 import net.feerie.creatura.client.pixi.Container;
 import net.feerie.creatura.client.pixi.Loader;
 import net.feerie.creatura.client.pixi.Options;
-import net.feerie.creatura.client.pixi.Settings;
+import net.feerie.creatura.client.pixi.PIXI;
 import net.feerie.creatura.client.renduPixi.RenduArbre;
 import net.feerie.creatura.client.renduPixi.RenduCreature;
 import net.feerie.creatura.client.renduPixi.RenduEau;
 import net.feerie.creatura.client.renduPixi.RenduElement;
 import net.feerie.creatura.client.renduPixi.RenduEntiteSimple;
+import net.feerie.creatura.client.renduPixi.RenduLitere;
 import net.feerie.creatura.client.renduPixi.RenduMachines;
 import net.feerie.creatura.client.renduPixi.RenduNuisible;
 import net.feerie.creatura.client.renduPixi.RenduZone;
@@ -26,7 +27,9 @@ import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.CreatureNuisible;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.EntiteArbre;
+import net.feerie.creatura.shared.entites.EntiteDistributeurGranule;
 import net.feerie.creatura.shared.entites.EntiteEau;
+import net.feerie.creatura.shared.entites.EntiteLitiere;
 import net.feerie.creatura.shared.entites.TypeEntite;
 import net.feerie.creatura.shared.events.ObservateurEntiteAjoutee;
 import net.feerie.creatura.shared.events.ObservateurEntiteSupprimee;
@@ -74,8 +77,6 @@ public class Vue
 		canvasElement = canvas.getCanvasElement();
 		
 		//Création de l'application PIXI
-		Settings.PRECISION_FRAGMENT = "highp";
-		Settings.PRECISION_VERTEX = "highp";
 		Options options = new Options();
 		options.view = canvasElement;
 		options.width = largeurFenetre;
@@ -94,19 +95,30 @@ public class Vue
 		//Contenu de la vue
 		rendusEntites = new HashMap<>();
 		
-		Settings.WRAP_MODE = Settings.WrapModes.REPEAT;
-		Loader.add("images/Zone.png");
+		PIXI.Settings.MIPMAP_TEXTURES = false;
+		PIXI.Settings.WRAP_MODE = PIXI.WRAP_MODES.REPEAT;
+		Loader.add("images/zones/SableFond.png");
+		Loader.add("images/zones/SableSol.png");
+		
 		Loader.load(new Loader.OnLoadCallback()
 		{
 			@Override
 			public void onLoad()
 			{
-				Settings.WRAP_MODE = Settings.WrapModes.CLAMP;
+				PIXI.Settings.MIPMAP_TEXTURES = true;
+				PIXI.Settings.WRAP_MODE = PIXI.WRAP_MODES.CLAMP;
 				Loader.add("images/Creature.png");
 				Loader.add("images/Nuisible.png");
 				Loader.add("images/Granule.png");
 				Loader.add("images/Fruit.png");
 				Loader.add("images/Popo.png");
+
+				Loader.add("images/ArbreFruitier.png");
+				Loader.add("images/ArbreFruitier-avant.png");
+				
+				Loader.add("images/Distributeur.png");
+				Loader.add("images/Litiere.png");
+				Loader.add("images/Litiere-contenu.png");
 				
 				Loader.load(new Loader.OnLoadCallback()
 				{
@@ -203,6 +215,10 @@ public class Vue
 				rendu = new RenduArbre((EntiteArbre) entite);
 			else if (entite.getType() == TypeEntite.EAU)
 				rendu = new RenduEau((EntiteEau) entite);
+			else if (entite.getType() == TypeEntite.LITIERE)
+				rendu = new RenduLitere((EntiteLitiere) entite);
+			else if (entite.getType() == TypeEntite.DISTRIBUTEUR_GRANULE)
+				rendu = new RenduMachines((EntiteDistributeurGranule) entite);
 			else
 				rendu = new RenduMachines(entite);
 			

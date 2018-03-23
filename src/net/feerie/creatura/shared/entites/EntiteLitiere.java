@@ -23,7 +23,7 @@ public class EntiteLitiere extends Entite
 	 */
 	public EntiteLitiere(Monde monde, int capacite, Position position)
 	{
-		super(monde, position, new Dimension(100, 20));
+		super(monde, position, new Dimension(64, 32));
 		this.monde = monde;
 		this.capacite = capacite;
 		this.contenu = 0;

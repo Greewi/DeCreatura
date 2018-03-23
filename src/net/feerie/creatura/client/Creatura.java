@@ -84,15 +84,15 @@ public class Creatura implements EntryPoint
 		monde.nouvelleEntite(new EntiteLitiere(monde, 10, new Position(850 + longeurOceanGauche, 150)));
 		
 		//Ajout d'un distributeur de granulés
-		monde.nouvelleEntite(new EntiteDistributeurGranule(monde, new Position(950 + longeurOceanGauche, 150), new Dimension(50, 150)));
+		monde.nouvelleEntite(new EntiteDistributeurGranule(monde, new Position(950 + longeurOceanGauche, 150)));
 		
 		//Ajout d'un point d'eau
 		monde.nouvelleEntite(new EntiteEau(monde, new Position(300 + longeurOceanGauche, 00), new Dimension(200, 150)));
 		
 		//Ajout des arbres
-		monde.nouvelleEntite(new EntiteArbre(monde, new Position(600 + longeurOceanGauche, 170), new Dimension(100, 200)));
-		monde.nouvelleEntite(new EntiteArbre(monde, new Position(1300 + longeurOceanGauche, 170), new Dimension(120, 260)));
-		monde.nouvelleEntite(new EntiteArbre(monde, new Position(2100 + longeurOceanGauche, 240), new Dimension(80, 160)));
+		monde.nouvelleEntite(new EntiteArbre(monde, new Position(600 + longeurOceanGauche, 170), 200));
+		monde.nouvelleEntite(new EntiteArbre(monde, new Position(1300 + longeurOceanGauche, 170), 260));
+		monde.nouvelleEntite(new EntiteArbre(monde, new Position(2100 + longeurOceanGauche, 240), 160));
 		
 		//Ajout d'une créature
 		this.creature = new Creature(monde, new Position(400 + longeurOceanGauche, 170));

@@ -9,10 +9,10 @@ public class EntiteDistributeurGranule extends Entite
 {
 	private final Rectangle rectangleGeneration;
 	
-	public EntiteDistributeurGranule(Monde monde, Position position, Dimension taille)
+	public EntiteDistributeurGranule(Monde monde, Position position)
 	{
-		super(monde, position, taille);
-		rectangleGeneration = Rectangle.creeDepuisCoinHautGauche(new Position(position.x - taille.l / 2, position.z + taille.h / 2), new Dimension(taille.l, taille.h / 2));
+		super(monde, position, new Dimension(64, 128));
+		rectangleGeneration = Rectangle.creeDepuisCoinHautGauche(new Position(position.x - 24 + 4, position.z + 48), new Dimension(40, 8));
 	}
 	
 	@Override

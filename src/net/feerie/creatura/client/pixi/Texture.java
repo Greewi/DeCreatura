@@ -1,6 +1,7 @@
 package net.feerie.creatura.client.pixi;
 
 import jsinterop.annotations.JsConstructor;
+import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsProperty;
 import jsinterop.annotations.JsType;
 
@@ -13,4 +14,9 @@ public class Texture
 	
 	@JsProperty
 	public BaseTexture baseTexture;
+	@JsProperty
+	public Rectangle frame;
+	
+	@JsMethod
+	public native void _updateUvs();
 }

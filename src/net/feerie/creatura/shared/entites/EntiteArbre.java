@@ -15,11 +15,11 @@ public class EntiteArbre extends Entite
 	private int cyclesDepuisDernierFruit;
 	private final Rectangle rectangleFruits;
 	
-	public EntiteArbre(Monde monde, Position position, Dimension taille)
+	public EntiteArbre(Monde monde, Position position, int hauteur)
 	{
-		super(monde, position, taille);
+		super(monde, position, new Dimension(hauteur / 2, hauteur));
 		fruits = new ArrayList<>();
-		rectangleFruits = Rectangle.creeDepuisCoinHautGauche(new Position(position.x - taille.l / 2, position.z + taille.h / 2), new Dimension(taille.l, taille.h / 2));
+		rectangleFruits = Rectangle.creeDepuisCoinHautGauche(new Position(position.x - hauteur / 4, position.z + hauteur / 2), new Dimension(hauteur / 2, hauteur / 4));
 	}
 	
 	@Override

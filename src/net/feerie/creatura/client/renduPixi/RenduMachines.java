@@ -1,27 +1,31 @@
 package net.feerie.creatura.client.renduPixi;
 
 import net.feerie.creatura.client.pixi.Container;
-import net.feerie.creatura.client.pixi.Graphics;
+import net.feerie.creatura.client.pixi.Sprite;
 import net.feerie.creatura.shared.entites.Entite;
+import net.feerie.creatura.shared.entites.TypeEntite;
 
 public class RenduMachines implements RenduElement
 {
 	private final Entite entite;
-	private final Graphics graphics;
+	private final Sprite sprite;
 	
 	public RenduMachines(Entite entite)
 	{
 		this.entite = entite;
-		this.graphics = new Graphics();
-		this.graphics.beginFill(0xCCCCCC, 1.0);
-		this.graphics.drawRect(0, 0, 1, 1);
-		this.graphics.setDimensions(entite.getTaille().l, entite.getTaille().h);
+		if (entite.getType() == TypeEntite.DISTRIBUTEUR_GRANULE)
+			this.sprite = Sprite.newSprite("images/Distributeur.png");
+		else
+			this.sprite = Sprite.newSprite("images/Popo.png");
+		this.sprite.setDimensions(entite.getTaille().l, entite.getTaille().h);
+		this.sprite.anchor.x = 0.5;
+		this.sprite.anchor.y = 1;
 	}
 	
 	@Override
 	public void ajoute(Scene scene)
 	{
-		scene.ajouteElementFond(graphics);
+		scene.ajouteElementFond(sprite);
 	}
 	
 	@Override
@@ -29,15 +33,15 @@ public class RenduMachines implements RenduElement
 	{
 		double x = ((1 - progressionTic) * entite.position.x + progressionTic * entite.positionProchainTic.x);
 		double y = 1000 - ((1 - progressionTic) * entite.position.z + progressionTic * entite.positionProchainTic.z);
-		this.graphics.setPosition(x - entite.getTaille().l / 2, y - entite.getTaille().h);
+		this.sprite.setPosition(x, y);
 	}
 	
 	@Override
 	public void detruit()
 	{
-		Container parent = graphics.getParent();
+		Container parent = sprite.getParent();
 		if (parent != null)
-			parent.removeChild(graphics);
+			parent.removeChild(sprite);
 	}
 	
 }

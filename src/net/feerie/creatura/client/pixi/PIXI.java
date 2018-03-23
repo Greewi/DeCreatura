@@ -7,6 +7,58 @@ import jsinterop.annotations.JsType;
 @JsType(isNative = true, namespace = JsPackage.GLOBAL)
 public class PIXI
 {
+	@JsType(isNative = true, namespace = "PIXI", name = "settings")
+	public static class Settings
+	{
+		@JsProperty
+		public static boolean CAN_UPLOAD_SAME_BUFFER;
+		@JsProperty
+		public static int FILTER_RESOLUTION;
+		@JsProperty
+		public static int GC_MAX_CHECK_COUNT;
+		@JsProperty
+		public static int GC_MAX_IDLE;
+		/*
+		 * TODO GC_MODE
+		 */
+		@JsProperty
+		public static int MESH_CANVAS_PADDING;
+		@JsProperty
+		public static boolean MIPMAP_TEXTURES;
+		@JsProperty
+		public static String PRECISION_FRAGMENT;
+		@JsProperty
+		public static String PRECISION_VERTEX;
+		@JsProperty
+		public static int RESOLUTION;
+		@JsProperty
+		public static String RETINA_PREFIX;
+		/*
+		 * TODO SCALE_MODE
+		 */
+		@JsProperty
+		public static int SPRITE_MAX_TEXTURES;
+		@JsProperty
+		public static int TARGET_FPMS;
+		/*
+		 * TODO TRANSFORM_MODE
+		 */
+		@JsProperty
+		public static int UPLOADS_PER_FRAME;
+		@JsProperty
+		public static int WRAP_MODE;
+	}
+	
+	@JsType(isNative = true, namespace = "PIXI")
+	public static class WRAP_MODES
+	{
+		@JsProperty
+		public static int CLAMP;
+		@JsProperty
+		public static int REPEAT;
+		@JsProperty
+		public static int MIRRORED_REPEAT;
+	}
 	
 	@JsType(isNative = true, namespace = "PIXI")
 	public static class BLEND_MODES

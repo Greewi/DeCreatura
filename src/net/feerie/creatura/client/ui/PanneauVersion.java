@@ -14,7 +14,7 @@ public class PanneauVersion
 	public PanneauVersion()
 	{
 		panneau = DivElement.as(Document.get().getElementById("infosVersion"));
-		List<PatchNote> patchnotes = Arrays.asList(version0_8());
+		List<PatchNote> patchnotes = Arrays.asList(version0_8(), version0_8b());
 		
 		StringBuilder html = new StringBuilder();
 		for (PatchNote patchnote : patchnotes)
@@ -43,7 +43,7 @@ public class PanneauVersion
 		patchNote.ajoute("Le régime alimentaire de votre créature n'accepte plus les fruits (pour le moment). Mais vous avez un distributeur de granule (le truc vertical gris).");
 		return patchNote;
 	}
-
+	
 	@SuppressWarnings("unused")
 	private PatchNote version0_6()
 	{
@@ -52,7 +52,7 @@ public class PanneauVersion
 		patchNote.ajoute("Vous pouvez à nouveau sécher votre créature (ou la mouiller !)");
 		return patchNote;
 	}
-
+	
 	@SuppressWarnings("unused")
 	private PatchNote version0_7()
 	{
@@ -64,7 +64,7 @@ public class PanneauVersion
 		patchNote.ajoute("Les touches + et - accélèrent et ralentissent le temps");
 		return patchNote;
 	}
-
+	
 	@SuppressWarnings("unused")
 	private PatchNote version0_7b()
 	{
@@ -75,13 +75,21 @@ public class PanneauVersion
 		patchNote.ajoute("La décrémentation des croyances est plus continue");
 		return patchNote;
 	}
-
+	
 	private PatchNote version0_8()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.8 - Avec PIXI.js) : ");
 		patchNote.ajoute("Nouveau moteur de rendu à base de PIXI.js à travers JSInterop");
 		patchNote.ajoute("Correction d'un bug qui permettait a une créature de manger ce qu'une autre créature a déjà mangé");
 		patchNote.ajoute("Réduction de la violence de l'empoisonnement");
+		return patchNote;
+	}
+	
+	private PatchNote version0_8b()
+	{
+		PatchNote patchNote = new PatchNote("Patch note (v0.8b) : ");
+		patchNote.ajoute("Correction dimensions d'affichage");
+		patchNote.ajoute("Prise en compte du redimentionnement de la fenêtre");
 		return patchNote;
 	}
 	

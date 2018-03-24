@@ -4,7 +4,6 @@ import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -57,114 +56,79 @@ public class ControleurVue
 	
 	private final void initialiseEvenement()
 	{
-		final MouseMoveHandler mouseMoveHandler = new MouseMoveHandler()
-		{
+		final MouseMoveHandler mouseMoveHandler = (MouseMoveEvent event) -> {
+			int x = event.getRelativeX(event.getRelativeElement());
+			int y = event.getRelativeY(event.getRelativeElement());
+			if ((x - xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y - ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
+				scrollEnCours = true;
+			vue.setXVue(xVueInitial - ((x - xSourisInitial) * vue.getLargeurVue()) / vue.getLargeurFenetre());
 			
-			@Override
-			public void onMouseMove(MouseMoveEvent event)
-			{
-				int x = event.getRelativeX(event.getRelativeElement());
-				int y = event.getRelativeY(event.getRelativeElement());
-				if ((x - xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y - ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
-					scrollEnCours = true;
-				vue.setXVue(xVueInitial - ((x - xSourisInitial) * vue.getLargeurVue()) / vue.getLargeurFenetre());
-			}
 		};
 		
-		final MouseUpHandler mouseUpHandler = new MouseUpHandler()
-		{
+		final MouseUpHandler mouseUpHandler = (MouseUpEvent event) -> {
+			reinitialiseHandlers();
 			
-			@Override
-			public void onMouseUp(MouseUpEvent event)
+			if (scrollEnCours)
 			{
-				reinitialiseHandlers();
+				scrollEnCours = false;
+			}
+			else
+			{
+				int x = vue.getXVue() + (event.getRelativeX(event.getRelativeElement()) * vue.getLargeurVue()) / vue.getLargeurFenetre();
+				int y = 1000 - (event.getRelativeY(event.getRelativeElement()) * vue.getHauteurVue()) / vue.getHauteurFenetre();
 				
-				if (scrollEnCours)
+				Entite entiteSelectionnee = null;
+				for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
 				{
-					scrollEnCours = false;
+					if (entiteSelectionnee == null || entite.getType().getPrioriteSelection() > entiteSelectionnee.getType().getPrioriteSelection())
+						entiteSelectionnee = entite;
 				}
-				else
+				
+				creatura.ouvreInterfaceGenerale();
+				
+				if (entiteSelectionnee != null)
 				{
-					int x = vue.getXVue() + (event.getRelativeX(event.getRelativeElement()) * vue.getLargeurVue()) / vue.getLargeurFenetre();
-					int y = 1000 - (event.getRelativeY(event.getRelativeElement()) * vue.getHauteurVue()) / vue.getHauteurFenetre();
-					
-					Entite entiteSelectionnee = null;
-					for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
-					{
-						if (entiteSelectionnee == null || entite.getType().getPrioriteSelection() > entiteSelectionnee.getType().getPrioriteSelection())
-							entiteSelectionnee = entite;
-					}
-					
-					creatura.ouvreInterfaceGenerale();
-					
-					if (entiteSelectionnee != null)
-					{
-						String outilAOuvrir = entiteSelectionnee.active(null);
-						Console.log("Outil à ouvrir : " + outilAOuvrir);
-						if (outilAOuvrir != null && outilAOuvrir.equalsIgnoreCase("Creature") && entiteSelectionnee.getType() == TypeEntite.CREATURE)
-							creatura.ouvreInterfaceCreature((Creature) entiteSelectionnee);
-					}
+					String outilAOuvrir = entiteSelectionnee.active(null);
+					Console.log("Outil à ouvrir : " + outilAOuvrir);
+					if (outilAOuvrir != null && outilAOuvrir.equalsIgnoreCase("Creature") && entiteSelectionnee.getType() == TypeEntite.CREATURE)
+						creatura.ouvreInterfaceCreature((Creature) entiteSelectionnee);
 				}
 			}
 		};
 		
-		final MouseDownHandler mouseDownHandler = new MouseDownHandler()
-		{
-			
-			@Override
-			public void onMouseDown(MouseDownEvent event)
-			{
-				scrollEnCours = false;
-				xSourisInitial = event.getRelativeX(event.getRelativeElement());
-				ySourisInitial = event.getRelativeY(event.getRelativeElement());
-				xVueInitial = vue.getXVue();
-				mouseMoveRegistration = RootPanel.get().addDomHandler(mouseMoveHandler, MouseMoveEvent.getType());
-				mouseUpRegistration = RootPanel.get().addDomHandler(mouseUpHandler, MouseUpEvent.getType());
-			}
+		final MouseDownHandler mouseDownHandler = (MouseDownEvent event) -> {
+			scrollEnCours = false;
+			xSourisInitial = event.getRelativeX(event.getRelativeElement());
+			ySourisInitial = event.getRelativeY(event.getRelativeElement());
+			xVueInitial = vue.getXVue();
+			mouseMoveRegistration = RootPanel.get().addDomHandler(mouseMoveHandler, MouseMoveEvent.getType());
+			mouseUpRegistration = RootPanel.get().addDomHandler(mouseUpHandler, MouseUpEvent.getType());
 		};
 		
-		final BlurHandler blurHandler = new BlurHandler()
-		{
-			
-			@Override
-			public void onBlur(BlurEvent event)
-			{
-				reinitialiseHandlers();
-				scrollEnCours = false;
-			}
+		final BlurHandler blurHandler = (BlurEvent event) -> {
+			reinitialiseHandlers();
+			scrollEnCours = false;
 		};
 		
-		final MouseOutHandler mouseOutHandler = new MouseOutHandler()
-		{
-			
-			@Override
-			public void onMouseOut(MouseOutEvent event)
-			{
-				reinitialiseHandlers();
-				scrollEnCours = false;
-			}
+		final MouseOutHandler mouseOutHandler = (MouseOutEvent event) -> {
+			reinitialiseHandlers();
+			scrollEnCours = false;
 		};
 		
 		vue.getCanvas().addMouseDownHandler(mouseDownHandler);
 		RootPanel.get().addDomHandler(blurHandler, BlurEvent.getType());
 		RootPanel.get().addDomHandler(mouseOutHandler, MouseOutEvent.getType());
 		
-		RootPanel.get().addDomHandler(new KeyDownHandler()
-		{
-			
-			@Override
-			public void onKeyDown(KeyDownEvent event)
+		RootPanel.get().addDomHandler((KeyDownEvent event) -> {
+			if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_PLUS)
 			{
-				if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_PLUS)
-				{
-					Constantes.PERIODE_TIC /= 1.20;
-					if (Constantes.PERIODE_TIC < 5)
-						Constantes.PERIODE_TIC = 5;
-				}
-				else if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_MINUS)
-				{
-					Constantes.PERIODE_TIC *= 1.20;
-				}
+				Constantes.PERIODE_TIC /= 1.20;
+				if (Constantes.PERIODE_TIC < 5)
+					Constantes.PERIODE_TIC = 5;
+			}
+			else if (event.getNativeKeyCode() == KeyCodes.KEY_NUM_MINUS)
+			{
+				Constantes.PERIODE_TIC *= 1.20;
 			}
 		}, KeyDownEvent.getType());
 		

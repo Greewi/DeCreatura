@@ -19,6 +19,8 @@ public class Container
 	public double height;
 	@JsProperty
 	private Container parent;
+	@JsProperty
+	public ObservablePoint scale;
 	
 	@JsConstructor
 	public Container()

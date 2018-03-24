@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.dom.client.CanvasElement;
+import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -60,14 +61,10 @@ public class Vue
 	{
 		this.monde = monde;
 		
-		largeurVue = Window.getClientWidth();
-		hauteurVue = Window.getClientHeight();
 		largeurFenetre = Window.getClientWidth();
 		hauteurFenetre = Window.getClientHeight();
-		if (largeurFenetre / (double) largeurVue > hauteurFenetre / (double) hauteurVue)
-			largeurFenetre = (int) (largeurVue * hauteurFenetre / (double) hauteurVue);
-		else
-			hauteurFenetre = (int) (hauteurVue * largeurFenetre / (double) largeurVue);
+		hauteurVue = 1000;
+		largeurVue = largeurFenetre * hauteurVue / hauteurFenetre;
 		
 		//Création du canvas
 		this.canvas = Canvas.createIfSupported();
@@ -84,6 +81,8 @@ public class Vue
 		options.backgroundColor = 0xc9ecff;
 		application = new Application(options);
 		stage = application.stage;
+		stage.scale.x = hauteurFenetre / (double) hauteurVue;
+		stage.scale.y = hauteurFenetre / (double) hauteurVue;
 		scene = new Scene(stage);
 		
 		//Observateurs
@@ -112,7 +111,7 @@ public class Vue
 				Loader.add("images/Granule.png");
 				Loader.add("images/Fruit.png");
 				Loader.add("images/Popo.png");
-
+				
 				Loader.add("images/ArbreFruitier.png");
 				Loader.add("images/ArbreFruitier-avant.png");
 				
@@ -135,6 +134,20 @@ public class Vue
 					}
 				});
 			}
+		});
+		
+		Window.addResizeHandler((ResizeEvent event) -> {
+			int xCentreActuel = getXVue() + largeurVue / 2;
+			largeurFenetre = event.getWidth();
+			hauteurFenetre = event.getHeight();
+			hauteurVue = 1000;
+			largeurVue = largeurFenetre * hauteurVue / hauteurFenetre;
+			canvas.setCoordinateSpaceWidth(largeurFenetre);
+			canvas.setCoordinateSpaceHeight(hauteurFenetre);
+			application.renderer.resize(largeurFenetre, hauteurFenetre);
+			stage.scale.x = hauteurFenetre / (double) hauteurVue;
+			stage.scale.y = hauteurFenetre / (double) hauteurVue;
+			setXVue(xCentreActuel - largeurVue / 2);
 		});
 	}
 	

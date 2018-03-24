@@ -9,6 +9,7 @@ import net.feerie.creatura.client.pixi.Container;
  */
 public class Scene
 {
+	private final Container conteneur;
 	private final Container coucheArrierePlan;
 	private final Container coucheElementsFond;
 	private final Container coucheElementsMilieu;
@@ -22,16 +23,28 @@ public class Scene
 	 */
 	public Scene(Container stage)
 	{
+		conteneur = new Container();
+		stage.addChild(conteneur);
 		coucheArrierePlan = new Container();
-		stage.addChild(coucheArrierePlan);
+		conteneur.addChild(coucheArrierePlan);
 		coucheElementsFond = new Container();
-		stage.addChild(coucheElementsFond);
+		conteneur.addChild(coucheElementsFond);
 		coucheElementsMilieu = new Container();
-		stage.addChild(coucheElementsMilieu);
+		conteneur.addChild(coucheElementsMilieu);
 		coucheElementsAvant = new Container();
-		stage.addChild(coucheElementsAvant);
+		conteneur.addChild(coucheElementsAvant);
 		coucheAvantPlan = new Container();
-		stage.addChild(coucheAvantPlan);
+		conteneur.addChild(coucheAvantPlan);
+	}
+	
+	/**
+	 * Renvoie le conteneur de la scène
+	 * 
+	 * @return le conteneur de la scène
+	 */
+	public Container getConteneur()
+	{
+		return conteneur;
 	}
 	
 	/**

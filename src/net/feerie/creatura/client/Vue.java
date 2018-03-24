@@ -141,7 +141,7 @@ public class Vue
 			largeurFenetre = event.getWidth();
 			hauteurFenetre = event.getHeight();
 			hauteurVue = 1000;
-			largeurVue = largeurFenetre * hauteurVue / hauteurFenetre;
+			largeurVue = (largeurFenetre * hauteurVue) / hauteurFenetre;
 			canvas.setCoordinateSpaceWidth(largeurFenetre);
 			canvas.setCoordinateSpaceHeight(hauteurFenetre);
 			application.renderer.resize(largeurFenetre, hauteurFenetre);
@@ -183,7 +183,7 @@ public class Vue
 		if (xVue > monde.getCarte().getLongueurTotale() - largeurVue)
 			xVue = monde.getCarte().getLongueurTotale() - largeurVue;
 		this.xVue = xVue;
-		stage.setPosition(-xVue, 0);
+		scene.getConteneur().setPosition(-xVue, 0);
 	}
 	
 	public Canvas getCanvas()

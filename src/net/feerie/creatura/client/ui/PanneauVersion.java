@@ -14,7 +14,7 @@ public class PanneauVersion
 	public PanneauVersion()
 	{
 		panneau = DivElement.as(Document.get().getElementById("infosVersion"));
-		List<PatchNote> patchnotes = Arrays.asList(version0_8(), version0_8b());
+		List<PatchNote> patchnotes = Arrays.asList(version0_8(), version0_8b(), version0_8c());
 		
 		StringBuilder html = new StringBuilder();
 		for (PatchNote patchnote : patchnotes)
@@ -90,6 +90,13 @@ public class PanneauVersion
 		PatchNote patchNote = new PatchNote("Patch note (v0.8b) : ");
 		patchNote.ajoute("Correction dimensions d'affichage");
 		patchNote.ajoute("Prise en compte du redimentionnement de la fenêtre");
+		return patchNote;
+	}
+	
+	private PatchNote version0_8c()
+	{
+		PatchNote patchNote = new PatchNote("Patch note (v0.8c) : ");
+		patchNote.ajoute("Correction position éléments");
 		return patchNote;
 	}
 	

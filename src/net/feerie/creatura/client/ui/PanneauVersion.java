@@ -109,6 +109,7 @@ public class PanneauVersion
 		patchNote.ajoute("Prise en charge des écrans tactiles");
 		patchNote.ajoute("Focus de la créature");
 		patchNote.ajoute("Gronder et encourager la créature est plus efficace");
+		patchNote.ajoute("Refacto gestion camera");		
 		return patchNote;
 	}
 	

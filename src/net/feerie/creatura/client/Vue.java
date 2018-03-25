@@ -23,7 +23,6 @@ import net.feerie.creatura.client.renduPixi.RenduMachines;
 import net.feerie.creatura.client.renduPixi.RenduNuisible;
 import net.feerie.creatura.client.renduPixi.RenduZone;
 import net.feerie.creatura.client.renduPixi.Scene;
-import net.feerie.creatura.shared.Console;
 import net.feerie.creatura.shared.entites.Creature;
 import net.feerie.creatura.shared.entites.CreatureNuisible;
 import net.feerie.creatura.shared.entites.Entite;

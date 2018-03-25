@@ -35,11 +35,12 @@ import net.feerie.creatura.shared.monde.Monde;
 public class ControleurVue
 {
 	private final Vue vue;
+	private final Camera camera;
 	private final Monde monde;
 	private final Creatura creatura;
-	private int xVueInitial;
-	private int xSourisInitial;
-	private int ySourisInitial;
+	private double xCameraInitial;
+	private double xSourisInitial;
+	private double ySourisInitial;
 	private boolean scrollEnCours;
 	private HandlerRegistration mouseMoveRegistration;
 	private HandlerRegistration mouseUpRegistration;
@@ -51,6 +52,7 @@ public class ControleurVue
 	{
 		this.creatura = creatura;
 		this.vue = creatura.getVue();
+		this.camera = this.vue.getCamera();
 		this.monde = creatura.getMonde();
 		initialiseEvenement();
 	}
@@ -84,47 +86,52 @@ public class ControleurVue
 	 */
 	public final void touchStart(int x, int y)
 	{
-		if(vue.estFocusSurEntite())
-			vue.suisEntite(null);
-		
 		xSourisInitial = x;
 		ySourisInitial = y;
 		scrollEnCours = false;
-		xVueInitial = vue.getXVue();
+		xCameraInitial = camera.getX();
 	}
 	
 	public final void touchMove(int x, int y)
 	{
 		if ((x - xSourisInitial) * (x - xSourisInitial) + (y - ySourisInitial) * (y - ySourisInitial) > 20 * 20) //20 pixels de tolérance au scroll
 			scrollEnCours = true;
-		vue.setXVue(xVueInitial - ((x - xSourisInitial) * vue.getLargeurVue()) / vue.getLargeurFenetre());
+		camera.setX(xCameraInitial - (camera.getXMonde(x) - camera.getXMonde(xSourisInitial)));
 	}
 	
 	public final void touchEnd(int x, int y)
 	{
 		if (!scrollEnCours)
 		{
-			x = vue.getXVue() + (x * vue.getLargeurVue()) / vue.getLargeurFenetre();
-			y = 1000 - (y * vue.getHauteurVue()) / vue.getHauteurFenetre();
+			int xMonde = camera.getXMonde(x);
+			int zMonde = camera.getZMonde(y);
 			
 			Entite entiteSelectionnee = null;
-			for (Entite entite : monde.getEntiteAPosition(new Position(x, y)))
+			for (Entite entite : monde.getEntiteAPosition(new Position(xMonde, zMonde)))
 			{
 				if (entiteSelectionnee == null || entite.getType().getPrioriteSelection() > entiteSelectionnee.getType().getPrioriteSelection())
 					entiteSelectionnee = entite;
 			}
 			
-			creatura.ouvreInterfaceGenerale();
-			vue.suisEntite(null);
-			
-			if (entiteSelectionnee != null)
+			if (entiteSelectionnee == null)
+			{
+				camera.focusEntite(null, 1.0);
+				creatura.ouvreInterfaceGenerale();
+			}
+			else
 			{
 				String outilAOuvrir = entiteSelectionnee.active(null);
 				Console.log("Outil à ouvrir : " + outilAOuvrir);
 				if (outilAOuvrir != null && outilAOuvrir.equalsIgnoreCase("Creature") && entiteSelectionnee.getType() == TypeEntite.CREATURE)
 				{
-					vue.suisEntite(entiteSelectionnee);
 					creatura.ouvreInterfaceCreature((Creature) entiteSelectionnee);
+					if (camera.getFocus() != entiteSelectionnee)
+						camera.focusEntite(entiteSelectionnee, 3.0);
+				}
+				else
+				{
+					camera.focusEntite(null, 1.0);
+					creatura.ouvreInterfaceGenerale();
 				}
 			}
 		}

@@ -108,8 +108,9 @@ public class Creatura implements EntryPoint
 		vue = new Vue(monde);
 		controleurVue = new ControleurVue(this);
 		ouvreInterfaceGenerale();
+		
 		//Placement de la camera
-		vue.setXVue(longeurOceanGauche);
+		vue.getCamera().setX(creature.position.x);
 		
 		//Boucle de rendu
 		BoucleRendu boucleRendu = new BoucleRendu();

@@ -14,7 +14,7 @@ public class PanneauVersion
 	public PanneauVersion()
 	{
 		panneau = DivElement.as(Document.get().getElementById("infosVersion"));
-		List<PatchNote> patchnotes = Arrays.asList(version0_8(), version0_8b(), version0_8c());
+		List<PatchNote> patchnotes = Arrays.asList(version0_9());
 		
 		StringBuilder html = new StringBuilder();
 		for (PatchNote patchnote : patchnotes)
@@ -76,6 +76,7 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
+	@SuppressWarnings("unused")
 	private PatchNote version0_8()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.8 - Avec PIXI.js) : ");
@@ -85,6 +86,7 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
+	@SuppressWarnings("unused")
 	private PatchNote version0_8b()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.8b) : ");
@@ -93,10 +95,20 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
+	@SuppressWarnings("unused")
 	private PatchNote version0_8c()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.8c) : ");
 		patchNote.ajoute("Correction position éléments");
+		return patchNote;
+	}
+	
+	private PatchNote version0_9()
+	{
+		PatchNote patchNote = new PatchNote("Patch note (v0.9) : ");
+		patchNote.ajoute("Prise en charge des écrans tactiles");
+		patchNote.ajoute("Focus de la créature");
+		patchNote.ajoute("Gronder et encourager la créature est plus efficace");
 		return patchNote;
 	}
 	

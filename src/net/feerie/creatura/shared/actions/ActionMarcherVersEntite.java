@@ -3,6 +3,7 @@ package net.feerie.creatura.shared.actions;
 import net.feerie.creatura.shared.commons.Position;
 import net.feerie.creatura.shared.entites.Entite;
 import net.feerie.creatura.shared.entites.EntiteCreature;
+import net.feerie.creatura.shared.entites.TypeEntite;
 
 /**
  * Se déplace vers une entité et s'arrête au bord
@@ -42,10 +43,13 @@ public class ActionMarcherVersEntite extends ActionMarcher
 	{
 		Position depart = getCreature().position;
 		Position destination = new Position(cible.position);
-		if (depart.x < destination.x)
-			destination.x -= cible.getTaille().l / 2;
-		else
-			destination.x += cible.getTaille().l / 2;
+		if (cible.getType() == TypeEntite.EAU)
+		{
+			if (depart.x < destination.x)
+				destination.x -= cible.getTaille().l / 2;
+			else
+				destination.x += cible.getTaille().l / 2;
+		}
 		setDestination(destination);
 	}
 	

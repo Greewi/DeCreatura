@@ -31,7 +31,6 @@ public class Creature extends EntiteCreature
 		this.sante = 100;
 		this.moodles = new EnumMap<>(TypeMoodle.class);
 		setIA(new IAEvolutive(this, 20));
-		getMoodle(TypeMoodle.ENNUI).active();
 	}
 	
 	@Override

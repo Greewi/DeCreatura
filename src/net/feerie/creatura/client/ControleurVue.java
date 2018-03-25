@@ -84,6 +84,9 @@ public class ControleurVue
 	 */
 	public final void touchStart(int x, int y)
 	{
+		if(vue.estFocusSurEntite())
+			vue.suisEntite(null);
+		
 		xSourisInitial = x;
 		ySourisInitial = y;
 		scrollEnCours = false;
@@ -112,13 +115,17 @@ public class ControleurVue
 			}
 			
 			creatura.ouvreInterfaceGenerale();
+			vue.suisEntite(null);
 			
 			if (entiteSelectionnee != null)
 			{
 				String outilAOuvrir = entiteSelectionnee.active(null);
 				Console.log("Outil à ouvrir : " + outilAOuvrir);
 				if (outilAOuvrir != null && outilAOuvrir.equalsIgnoreCase("Creature") && entiteSelectionnee.getType() == TypeEntite.CREATURE)
+				{
+					vue.suisEntite(entiteSelectionnee);
 					creatura.ouvreInterfaceCreature((Creature) entiteSelectionnee);
+				}
 			}
 		}
 	}

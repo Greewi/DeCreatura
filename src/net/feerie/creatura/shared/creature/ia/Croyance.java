@@ -149,6 +149,15 @@ public class Croyance
 	}
 	
 	/**
+	 * Renforce la croyance au maximum
+	 */
+	public void renforceAuMaximum()
+	{
+		poids = 100;
+		tempsDepuisDerniereActivation = 0;
+	}
+	
+	/**
 	 * Affaiblit la croyance
 	 */
 	public void affaiblit()
@@ -174,7 +183,7 @@ public class Croyance
 	 */
 	public int getPoids()
 	{
-		return poids*1000 / (1000 + (tempsDepuisDerniereActivation*1000) / 80);
+		return poids * 1000 / (1000 + (tempsDepuisDerniereActivation * 1000) / 80);
 	}
 	
 	private Croyance(TypeAction action, TypeEntite cibleAction, TypeCroyance type, TypeEntite resultatEntite, TypeMoodle resultatMoodle)

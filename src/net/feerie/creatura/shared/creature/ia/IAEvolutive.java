@@ -110,17 +110,16 @@ public class IAEvolutive implements IA
 		Croyance croyanceMal = getCroyance(TypeCroyance.MAL, derniereActionEffectuee, cibleDerniereActionEffectuee, null, null);
 		
 		if (croyanceBien != null)
-			croyanceBien.renforce();
+			croyanceBien.renforceAuMaximum();
 		else
 		{
 			if (croyanceMal != null)
-			{
-				croyanceMal.affaiblit();
-				if (croyanceMal.getPoids() < 20)
-					croyances.remove(croyanceMal);
-			}
+				croyances.remove(croyanceMal);
 			else
-				ajouteCroyance(Croyance.creeBien(derniereActionEffectuee, cibleDerniereActionEffectuee));
+			{
+				Croyance croyance = ajouteCroyance(Croyance.creeBien(derniereActionEffectuee, cibleDerniereActionEffectuee));
+				croyance.renforceAuMaximum();
+			}
 		}
 	}
 	
@@ -134,17 +133,16 @@ public class IAEvolutive implements IA
 		Croyance croyanceMal = getCroyance(TypeCroyance.MAL, derniereActionEffectuee, cibleDerniereActionEffectuee, null, null);
 		
 		if (croyanceMal != null)
-			croyanceMal.renforce();
+			croyanceMal.renforceAuMaximum();
 		else
 		{
 			if (croyanceBien != null)
-			{
-				croyanceBien.affaiblit();
-				if (croyanceBien.getPoids() < 20)
-					croyances.remove(croyanceBien);
-			}
+				croyances.remove(croyanceBien);
 			else
-				ajouteCroyance(Croyance.creeMal(derniereActionEffectuee, cibleDerniereActionEffectuee));
+			{
+				Croyance croyance = ajouteCroyance(Croyance.creeMal(derniereActionEffectuee, cibleDerniereActionEffectuee));
+				croyance.renforceAuMaximum();
+			}
 		}
 	}
 	
@@ -215,8 +213,9 @@ public class IAEvolutive implements IA
 	 * supprime la croyance la plus faible.
 	 * 
 	 * @param croyance la croyance à ajouter
+	 * @return la croyance ajoutée
 	 */
-	private void ajouteCroyance(Croyance croyance)
+	private Croyance ajouteCroyance(Croyance croyance)
 	{
 		// Si la créature a déjà trop de croyances, on supprime la croyance avec le plus petit poids 
 		if (croyances.size() >= nombreCroyanceMaximal)
@@ -232,6 +231,7 @@ public class IAEvolutive implements IA
 		}
 		// On ajoute la croyance
 		croyances.add(croyance);
+		return croyance;
 	}
 	
 	/**

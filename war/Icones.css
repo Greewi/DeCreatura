@@ -1,0 +1,159 @@
+.icone {
+	width: 5vh;
+	height: 5vh;
+	background-size: cover;
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+}
+
+/* Icones générales */
+.icone-bleu {
+	background-image: url('images/icones/FOND_BLEU.png');
+}
+
+.icone-vert {
+	background-image: url('images/icones/FOND_VERT.png');
+}
+
+.icone-jaune {
+	background-image: url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-rouge {
+	background-image: url('images/icones/FOND_ROUGE.png');
+}
+
+.icone-gris {
+	background-image: url('images/icones/FOND_GRIS.png');
+}
+
+.icone-PLUS {
+	background-image: url('images/icones/PLUS.png');
+}
+
+.icone-IMPLIQUE {
+	background-image: url('images/icones/IMPLIQUE.png');
+}
+
+/* Icones moodles */
+.icone-moodle-FAIM {
+	background-image: url('images/icones/MOODLE_FAIM.png'), url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-moodle-FAMINE {
+	background-image: url('images/icones/MOODLE_FAIM.png'), url('images/icones/FOND_ROUGE.png');
+}
+
+.icone-moodle-SOIF {
+	background-image: url('images/icones/MOODLE_SOIF.png'), url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-moodle-DESHYDRATATION {
+	background-image: url('images/icones/MOODLE_SOIF.png'), url('images/icones/FOND_ROUGE.png');
+}
+
+.icone-moodle-FATIGUE {
+	background-image: url('images/icones/MOODLE_FATIGUE.png'), url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-moodle-FROID {
+	background-image: url('images/icones/MOODLE_FROID.png'), url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-moodle-CHAUD {
+	background-image: url('images/icones/MOODLE_CHAUD.png'), url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-moodle-MOUILLE {
+	background-image: url('images/icones/MOODLE_MOUILLE.png'), url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-moodle-POPO {
+	background-image: url('images/icones/MOODLE_POPO.png'), url('images/icones/FOND_JAUNE.png');
+}
+
+.icone-moodle-POISON {
+	background-image: url('images/icones/MOODLE_POISON.png'), url('images/icones/FOND_ROUGE.png');
+}
+
+/* Icones actions */
+.icone-action-ACTIVER {
+	background-image: url('images/icones/ACTION_ACTIVER.png'), url('images/icones/FOND_GRIS.png');
+}
+
+.icone-action-BOIRE {
+	background-image: url('images/icones/ACTION_BOIRE.png'), url('images/icones/FOND_GRIS.png');
+}
+
+.icone-action-DORMIR {
+	background-image: url('images/icones/ACTION_DORMIR.png'), url('images/icones/FOND_GRIS.png');
+}
+
+.icone-action-FAIRE_POPO {
+	background-image: url('images/icones/ACTION_FAIRE_POPO.png'), url('images/icones/FOND_GRIS.png');
+}
+
+.icone-action-MANGER {
+	background-image: url('images/icones/ACTION_MANGER.png'), url('images/icones/FOND_GRIS.png');
+}
+
+.icone-action-SE_DEPLACER {
+	background-image: url('images/icones/ACTION_SE_DEPLACER.png'), url('images/icones/FOND_GRIS.png');
+}
+
+/* Icones entites */
+.icone-entite-ARBRE_FRUITIER {
+	background-image: url('images/icones/ENTITE_ARBRE_FRUITIER.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-CREATURE {
+	background-image: url('images/icones/ENTITE_CREATURE.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-DISTRIBUTEUR_GRANULE {
+	background-image: url('images/icones/ENTITE_DISTRIBUTEUR.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-NOURRITURE_FRUIT {
+	background-image: url('images/icones/ENTITE_FRUIT.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-NOURRITURE_GRANULE {
+	background-image: url('images/icones/ENTITE_GRANULE.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-LITIERE {
+	background-image: url('images/icones/ENTITE_LITIERE.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-CREATURE_NUISIBLE {
+	background-image: url('images/icones/ENTITE_NUISIBLE.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-POPO {
+	background-image: url('images/icones/ENTITE_POPO.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-entite-EAU {
+	background-image: url('images/icones/ACTION_BOIRE.png'), url('images/icones/FOND_BLEU.png');
+}
+
+/* Icones croyances */
+.icone-croyance-BIEN {
+	background-image: url('images/icones/CROYANCE_BIEN.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-croyance-MAL {
+	background-image: url('images/icones/CROYANCE_MAL.png'), url('images/icones/FOND_BLEU.png');
+}
+
+.icone-croyance-PLUS {
+	background-image: url('images/icones/CROYANCE_PLUS.png');
+	margin-left: -5vh;
+}
+
+.icone-croyance-MOINS {
+	background-image: url('images/icones/CROYANCE_MOINS.png');
+	margin-left: -5vh;
+}

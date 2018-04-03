@@ -30,8 +30,8 @@ public class RenduZone implements RenduElement
 		double[] vertices = new double[] { //
 				zone.getX(), 1000, //
 				zone.getX() + zone.getLongueur(), 1000, //		
-				zone.getX() + zone.getLongueur(), 1000 - zone.getHauteurSolDroite(), //
-				zone.getX(), 1000 - zone.getHauteurSolGauche(), //		
+				zone.getX() + zone.getLongueur(), 1000 - zone.getHauteurSolDroite() + 2, //
+				zone.getX(), 1000 - zone.getHauteurSolGauche() + 2, //		
 		};
 		double[] uvs = new double[vertices.length];
 		for (int i = 0; i < vertices.length; i++)

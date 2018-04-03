@@ -59,6 +59,7 @@ public class Vue
 		canvasElement = canvas.getCanvasElement();
 		
 		//Création de l'application PIXI
+		PIXI.Settings.RESOLUTION = (int) getPixelRatio();
 		Options options = new Options();
 		options.view = canvasElement;
 		options.width = Window.getClientWidth();
@@ -129,6 +130,10 @@ public class Vue
 			redimentionne(event.getWidth(), event.getHeight());
 		});
 	}
+	
+	public final native double getPixelRatio()/*-{
+		return window.devicePixelRatio;
+	}-*/;
 	
 	public Canvas getCanvas()
 	{

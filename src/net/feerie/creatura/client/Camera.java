@@ -188,7 +188,7 @@ public class Camera
 	
 	public void metAJour(long dateActuelle, double progressionTic)
 	{
-		final double taux = 0.1;
+		final double taux = 1;
 		
 		if (focus != null)
 		{

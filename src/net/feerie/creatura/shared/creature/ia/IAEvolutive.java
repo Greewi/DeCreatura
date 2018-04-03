@@ -144,6 +144,7 @@ public class IAEvolutive implements IA
 				croyance.renforceAuMaximum();
 			}
 		}
+		creature.setActionActuelle(null);
 	}
 	
 	@Override

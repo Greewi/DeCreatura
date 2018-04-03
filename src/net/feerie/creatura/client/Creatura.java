@@ -6,8 +6,10 @@ import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.EntryPoint;
 
 import net.feerie.creatura.client.pixi.Utils;
-import net.feerie.creatura.client.ui.PanneauInfosCreatureMentales;
-import net.feerie.creatura.client.ui.PanneauInfosCreaturePhysique;
+import net.feerie.creatura.client.ui.PanneauInfosCreatureAction;
+import net.feerie.creatura.client.ui.PanneauInfosCreatureCroyances;
+import net.feerie.creatura.client.ui.PanneauInfosCreatureMoodles;
+import net.feerie.creatura.client.ui.PanneauInfosCreatureSante;
 import net.feerie.creatura.client.ui.PanneauInfosDebug;
 import net.feerie.creatura.client.ui.PanneauToolbarCreature;
 import net.feerie.creatura.client.ui.PanneauVersion;
@@ -41,8 +43,10 @@ public class Creatura implements EntryPoint
 	//UI
 	private PanneauInfosDebug panneauInfosDebug;
 	private PanneauVersion panneauVersion;
-	private PanneauInfosCreaturePhysique panneauInfosCreaturePhysique;
-	private PanneauInfosCreatureMentales panneauInfosCreatureMentales;
+	private PanneauInfosCreatureMoodles panneauInfosCreatureMoodles;
+	private PanneauInfosCreatureSante panneauInfosCreatureSante;
+	private PanneauInfosCreatureAction panneauInfosCreatureAction;
+	private PanneauInfosCreatureCroyances panneauInfosCreatureCroyances;
 	private PanneauToolbarCreature panneauToolbarCreature;
 	
 	public void onModuleLoad()
@@ -102,8 +106,10 @@ public class Creatura implements EntryPoint
 		//Initialisation de l'UI
 		panneauInfosDebug = new PanneauInfosDebug();
 		panneauVersion = new PanneauVersion();
-		panneauInfosCreaturePhysique = new PanneauInfosCreaturePhysique();
-		panneauInfosCreatureMentales = new PanneauInfosCreatureMentales();
+		panneauInfosCreatureMoodles = new PanneauInfosCreatureMoodles();
+		panneauInfosCreatureSante = new PanneauInfosCreatureSante();
+		panneauInfosCreatureAction = new PanneauInfosCreatureAction();
+		panneauInfosCreatureCroyances = new PanneauInfosCreatureCroyances();
 		panneauToolbarCreature = new PanneauToolbarCreature();
 		vue = new Vue(monde);
 		controleurVue = new ControleurVue(this);
@@ -129,8 +135,10 @@ public class Creatura implements EntryPoint
 	
 	public void ouvreInterfaceGenerale()
 	{
-		panneauInfosCreaturePhysique.ferme();
-		panneauInfosCreatureMentales.ferme();
+		panneauInfosCreatureMoodles.ferme();
+		panneauInfosCreatureSante.ferme();
+		panneauInfosCreatureAction.ferme();
+		panneauInfosCreatureCroyances.ferme();
 		panneauToolbarCreature.ferme();
 		panneauInfosDebug.ouvre(creature);
 		panneauVersion.ouvre();
@@ -140,8 +148,10 @@ public class Creatura implements EntryPoint
 	{
 		if (creature.estVivante())
 		{
-			panneauInfosCreaturePhysique.ouvre(creature);
-			panneauInfosCreatureMentales.ouvre(creature);
+			panneauInfosCreatureMoodles.ouvre(creature);
+			panneauInfosCreatureSante.ouvre(creature);
+			panneauInfosCreatureAction.ouvre(creature);
+			panneauInfosCreatureCroyances.ouvre(creature);
 			panneauToolbarCreature.ouvre(creature);
 			panneauInfosDebug.ferme();
 			panneauVersion.ferme();

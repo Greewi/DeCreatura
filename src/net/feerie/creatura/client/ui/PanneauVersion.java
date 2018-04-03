@@ -1,7 +1,6 @@
 package net.feerie.creatura.client.ui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.dom.client.DivElement;
@@ -14,7 +13,16 @@ public class PanneauVersion
 	public PanneauVersion()
 	{
 		panneau = DivElement.as(Document.get().getElementById("infosVersion"));
-		List<PatchNote> patchnotes = Arrays.asList(version0_9());
+		List<PatchNote> patchnotes = new ArrayList<>();
+		patchnotes.add(version0_10());
+		patchnotes.add(version0_9());
+		patchnotes.add(version0_8c());
+		patchnotes.add(version0_8b());
+		patchnotes.add(version0_8());
+		patchnotes.add(version0_7b());
+		patchnotes.add(version0_7());
+		patchnotes.add(version0_6());
+		patchnotes.add(version0_5());
 		
 		StringBuilder html = new StringBuilder();
 		for (PatchNote patchnote : patchnotes)
@@ -33,7 +41,6 @@ public class PanneauVersion
 		panneau.removeClassName("infosVersion--ouvert");
 	}
 	
-	@SuppressWarnings("unused")
 	private PatchNote version0_5()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.5) : ");
@@ -44,7 +51,6 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
-	@SuppressWarnings("unused")
 	private PatchNote version0_6()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.6) : ");
@@ -53,7 +59,6 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
-	@SuppressWarnings("unused")
 	private PatchNote version0_7()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.7) : ");
@@ -65,7 +70,6 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
-	@SuppressWarnings("unused")
 	private PatchNote version0_7b()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.7b) : ");
@@ -76,7 +80,6 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
-	@SuppressWarnings("unused")
 	private PatchNote version0_8()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.8 - Avec PIXI.js) : ");
@@ -86,7 +89,6 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
-	@SuppressWarnings("unused")
 	private PatchNote version0_8b()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.8b) : ");
@@ -95,7 +97,6 @@ public class PanneauVersion
 		return patchNote;
 	}
 	
-	@SuppressWarnings("unused")
 	private PatchNote version0_8c()
 	{
 		PatchNote patchNote = new PatchNote("Patch note (v0.8c) : ");
@@ -109,7 +110,16 @@ public class PanneauVersion
 		patchNote.ajoute("Prise en charge des écrans tactiles");
 		patchNote.ajoute("Focus de la créature");
 		patchNote.ajoute("Gronder et encourager la créature est plus efficace");
-		patchNote.ajoute("Refacto gestion camera");		
+		patchNote.ajoute("Refacto gestion camera");
+		return patchNote;
+	}
+	
+	private PatchNote version0_10()
+	{
+		PatchNote patchNote = new PatchNote("Patch note (v0.10) : ");
+		patchNote.ajoute("Refonte de l'interface des créatures");
+		patchNote.ajoute("Pleins de \"jolies\" icones&nbsp;!");
+		patchNote.ajoute("Gronder la créature l'interrompt");
 		return patchNote;
 	}
 	

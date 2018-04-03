@@ -4,6 +4,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <link type="text/css" rel="stylesheet" href="Creatura.css">
+    <link type="text/css" rel="stylesheet" href="Icones.css">
     <title>Creatura</title>
     <script type="text/javascript" src="creatura/creatura.nocache.js"></script>
   	<meta name="viewport" content="width=device-width, user-scalable=no">
@@ -21,25 +22,27 @@
 	<div id="canvas"></div>
 	<div id="infosDebug"></div>
 	<div id="infosVersion"></div>
-	<div id="infosCreaturePhysique">
-		<p class="infosCreature-label">Organes :</p>
-		<div id="organeCreature" class="infosCreature-infos"></div>
-		<p class="infosCreature-label">Moodle :</p>
-		<div id="moodleCreature" class="infosCreature-infos"></div>
-		<p class="infosCreature-label">Santé :</p>
-		<div id="santeCreature" class="infosCreature-infos"></div>
+	
+	<!-- Interface créature -->
+	<div id="infosCreatureMoodle">
+		<div id="moodleCreature" class="infosCreature-infosMoodle"></div>
 	</div>
-	<div id="infosCreatureMentales">
-		<p class="infosCreature-label">Action :</p>
-		<div id="actionCreature" class="infosCreature-infos"></div>
-		<p class="infosCreature-label">Croyances :</p>
-		<div id="croyancesCreature" class="infosCreature-infos"></div>
+	<div id="infosCreatureSante">
+		<div id="santeCreature" class="infosCreature-infosSante"></div>
+	</div>
+	<div id="infosCreatureAction">
+		<div id="actionCreatureAction" class="icone icone-gris"></div>
+		<div class="icone icone-PLUS"></div>
+		<div id="actionCreatureCible" class="icone icone-gris"></div>
+	</div>
+	<div id="infosCreatureCroyances">
+		<div id="croyancesCreature" class="infosCreature-infosCroyance"></div>
 	</div>
 	<div id="toolbarCreature">
-		<button id="boutonSecherCreature" class="toolbarCreature-bouton">Secher la creature</button>
-		<button id="boutonMouillerCreature" class="toolbarCreature-bouton">Mouiller la creature</button>
-		<button id="boutonEncouragerCreature" class="toolbarCreature-bouton">Encourager la creature</button>
-		<button id="boutonGronderCreature" class="toolbarCreature-bouton">Gronder la creature</button>
+		<button id="boutonSecherCreature" class="toolbarCreature-bouton"><div class="icone icone-moodle-MOUILLE"></div><div class="icone icone-croyance-MOINS"></div></button>
+		<button id="boutonMouillerCreature" class="toolbarCreature-bouton"><div class="icone icone-moodle-MOUILLE"></div><div class="icone icone-croyance-PLUS"></div></button>
+		<button id="boutonEncouragerCreature" class="toolbarCreature-bouton"><div class="icone icone-croyance-BIEN"></div></button>
+		<button id="boutonGronderCreature" class="toolbarCreature-bouton"><div class="icone icone-croyance-MAL"></div></button>
 	</div>
 	<script type="text/javascript" src="lib/pixi.js"></script>
   </body>

@@ -11,7 +11,8 @@ body {
 
 #canvas canvas {
 	position: absolute;
-	bottom: 0;
+	width: 100%;
+	height: 100%;
 }
 
 /**
@@ -29,6 +30,7 @@ body {
 	transform: translate(-240px, 0);
 	transition: transform;
 	transition-duration: 500ms;
+	pointer-events: none;
 }
 
 #infosDebug.infosDebug--ouvert {
@@ -40,6 +42,8 @@ body {
  */
 #infosVersion {
 	width: 200px;
+	height: 200px;
+	overflow-y: auto;
 	position: absolute;
 	top: 0px;
 	right: 0px;
@@ -58,53 +62,113 @@ body {
 }
 
 /**
- * Fenêtre d'information physique d'une créature
+ * Panneau des moodles d'une créature
  */
-#infosCreaturePhysique {
+#infosCreatureMoodle {
 	position: absolute;
-	bottom: 0px;
-	padding: 10px 20px 20px 10px;
-	left: 0px;
-	width: 200px;
-	background-color: rgba(255, 255, 255, 0.8);
-	border-top-right-radius: 10px;
+	width: 5vh;
+	top: 30vh;
+	bottom: 30vh;
+	right: 50vw;
+	margin-right: 15vh;
 	will-change: transform;
-	transform: translate(-240px, 0);
+	transform: translate(-50vw, 0);
 	transition: transform;
 	transition-duration: 500ms;
+	display: grid;
+	grid-template-rows: auto;
+	pointer-events: none;
 }
 
-#infosCreaturePhysique.infosCreaturePhysique--ouvert {
+#infosCreatureMoodle.infosCreatureMoodle--ouvert {
+	transform: translate(0, 0);
+}
+
+.infosCreature-infosMoodle {
+	grid-column: 1;
+	grid-row: 1;
+	align-self: center;
+}
+
+/**
+ * Panneau de santé d'une créature
+ */
+#infosCreatureSante {
+	position: absolute;
+	top: 62vh;
+	left: 50vw;
+	margin-left: -12.5vh;
+	width: 25vh;
+	height: 5vh;
+	will-change: transform;
+	transform: translate(0, 50vh);
+	transition: transform;
+	transition-duration: 500ms;
+	pointer-events: none;
+	background-image: url('images/icones/COEUR_VIDE.png');
+	background-size: contain;
+}
+
+#infosCreatureSante.infosCreatureSante--ouvert {
+	transform: translate(0, 0);
+}
+
+.infosCreature-infosSante {
+	width: 25vh;
+	height: 5vh;
+	background-image: url('images/icones/COEUR.png');
+	background-size: contain;
+}
+
+/**
+ * Panneau de l'action considérée par une créature
+ */
+#infosCreatureAction {
+	position: absolute;
+	top: 30vh;
+	left: 50vw;
+	margin-left: -7.5vh;
+	width: 15vh;
+	height: 5vh;
+	will-change: transform;
+	transform: translate(0, -50vh);
+	transition: transform;
+	transition-duration: 500ms;
+	font-size: 0;
+	pointer-events: none;
+}
+
+#infosCreatureAction.infosCreatureAction--ouvert {
 	transform: translate(0, 0);
 }
 
 /**
- * Fenêtre d'information mentales d'une créature
+ * Panneau des croyances de la créature
  */
-#infosCreatureMentales {
+#infosCreatureCroyances {
 	position: absolute;
-	bottom: 0px;
-	padding: 10px 10px 20px 20px;
-	right: 0px;
-	width: 250px;
-	background-color: rgba(255, 255, 255, 0.8);
-	border-top-left-radius: 10px;
+	top: 0vh;
+	right: 5vw;
+	width: 25vh;
+	height: 100vh;
 	will-change: transform;
-	transform: translate(290px, 0);
+	transform: translate(50vw, 0) scale(0.5, 0.5);
+	transform-origin: right;
 	transition: transform;
 	transition-duration: 500ms;
+	font-size: 0;
+	display: grid;
+	pointer-events: none;
 }
 
-#infosCreatureMentales.infosCreatureMentales--ouvert {
-	transform: translate(0, 0);
+#infosCreatureCroyances.infosCreatureCroyances--ouvert {
+	transform: translate(0, 0) scale(0.6, 0.6);
 }
 
-.infosCreature-label {
-	font-weight: bold;
-}
-
-.infosCreature-infos {
-	padding-left: 20px;
+.infosCreature-infosCroyance {
+	width: 25vh;
+	font-size: 0;
+	align-self: center;
 }
 
 /**
@@ -112,18 +176,22 @@ body {
  */
 #toolbarCreature {
 	position: absolute;
-	bottom: 0px;
-	left: 240px;
-	padding: 10px 10px 20px 10px;
-	height: 40px;
-	width: 400px;
+	bottom: 10px;
+	left: 50vw;
+	margin-left: -22vh;
+	padding: 2vh 2vh 2vh 2vh;
+	height: 7vh;
+	width: 40vh;
 	background-color: rgba(255, 255, 255, 0.8);
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
+	border-radius: 3vh;
 	will-change: transform;
-	transform: translate(0, 70px);
+	transform: translate(0, 50vh);
 	transition: transform;
 	transition-duration: 500ms;
+	display: grid;
+	grid-template-columns: auto auto auto;
+	grid-column-gap: 2vh;
+	grid-auto-flow: row;
 }
 
 #toolbarCreature.toolbarCreature--ouvert {
@@ -136,10 +204,11 @@ body {
 	border-radius: 5px;
 	background: #000000;
 	color: #FFFFFF;
-	height: 50px;
+	height: 7vh;
 	padding: 5px;
 }
 
 .toolbarCreature-bouton.toolbarCreature-bouton--actif {
-	display: inline-block;
+	display: block;
+	align-self: center;
 }
